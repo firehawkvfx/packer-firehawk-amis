@@ -45,35 +45,19 @@ variable "vault_version" {
   default = "1.5.5"
 }
 
-variable "vpc_id" {
-  type = string
-}
+# variable "consul_cluster_tag_key" {
+#   type = string
+# }
 
-variable "security_group_id" {
-  type = string
-}
-
-variable "subnet_id" {
-  type = string
-}
-
-variable "consul_cluster_tag_key" {
-  type = string
-}
-
-variable "consul_cluster_tag_value" {
-  type = string
-}
+# variable "consul_cluster_tag_value" {
+#   type = string
+# }
 
 variable "openvpn_server_base_ami" {
   type = string
 }
 
 variable "amazon_linux_2_ami" {
-  type = string
-}
-
-variable "ubuntu16_ami" {
   type = string
 }
 
@@ -89,9 +73,6 @@ variable "centos7_ami" {
 #   type = string
 # }
 
-variable "aws_internal_domain" {
-  type = string
-}
 
 variable "test_consul" { # If a consul cluster is running, attempt to join the cluster. This can be useful for debugging, but will prevent inital builds if you have no infrastructure running yet.  This test may not also work unless the appropriate role is assigned.
   type    = bool
