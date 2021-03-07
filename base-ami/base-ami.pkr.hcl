@@ -125,8 +125,6 @@ build {
 ### Ensure openvpnas user is owner of their home dir to firx Open VPN AMI bug
 
   provisioner "shell" {
-    inline_shebang = "/bin/bash -e"
-    # only           = ["amazon-ebs.openvpn-server-base-ami"]
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline         = [
       "export SHOWCOMMANDS=true; set -x",
@@ -141,8 +139,6 @@ build {
 ### Ensure Dialog is installed to fix open vpn image issues ###
 
   provisioner "shell" {
-    inline_shebang = "/bin/bash -e"
-    # only           = ["amazon-ebs.openvpn-server-base-ami"]
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     valid_exit_codes = [0,1] # ignore exit code.  this requirement is a bug in the open vpn ami.
     inline         = [
