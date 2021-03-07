@@ -14,8 +14,8 @@ locals {
 }
 
 source "amazon-ebs" "amazon-linux-2-ami" {
-  ami_description = "An Amazon Linux 2 AMI that will accept connections from hosts with TLS Certs."
-  ami_name        = "firehawk-bastionbase-amazon-linux-2-${local.timestamp}-{{uuid}}"
+  ami_description = "An Amazon Linux 2 AMI with basic updates."
+  ami_name        = "firehawk-base-amazon-linux-2-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
   source_ami_filter {
@@ -33,8 +33,8 @@ source "amazon-ebs" "amazon-linux-2-ami" {
 }
 
 source "amazon-ebs" "centos7-ami" {
-  ami_description = "A Cent OS 7 AMI that will accept connections from hosts with TLS Certs."
-  ami_name        = "firehawk-bastionbase-centos7-${local.timestamp}-{{uuid}}"
+  ami_description = "A Cent OS 7 AMI with basic updates."
+  ami_name        = "firehawk-base-centos7-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
   source_ami_filter {
@@ -50,8 +50,8 @@ source "amazon-ebs" "centos7-ami" {
 }
 
 source "amazon-ebs" "ubuntu18-ami" {
-  ami_description = "An Ubuntu 18.04 AMI that will accept connections from hosts with TLS Certs."
-  ami_name        = "firehawk-bastionbase-ubuntu18-${local.timestamp}-{{uuid}}"
+  ami_description = "An Ubuntu 18.04 AMI with basic updates."
+  ami_name        = "firehawk-base-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
   source_ami_filter {
@@ -69,7 +69,7 @@ source "amazon-ebs" "ubuntu18-ami" {
 }
 
 source "amazon-ebs" "openvpn-server-base-ami" {
-  ami_description = "An Open VPN Access Server AMI configured for Firehawk"
+  ami_description = "An Open VPN Access Server AMI with basic updates"
   ami_name        = "firehawk-openvpn-server-base-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
@@ -160,8 +160,7 @@ build {
     inline         = [
       "sudo apt-get -y update",
       "sudo apt-get install dpkg -y",
-      # "sudo apt-get -y upgrade",
-      "sudo apt-get --yes --force-yes -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade",
+      "sudo apt-get --yes --force-yes -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade", # These args are required to fix a dpkg bug in the openvpn ami.
 
     ]
     only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.openvpn-server-base-ami"]
