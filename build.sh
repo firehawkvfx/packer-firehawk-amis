@@ -18,7 +18,7 @@ if [[ -f "$manifest" ]]; then
     export PKR_VAR_amazon_linux_2_ami="$(jq -r '.builds[] | select(.name == "amazon-linux-2-ami") | .artifact_id' "$manifest" | tail -1 | cut -d ":" -f2)"
     echo "Found amazon_linux_2_ami in manifest: PKR_VAR_amazon_linux_2_ami=$PKR_VAR_amazon_linux_2_ami"
 
-    export PKR_VAR_openvpn_server_base_ami="$(jq -r '.builds[] | select(.name == "openvpn-server-base-ami") | .artifact_id' "$manifest" | tail -1 | cut -d ":" -f2)"
+    export PKR_VAR_openvpn_server_base_ami="$(jq -r '.builds[] | select(.name == "base-openvpn-server-ami") | .artifact_id' "$manifest" | tail -1 | cut -d ":" -f2)"
     echo "Found openvpn_server_base_ami in manifest: PKR_VAR_openvpn_server_base_ami=$PKR_VAR_openvpn_server_base_ami"
 else
     echo "Manifest for base ami does not exist.  Build the base ami and try again."

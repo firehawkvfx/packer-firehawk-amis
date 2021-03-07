@@ -68,9 +68,9 @@ source "amazon-ebs" "ubuntu18-ami" {
   ssh_username = "ubuntu"
 }
 
-source "amazon-ebs" "openvpn-server-base-ami" {
+source "amazon-ebs" "base-openvpn-server-ami" {
   ami_description = "An Open VPN Access Server AMI with basic updates"
-  ami_name        = "firehawk-openvpn-server-base-${local.timestamp}-{{uuid}}"
+  ami_name        = "firehawk-base-openvpn-server-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
   user_data = <<EOF
@@ -94,7 +94,7 @@ build {
     "source.amazon-ebs.ubuntu18-ami",
     "source.amazon-ebs.amazon-linux-2-ami",
     "source.amazon-ebs.centos7-ami",
-    "source.amazon-ebs.openvpn-server-base-ami",
+    "source.amazon-ebs.base-openvpn-server-ami",
     ]
 
 ### Wait for cloud init ###
@@ -122,7 +122,7 @@ build {
       ]
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline_shebang = "/bin/bash -e"
-    only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.openvpn-server-base-ami"]
+    only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.base-openvpn-server-ami"]
   }
 
 ### Ensure openvpnas user is owner of their home dir to firx Open VPN AMI bug
@@ -136,7 +136,7 @@ build {
       "echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections; echo \"exit $?\"",
     ]
     inline_shebang = "/bin/bash -e"
-    only = ["amazon-ebs.openvpn-server-base-ami"]
+    only = ["amazon-ebs.base-openvpn-server-ami"]
   }
 
 ### Ensure Dialog is installed to fix open vpn image issues ###
@@ -149,7 +149,7 @@ build {
       "sudo apt-get install -y -q; echo \"exit $?\""
     ]
     inline_shebang = "/bin/bash -e"
-    only = ["amazon-ebs.openvpn-server-base-ami"]
+    only = ["amazon-ebs.base-openvpn-server-ami"]
   }
 
 ### Update ###
@@ -163,7 +163,7 @@ build {
       "sudo apt-get --yes --force-yes -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade", # These args are required to fix a dpkg bug in the openvpn ami.
 
     ]
-    only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.openvpn-server-base-ami"]
+    only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.base-openvpn-server-ami"]
   }
   provisioner "shell" {
     inline_shebang = "/bin/bash -e"
@@ -213,7 +213,7 @@ build {
       "sudo apt-get install -y git",
       "echo '...Finished bootstrapping'"
     ]
-    only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.openvpn-server-base-ami"]
+    only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.base-openvpn-server-ami"]
   }
   provisioner "shell" {
     inline = [
