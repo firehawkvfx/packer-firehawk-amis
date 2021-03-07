@@ -53,12 +53,12 @@ variable "vault_module_version" { # The hashicorp github module version to clone
 
 variable "consul_cluster_tag_key" {
   type = string
-  default = null
+  default = ""
 }
 
 variable "consul_cluster_tag_value" {
   type = string
-  default = null
+  default = ""
 }
 
 variable "openvpn_server_base_ami" {
