@@ -1,6 +1,8 @@
-# The base AMI's purpose is to produce an image with apt-get/yum updates 
-# Updates can be unstable on a daily basis so the base ami once successful can be reused for further ami configuration also improving build time.
-# Avoiding updates altogether is not ideal as some packages and executables depend on updates to function.
+# The base AMI's primary purpose is to produce an anchor point with apt-get/yum updates, and apply bug fixes to incoming AMI's.
+# Updates can be unstable on a daily basis so the base ami once successful can be reused, improving build time.
+# Avoiding updates altogether is not good for security and some packages and executables depend on updates to function, so the update process is run initially here.
+# Some AMI's may require fixes to resolves bugs which are also performed here (Centos 7, Open VPN).
+# We also install any packages that will not likely require frequent modification (Python, Git).  If they do require significant/frequent/unreliable modification they do not belong here.
 
 variable "aws_region" {
   type = string
@@ -156,8 +158,10 @@ build {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline         = [
       "sudo apt-get -y update",
+      "sudo apt-get install dpkg -y",
       "sudo apt-get -y upgrade",
-      "sudo apt-get install dpkg -y"
+      # "sudo apt-get --yes --force-yes -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade",
+
     ]
     only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.openvpn-server-base-ami"]
   }
