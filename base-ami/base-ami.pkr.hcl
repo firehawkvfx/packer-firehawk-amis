@@ -45,6 +45,7 @@ source "amazon-ebs" "centos7-ami" {
     most_recent = true
     owners      = ["679593333241"]
   }
+  user_data_file = "${local.template_dir}/cloud-init.yaml" # This is a fix for some instance types with Centos 7 and mounts causing errors.
   ssh_username = "centos"
 }
 

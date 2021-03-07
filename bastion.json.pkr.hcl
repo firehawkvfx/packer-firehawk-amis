@@ -154,8 +154,6 @@ source "amazon-ebs" "centos7-ami" {
   # }
   ssh_username = "centos"
 
-  user_data_file = "${local.template_dir}/cloud-init.yaml"
-
   vpc_id               = "${var.vpc_id}"
   subnet_id            = "${var.subnet_id}"
   security_group_id    = "${var.security_group_id}"
