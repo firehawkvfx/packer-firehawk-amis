@@ -180,9 +180,9 @@ build {
 
   ### Public cert block to verify other consul agents ###
 
-  provisioner "shell" {
-    inline = ["mkdir -p /tmp/terraform-aws-vault/modules"]
-  }
+  # provisioner "shell" {
+  #   inline = ["mkdir -p /tmp/terraform-aws-vault/modules"]
+  # }
   # provisioner "file" {
   #   destination = "/tmp/terraform-aws-vault/modules"
   #   source      = "${local.template_dir}/../../../terraform-aws-vault/modules/"

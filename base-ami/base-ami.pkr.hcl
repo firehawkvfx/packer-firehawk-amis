@@ -223,6 +223,15 @@ build {
     ]
     only = ["amazon-ebs.amazon-linux-2-ami", "amazon-ebs.centos7-ami"]
   }
+
+### Cleanup
+  provisioner "shell" {
+    inline_shebang = "/bin/bash -e"
+    environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
+    inline         = [
+      "rm -fr /tmp/*"
+    ]
+  }
   
   post-processor "manifest" {
       output = "${local.template_dir}/manifest.json"
