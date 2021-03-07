@@ -283,37 +283,37 @@ build {
     only           = ["amazon-ebs.ubuntu18-ami"]
   }
   # Install latest git for centos and amazon linux
-  provisioner "shell" {
-    inline = [
-      "sudo yum update -y",
-      "sleep 5",
-      "export CENTOS_MAIN_VERSION=$(cat /etc/centos-release | awk -F 'release[ ]*' '{print $2}' | awk -F '.' '{print $1}')",
-      "echo $CENTOS_MAIN_VERSION", # output should be "6" or "7"
-      "sudo yum install -y https://repo.ius.io/ius-release-el$${CENTOS_MAIN_VERSION}.rpm", # Install IUS Repo and Epel-Release:
-      "sudo yum install -y epel-release",
-      "sudo yum erase -y git*",       # re-install git:
-      "sudo yum install -y git-core",
-      "git --version"
-    ]
-    only = ["amazon-ebs.centos7-ami"]
-  }
-  provisioner "shell" {
-    inline = [
-      "sudo yum update -y",
-      "sleep 5",
-      "sudo yum install -y git",
-      "git --version"
-    ]
-    only = ["amazon-ebs.amazon-linux-2-ami"]
-  }
-  provisioner "shell" {
-    inline = [
-      "sudo yum install -y python python3.7 python3-pip",
-      "python3 -m pip install --user --upgrade pip",
-      "python3 -m pip install --user boto3"
-    ]
-    only = ["amazon-ebs.amazon-linux-2-ami", "amazon-ebs.centos7-ami"]
-  }
+  # provisioner "shell" {
+  #   inline = [
+  #     "sudo yum update -y",
+  #     "sleep 5",
+  #     "export CENTOS_MAIN_VERSION=$(cat /etc/centos-release | awk -F 'release[ ]*' '{print $2}' | awk -F '.' '{print $1}')",
+  #     "echo $CENTOS_MAIN_VERSION", # output should be "6" or "7"
+  #     "sudo yum install -y https://repo.ius.io/ius-release-el$${CENTOS_MAIN_VERSION}.rpm", # Install IUS Repo and Epel-Release:
+  #     "sudo yum install -y epel-release",
+  #     "sudo yum erase -y git*",       # re-install git:
+  #     "sudo yum install -y git-core",
+  #     "git --version"
+  #   ]
+  #   only = ["amazon-ebs.centos7-ami"]
+  # }
+  # provisioner "shell" {
+  #   inline = [
+  #     "sudo yum update -y",
+  #     "sleep 5",
+  #     "sudo yum install -y git",
+  #     "git --version"
+  #   ]
+  #   only = ["amazon-ebs.amazon-linux-2-ami"]
+  # }
+  # provisioner "shell" {
+  #   inline = [
+  #     "sudo yum install -y python python3.7 python3-pip",
+  #     "python3 -m pip install --user --upgrade pip",
+  #     "python3 -m pip install --user boto3"
+  #   ]
+  #   only = ["amazon-ebs.amazon-linux-2-ami", "amazon-ebs.centos7-ami"]
+  # }
   ### This block will install Vault and Consul Agent
   provisioner "shell" { # Vault client probably wont be installed on bastions in future, but most hosts that will authenticate will require it.
     inline = [

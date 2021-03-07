@@ -6,23 +6,6 @@ variable "aws_region" {
   type = string
   default = null
 }
-
-variable "vpc_id" {
-  type = string
-}
-
-variable "security_group_id" {
-  type = string
-}
-
-variable "subnet_id" {
-  type = string
-}
-
-variable "provisioner_iam_profile_name" {
-  type = string
-}
-
 locals {
   timestamp    = regex_replace(timestamp(), "[- TZ:]", "")
   template_dir = path.root
@@ -45,14 +28,7 @@ source "amazon-ebs" "amazon-linux-2-ami" {
     owners      = ["amazon"]
   }
   ssh_username = "ec2-user"
-
-  vpc_id               = "${var.vpc_id}"
-  subnet_id            = "${var.subnet_id}"
-  security_group_id    = "${var.security_group_id}"
-  iam_instance_profile = var.provisioner_iam_profile_name
 }
-
-#could not parse template for following block: "template: generated:4: function \"clean_resource_name\" not defined"
 
 source "amazon-ebs" "centos7-ami" {
   ami_description = "A Cent OS 7 AMI that will accept connections from hosts with TLS Certs."
@@ -68,40 +44,7 @@ source "amazon-ebs" "centos7-ami" {
     owners      = ["679593333241"]
   }
   ssh_username = "centos"
-
-  vpc_id               = "${var.vpc_id}"
-  subnet_id            = "${var.subnet_id}"
-  security_group_id    = "${var.security_group_id}"
-  iam_instance_profile = var.provisioner_iam_profile_name
 }
-
-#could not parse template for following block: "template: generated:4: function \"clean_resource_name\" not defined"
-
-source "amazon-ebs" "ubuntu16-ami" {
-  ami_description = "An Ubuntu 16.04 AMI that will accept connections from hosts with TLS Certs."
-  ami_name        = "firehawk-bastionbase-ubuntu16-${local.timestamp}-{{uuid}}"
-  instance_type   = "t2.micro"
-  region          = "${var.aws_region}"
-  source_ami_filter {
-    filters = {
-      architecture                       = "x86_64"
-      "block-device-mapping.volume-type" = "gp2"
-      name                               = "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"
-      root-device-type                   = "ebs"
-      virtualization-type                = "hvm"
-    }
-    most_recent = true
-    owners      = ["099720109477"]
-  }
-  ssh_username = "ubuntu"
-
-  vpc_id               = "${var.vpc_id}"
-  subnet_id            = "${var.subnet_id}"
-  security_group_id    = "${var.security_group_id}"
-  iam_instance_profile = var.provisioner_iam_profile_name
-}
-
-#could not parse template for following block: "template: generated:4: function \"clean_resource_name\" not defined"
 
 source "amazon-ebs" "ubuntu18-ami" {
   ami_description = "An Ubuntu 18.04 AMI that will accept connections from hosts with TLS Certs."
@@ -120,20 +63,38 @@ source "amazon-ebs" "ubuntu18-ami" {
     owners      = ["099720109477"]
   }
   ssh_username = "ubuntu"
+}
 
-  vpc_id               = "${var.vpc_id}"
-  subnet_id            = "${var.subnet_id}"
-  security_group_id    = "${var.security_group_id}"
-  iam_instance_profile = var.provisioner_iam_profile_name
+source "amazon-ebs" "openvpn-server-base-ami" {
+  ami_description = "An Open VPN Access Server AMI configured for Firehawk"
+  ami_name        = "firehawk-openvpn-server-base-${local.timestamp}-{{uuid}}"
+  instance_type   = "t2.micro"
+  region          = "${var.aws_region}"
+  user_data = <<EOF
+#! /bin/bash
+admin_user=openvpnas
+admin_pw=''
+EOF
+  source_ami_filter {
+    filters = {
+      description  = "OpenVPN Access Server 2.8.3 publisher image from https://www.openvpn.net/."
+      product-code = "f2ew2wrz425a1jagnifd02u5t"
+    }
+    most_recent = true
+    owners      = ["679593333241"]
+  }
+  ssh_username = "openvpnas"
 }
 
 build {
   sources = [
     "source.amazon-ebs.ubuntu18-ami",
-    "source.amazon-ebs.ubuntu16-ami",
     "source.amazon-ebs.amazon-linux-2-ami",
-    "source.amazon-ebs.centos7-ami"
+    "source.amazon-ebs.centos7-ami",
+    "source.amazon-ebs.openvpn-server-base-ami",
     ]
+
+### Wait for cloud init ###
 
   provisioner "shell" {
     inline         = [
@@ -148,6 +109,8 @@ build {
     inline_shebang = "/bin/bash -e"
   }
 
+### Wait for apt daily update ###
+
   provisioner "shell" {
     inline         = [
       "echo === System Packages ===",
@@ -156,27 +119,111 @@ build {
       ]
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline_shebang = "/bin/bash -e"
-    only = ["amazon-ebs.ubuntu18-ami"]
+    only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.openvpn-server-base-ami"]
   }
-  
+
+### Ensure openvpnas user is owner of their home dir to firx Open VPN AMI bug
+
+  provisioner "shell" {
+    inline_shebang = "/bin/bash -e"
+    # only           = ["amazon-ebs.openvpn-server-base-ami"]
+    environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
+    inline         = [
+      "export SHOWCOMMANDS=true; set -x",
+      "sudo cat /etc/systemd/system.conf",
+      "sudo chown openvpnas:openvpnas /home/openvpnas; echo \"exit $?\"",
+      "echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections; echo \"exit $?\"",
+    ]
+    inline_shebang = "/bin/bash -e"
+    only = ["amazon-ebs.openvpn-server-base-ami"]
+  }
+
+### Ensure Dialog is installed to fix open vpn image issues ###
+
+  provisioner "shell" {
+    inline_shebang = "/bin/bash -e"
+    # only           = ["amazon-ebs.openvpn-server-base-ami"]
+    environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
+    valid_exit_codes = [0,1] # ignore exit code.  this requirement is a bug in the open vpn ami.
+    inline         = [
+      "sudo apt-get -y install dialog; echo \"exit $?\"", # supressing exit code - until dialog is installed, apt-get may produce non zero exit codes. In open vpn ami
+      "sudo apt-get install -y -q; echo \"exit $?\""
+    ]
+    inline_shebang = "/bin/bash -e"
+    only = ["amazon-ebs.openvpn-server-base-ami"]
+  }
+
+### Update ###
+
   provisioner "shell" {
     inline_shebang = "/bin/bash -e"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline         = [
-      "sudo apt-get update -y"
+      "sudo apt-get -y update",
+      "sudo apt-get -y upgrade",
+      "sudo apt-get install dpkg -y"
     ]
-    only = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.ubuntu16-ami"]
+    only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.openvpn-server-base-ami"]
   }
-
   provisioner "shell" {
     inline_shebang = "/bin/bash -e"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline         = [
       "sudo yum update -y"
     ]
-    only = ["amazon-ebs.centos7-ami", "amazon-linux-2-ami"]
+    only = ["amazon-ebs.amazon-linux-2-ami", "amazon-ebs.centos7-ami"]
   }
 
+### GIT ###
+
+  provisioner "shell" {
+    inline = [
+      "sudo yum update -y",
+      "sleep 5",
+      "export CENTOS_MAIN_VERSION=$(cat /etc/centos-release | awk -F 'release[ ]*' '{print $2}' | awk -F '.' '{print $1}')",
+      "echo $CENTOS_MAIN_VERSION", # output should be "6" or "7"
+      "sudo yum install -y https://repo.ius.io/ius-release-el$${CENTOS_MAIN_VERSION}.rpm", # Install IUS Repo and Epel-Release:
+      "sudo yum install -y epel-release",
+      "sudo yum erase -y git*",       # re-install git:
+      "sudo yum install -y git-core",
+      "git --version"
+    ]
+    only = ["amazon-ebs.centos7-ami"]
+  }
+  provisioner "shell" {
+    inline = [
+      "sudo yum install -y git",
+      "git --version"
+    ]
+    only = ["amazon-ebs.amazon-linux-2-ami"]
+  }
+
+### Python 3 & PIP ###
+
+  provisioner "shell" {
+    inline_shebang = "/bin/bash -e"
+    environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
+    inline         = [ 
+      "sudo apt-get -y install python3",
+      "sudo apt-get -y install python-apt",
+      "sudo apt install -y python3-pip",
+      "python3 -m pip install --upgrade pip",
+      "python3 -m pip install boto3",
+      "python3 -m pip --version",
+      "sudo apt-get install -y git",
+      "echo '...Finished bootstrapping'"
+    ]
+    only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.openvpn-server-base-ami"]
+  }
+  provisioner "shell" {
+    inline = [
+      "sudo yum install -y python python3.7 python3-pip",
+      "python3 -m pip install --user --upgrade pip",
+      "python3 -m pip install --user boto3"
+    ]
+    only = ["amazon-ebs.amazon-linux-2-ami", "amazon-ebs.centos7-ami"]
+  }
+  
   post-processor "manifest" {
       output = "${local.template_dir}/manifest.json"
       strip_path = true
