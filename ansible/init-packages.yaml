@@ -1,0 +1,55 @@
+# - hosts: "{{ variable_host | default('ansible_control') }}"
+#   remote_user: "{{ variable_connect_as_user | default(variable_user) }}"
+#   gather_facts: "{{ variable_gather_facts | default('false') }}"
+#   become: true
+
+#   vars:
+#     variable_user: openvpnas
+#     variable_become_user: "{{ variable_user }}"
+
+#   # vars:
+#     # ansible_python_interpreter: "/usr/bin/python3"
+
+#   tasks:
+#     - name: Test vpn connection.
+#       debug:
+#         msg: "test vpn connection"
+
+- hosts: "{{ variable_host | default('ansible_control') }}"
+  remote_user: "{{ variable_connect_as_user | default(variable_user) }}"
+  gather_facts: "{{ variable_gather_facts | default('false') }}"
+  become: true
+
+  vars:
+    variable_user: openvpnas
+    variable_become_user: "{{ variable_user }}"
+    openvpn_user: openvpnas
+    # ansible_python_interpreter: "/usr/bin/python3"
+    # my_password: "{{ openvpn_user_pw | string | password_hash('sha512') }}"
+
+  pre_tasks:
+    - name: Test vpn connection.
+      debug:
+        msg: "test vpn connection"
+  # install pexpect and its dependencies to use passwd
+  roles:
+    # - role: openvpn_package
+    - role: init-packages
+
+  # set user password.  this is a temporary measure as it should be handled by user data, but for some reason open vpn isn't accepting that approach as of 2.71
+  post_tasks:
+    - getent:
+        database: passwd
+        key: "{{ openvpn_user }}"
+        fail_key: False
+
+    - name: check if user exists
+      debug:
+        var: getent_passwd[ openvpn_user ]
+
+    # - name: "Set login user password - {{ openvpn_user }}"
+    #   user:
+    #     name: "{{ openvpn_user }}"
+    #     password: "{{ my_password }}"
+    #   when: getent_passwd[ openvpn_user ] is defined
+    #   no_log: true

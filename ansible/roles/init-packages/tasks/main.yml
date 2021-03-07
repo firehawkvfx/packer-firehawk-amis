@@ -1,0 +1,91 @@
+---
+# tasks file for roles/init-packages
+
+# - name: Collect some facts only for ansible_distribution
+#   setup:
+#     gather_subset:
+#       - '!all'
+#       - 'min'
+#   tags:
+#   - always
+  
+- name: ansible distro
+  debug:
+    var: ansible_distribution
+
+- name: install mkpasswd, pip, pexpect, passlib, fping.  some of these may need to be reenabled with care.
+  package:
+    name:
+    - python-pip
+    - python-apt
+    - python-netaddr # For jinja ip address filtering 
+    - whois
+    - python-passlib
+    - zip
+    - rng-tools
+    - gpgv2
+    - jq
+    - inotify-tools # Used to catch existance of interrupt file https://stackoverflow.com/questions/18893283/how-to-proceed-in-the-script-if-file-exists
+    # - dnsmasq # For open vpn server,
+    state: present
+  become: true
+  vars:
+    ansible_python_interpreter: "{{ package_python_interpreter }}"
+
+- name: fping
+  apt:
+    name:
+    - fping # used to ping with max reytries up to a certain time to test open vpn.
+    state: present
+    update_cache: yes
+  register: install_package
+  until: install_package is not failed
+  retries: 5
+  become: true
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  vars:
+    ansible_python_interpreter: "{{ package_python_interpreter }}"
+
+- name: install bind-utils for host command
+  package:
+    name:
+    - bind-utils
+    state: present
+  become: true
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+  vars:
+    ansible_python_interpreter: "{{ package_python_interpreter }}"
+
+- name: Install requests module to query web pages in (houdini python install script)
+  pip:
+    name: requests
+    executable: pip
+  become: true
+
+- name: install pexpect for rhel / centos,
+  pip:
+    name: pexpect
+    executable: pip
+  become: true
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+
+# Enterprise Linux'
+# Above is for RHEL and Centos, the following is for Debian/Ubuntu:
+
+- name: Install expect pip for Ubuntu
+  pip:
+    name: pexpect
+    executable: pip
+  become: true
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: install pexpect for ubuntu
+  package:
+    name:
+    # - python-pexpect
+    - nfs-common
+    state: present
+  become: true
+  vars:
+    ansible_python_interpreter: "{{ package_python_interpreter }}"
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
