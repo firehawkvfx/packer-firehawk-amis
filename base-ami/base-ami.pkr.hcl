@@ -160,8 +160,8 @@ build {
     inline         = [
       "sudo apt-get -y update",
       "sudo apt-get install dpkg -y",
-      "sudo apt-get -y upgrade",
-      # "sudo apt-get --yes --force-yes -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade",
+      # "sudo apt-get -y upgrade",
+      "sudo apt-get --yes --force-yes -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade",
 
     ]
     only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.openvpn-server-base-ami"]
