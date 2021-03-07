@@ -45,6 +45,10 @@ variable "vault_version" {
   default = "1.5.5"
 }
 
+variable "vault_module_version" { # The hashicorp github module version to clone.
+  default = "v0.13.11"
+}
+
 # variable "consul_cluster_tag_key" {
 #   type = string
 # }
@@ -202,6 +206,7 @@ build {
       "sudo mv /tmp/ca.crt.pem /opt/vault/tls/",
       "sudo chmod -R 600 /opt/vault/tls",
       "sudo chmod 700 /opt/vault/tls",
+      "git clone --branch ${var.vault_module_version} https://github.com/hashicorp/terraform-aws-vault.git /tmp/terraform-aws-vault", # This can be replaced with a local copy if required.
       "sudo /tmp/terraform-aws-vault/modules/update-certificate-store/update-certificate-store --cert-file-path /opt/vault/tls/ca.crt.pem"
     ]
     inline_shebang = "/bin/bash -e"
