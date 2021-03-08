@@ -52,12 +52,12 @@ variable "vault_module_version" { # The hashicorp github module version to clone
 ### Only required if testing consul during build
 
 variable "consul_cluster_tag_key" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "consul_cluster_tag_value" {
-  type = string
+  type    = string
   default = ""
 }
 
@@ -88,19 +88,19 @@ variable "test_consul" { # If a consul cluster is running, attempt to join the c
 
 variable "deadline_version" {
   description = "The version of the deadline installer to aquire"
-  type = string
-  default = "10.1.9.2"
+  type        = string
+  default     = "10.1.9.2"
 }
 
 variable "installers_bucket" {
   description = "The installer bucket to persist installations to"
-  type = string
+  type        = string
 }
 
 locals {
-  timestamp    = regex_replace(timestamp(), "[- TZ:]", "")
-  template_dir = path.root
-  deadline_version = var.deadline_version
+  timestamp         = regex_replace(timestamp(), "[- TZ:]", "")
+  template_dir      = path.root
+  deadline_version  = var.deadline_version
   installers_bucket = var.installers_bucket
 }
 
@@ -159,9 +159,9 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
   iam_instance_profile = var.provisioner_iam_profile_name
 
   launch_block_device_mappings {
-    device_name = "/dev/sda1"
-    volume_size = 40
-    volume_type = "gp2"
+    device_name           = "/dev/sda1"
+    volume_size           = 40
+    volume_type           = "gp2"
     delete_on_termination = true
   }
   ami_block_device_mappings {
@@ -181,12 +181,12 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
 
 build {
   sources = [
-    "source.amazon-ebs.amazon-linux-2-ami", 
-    "source.amazon-ebs.centos7-ami", 
-    "source.amazon-ebs.ubuntu18-ami", 
+    "source.amazon-ebs.amazon-linux-2-ami",
+    "source.amazon-ebs.centos7-ami",
+    "source.amazon-ebs.ubuntu18-ami",
     "source.amazon-ebs.deadline-db-ubuntu18-ami",
     "source.amazon-ebs.openvpn-server-ami"
-    ]
+  ]
 
   ### Open VPN - Wait for updates to finish and change daily update timer ###
 
@@ -224,6 +224,19 @@ build {
     ]
     inline_shebang = "/bin/bash -e"
     only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+  }
+
+  ### Ensure aws works for root user.  This should be relocated to the base ami.
+
+  provisioner "shell" {
+    inline = [
+      "echo '...Correct links for AWS CLI'",
+      "set -x; which aws",
+      "sudo ln -s $(which aws) /usr/local/sbin/aws",
+      "sudo ls -ltriah /usr/local/sbin/aws"
+    ]
+    inline_shebang = "/bin/bash -e"
+    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
   ### Public cert block to verify other consul agents ###
@@ -268,28 +281,10 @@ build {
     inline_shebang = "/bin/bash -e"
     only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
   }
-  # provisioner "shell" {
-  #   inline         = ["echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections", "sudo apt-get install -y -q", "sudo apt-get -y update", "sudo apt-get install -y git"]
-  #   inline_shebang = "/bin/bash -e"
-  #   only           = ["amazon-ebs.ubuntu16-ami", "amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
-  # }
 
   ### End public cert block to verify other consul agents ###
 
-### Ensure aws works for root user.  This should be relocated to the base ami.
-
-  provisioner "shell" {
-    inline         = [
-      "which aws",
-      "sudo ln -s $(which aws) /usr/local/sbin/aws",
-      "ls -ltriah /usr/local/sbin/aws"
-      ]
-    inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
-  }
-
-
-### Install Mongo / Deadline DB
+  ### Install Mongo / Deadline DB
 
   provisioner "ansible" {
     playbook_file = "./ansible/transparent-hugepages-disable.yml"
@@ -300,10 +295,10 @@ build {
       "resourcetier=${var.resourcetier} user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost"
     ]
     collections_path = "./ansible/collections"
-    roles_path = "./ansible/roles"
-    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
-    galaxy_file = "./requirements.yml"
-    only           = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
   provisioner "ansible" {
@@ -315,10 +310,10 @@ build {
       "resourcetier=${var.resourcetier} user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
     ]
     collections_path = "./ansible/collections"
-    roles_path = "./ansible/roles"
-    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
-    galaxy_file = "./requirements.yml"
-    only           = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
   provisioner "ansible" {
@@ -330,10 +325,10 @@ build {
       "resourcetier=${var.resourcetier} user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
     ]
     collections_path = "./ansible/collections"
-    roles_path = "./ansible/roles"
-    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
-    galaxy_file = "./requirements.yml"
-    only           = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
   ### Open VPN install CLI.  This should be removed and tested as it is a duplicate process from the base ami.
