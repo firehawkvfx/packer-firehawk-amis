@@ -41,7 +41,9 @@ export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/meta-data/plac
 # Get the resourcetier from the instance tag.
 export TF_VAR_instance_id_main_cloud9=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 export TF_VAR_resourcetier="$(aws ec2 describe-tags --filters Name=resource-id,Values=$TF_VAR_instance_id_main_cloud9 --out=json|jq '.Tags[]| select(.Key == "resourcetier")|.Value' --raw-output)" # Can be dev,green,blue,main.  it is pulled from this instance's tags by default
-export TF_VAR_vpcname="${TF_VAR_resourcetier}${vpcname}" # No underscores allowed - because the vpc name is used to label terraform state S3 buckets
+export TF_VAR_resourcetier_vault="$TF_VAR_resourcetier" # WARNING: if vault is deployed in a seperate tier for use, then this will probably need to become an SSM driven parameter from the template
+export TF_VAR_vpcname="${TF_VAR_resourcetier}${vpcname}" # Why no underscores? Because the vpc name is used to label terraform state S3 buckets
+export TF_VAR_vpcname_vault="${TF_VAR_resourcetier}vaultvpc" # WARNING: if vault is deployed in a seperate tier for use, then this will probably need to become an SSM driven parameter from the template
 
 # Instance and vpc data
 export TF_VAR_deployer_ip_cidr="$(curl http://169.254.169.254/latest/meta-data/public-ipv4)/32" # Initially there will be no remote ip onsite, so we use the cloud 9 ip.
@@ -49,7 +51,7 @@ export TF_VAR_remote_cloud_public_ip_cidr="$(curl http://169.254.169.254/latest/
 export TF_VAR_remote_cloud_private_ip_cidr="$(curl http://169.254.169.254/latest/meta-data/local-ipv4)/32"
 macid=$(curl http://169.254.169.254/latest/meta-data/network/interfaces/macs/)
 export TF_VAR_vpc_id_main_cloud9=$(curl http://169.254.169.254/latest/meta-data/network/interfaces/macs/${macid}/vpc-id) # Aquire the cloud 9 instance's VPC ID to peer with Main VPC
-
+export TF_VAR_cloud9_instance_name="$(aws ec2 describe-tags --filters Name=resource-id,Values=$TF_VAR_instance_id_main_cloud9 --out=json|jq '.Tags[]| select(.Key == "Name")|.Value' --raw-output)"
 export TF_VAR_account_id=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep -oP '(?<="accountId" : ")[^"]*(?=")')
 export TF_VAR_owner="$(aws s3api list-buckets --query Owner.DisplayName --output text)"
 # region specific vars
@@ -86,12 +88,6 @@ export PKR_VAR_provisioner_iam_profile_name="provisioner_instance_role_$TF_VAR_c
 # Terraform Vars
 export TF_VAR_general_use_ssh_key="$HOME/.ssh/id_rsa" # For debugging deployment of most resources- not for production use.
 export TF_VAR_aws_private_key_path="$TF_VAR_general_use_ssh_key"
-public_key_path="$HOME/.ssh/id_rsa.pub"
-if [[ ! -f $public_key_path ]] ; then
-    echo "File $public_key_path is not there, aborting. Ensure you have initialised a keypair with ssh-keygen"
-    return
-fi
-export TF_VAR_vault_public_key=$(cat $public_key_path)
 
 export TF_VAR_log_dir="$SCRIPTDIR/tmp/log"; mkdir -p $TF_VAR_log_dir
 
@@ -126,6 +122,7 @@ if [[ num_invalid -eq 0 ]]; then
 
   export TF_VAR_bucket_extension="$TF_VAR_resourcetier.$TF_VAR_global_bucket_extension"
   export TF_VAR_installers_bucket="software.$TF_VAR_resourcetier.$TF_VAR_global_bucket_extension" # All installers should be kept in the same bucket.  If a main account is present, packer builds should trigger from the main account.
+  export TF_VAR_bucket_extension_vault="$TF_VAR_resourcetier.$TF_VAR_global_bucket_extension" # WARNING: if vault is deployed in a seperate tier for use, then this will probably need to become an SSM driven parameter from the template
   # export PKR_VAR_installers_bucket="$TF_VAR_installers_bucket"
 else
   log_error "SSM parameters are not yet initialised.  You can init SSM parameters with the cloudformation template modules/cloudformation-cloud9-vault-iam/cloudformation_ssm_parameters_firehawk.yaml"
