@@ -229,7 +229,7 @@ build {
     inline_shebang = "/bin/bash -e"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline         = [
-      "rm -fr /tmp/*"
+      "sudo rm -fr /tmp/*"
     ]
   }
   
