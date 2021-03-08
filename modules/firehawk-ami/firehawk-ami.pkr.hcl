@@ -206,7 +206,6 @@ build {
     only             = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
-
   provisioner "file" { # fix apt upgrades to not hold up boot
     destination = "/tmp/override.conf"
     source      = "${local.template_dir}/override.conf"
@@ -276,6 +275,19 @@ build {
   # }
 
   ### End public cert block to verify other consul agents ###
+
+### Ensure aws works for root user.  This should be relocated to the base ami.
+
+  provisioner "shell" {
+    inline         = [
+      "which aws",
+      "sudo ln -s $(which aws) /usr/local/sbin/aws",
+      "ls -ltriah /usr/local/sbin/aws"
+      ]
+    inline_shebang = "/bin/bash -e"
+    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
+
 
 ### Install Mongo / Deadline DB
 

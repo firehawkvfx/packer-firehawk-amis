@@ -34,27 +34,27 @@
   # delegate_to: "{{ delegate_host }}"
   # become: true
 
-- name: Check registration of hostname and register service with consul
-  shell: |
-    hostnamectl
-    consul services register -name=deadlinedb
-    sleep 5
-    consul catalog services
-    dig deadlinedb.service.consul
-    if [[ $(dig +short deadlinedb.service.consul) -eq 0 ]]; then echo "No DNS entry found for deadlinedb.service.consul"; exit 1; fi
-  become: true
-  # args:
-  #   executable: /bin/bash
+  # optionally test consul registration
 
-- local_action: shell dig +short deadlinedb.service.consul
-  changed_when: false
-  register: dig_output
+# - name: Check registration of hostname and register service with consul
+#   shell: |
+#     hostnamectl
+#     consul services register -name=deadlinedb
+#     sleep 5
+#     consul catalog services
+#     dig deadlinedb.service.consul
+#     if [[ $(dig +short deadlinedb.service.consul) -eq 0 ]]; then echo "No DNS entry found for deadlinedb.service.consul"; exit 1; fi
+#   become: true
 
-- set_fact:
-    looked_up_ips: "{{ dig_output.stdout_lines }}"
+# - local_action: shell dig +short deadlinedb.service.consul
+#   changed_when: false
+#   register: dig_output
 
-- debug: msg="found ip {{ item }}"
-  with_items: looked_up_ips
+# - set_fact:
+#     looked_up_ips: "{{ dig_output.stdout_lines }}"
+
+# - debug: msg="found ip {{ item }}"
+#   with_items: looked_up_ips
 
 # See an example SSL workflow here https://stackoverflow.com/questions/35790287/self-signed-ssl-connection-using-pymongo#35967188
 
