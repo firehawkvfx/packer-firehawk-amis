@@ -24,7 +24,7 @@ data "terraform_remote_state" "provisioner_profile" { # read the arn with data.t
   backend = "s3"
   config = {
     bucket = "state.terraform.${var.bucket_extension_vault}"
-    key    = "${var.resourcetier}/${var.vpcname_vault}-terraform-aws-iam-profile-provisioner/terraform.tfstate"
+    key    = "${var.resourcetier_vault}/${var.vpcname_vault}-terraform-aws-iam-profile-provisioner/terraform.tfstate"
     region = data.aws_region.current.name
   }
 }
@@ -32,7 +32,7 @@ data "terraform_remote_state" "installers_bucket" { # read the arn with data.ter
   backend = "s3"
   config = {
     bucket = "state.terraform.${var.bucket_extension_vault}"
-    key    = "${var.resourcetier}/terraform-s3-bucket-software/terraform.tfstate"
+    key    = "${var.resourcetier_vault}/terraform-s3-bucket-software/terraform.tfstate"
     region = data.aws_region.current.name
   }
 }
