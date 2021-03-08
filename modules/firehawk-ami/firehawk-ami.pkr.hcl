@@ -149,7 +149,7 @@ source "amazon-ebs" "ubuntu18-ami" {
 }
 
 source "amazon-ebs" "deadline-db-ubuntu18-ami" {
-  ami_description = "An Ubuntu 18.04 AMI containing a Deadline DB server."
+  ami_description = "An Ubuntu 18.04 AMI with Deadline DB ${var.deadline_version} server."
   ami_name        = "firehawk-deadlinedb-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
@@ -184,7 +184,7 @@ build {
     "source.amazon-ebs.amazon-linux-2-ami", 
     "source.amazon-ebs.centos7-ami", 
     "source.amazon-ebs.ubuntu18-ami", 
-    "source.deadline-db-ubuntu18-ami",
+    "source.amazon-ebs.deadline-db-ubuntu18-ami",
     "source.amazon-ebs.openvpn-server-ami"
     ]
 
