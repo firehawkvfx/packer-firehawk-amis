@@ -11,9 +11,9 @@ variable "ca_public_key_path" {
   default = "/home/ec2-user/.ssh/tls/ca.crt.pem"
 }
 
-# variable "resourcetier" {
-#   type = string
-# }
+variable "resourcetier" { # May be used to isolate or aquire some environment specific resources.
+  type = string
+}
 
 variable "consul_download_url" {
   type    = string
