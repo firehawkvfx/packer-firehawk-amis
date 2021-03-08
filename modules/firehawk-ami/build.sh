@@ -25,6 +25,15 @@ else
     exit 1
 fi
 
+terraform init \
+    -input=false
+terraform plan -out=tfplan -input=false
+terraform apply -input=false tfplan
+
+export PKR_VAR_provisioner_iam_profile_name="$(terraform output instance_profile_name)"
+echo "Using profile: $PKR_VAR_provisioner_iam_profile_name"
+export PKR_VAR_installers_bucket="$(terraform output installers_bucket)"
+
 # Packer Vars
 export PKR_VAR_aws_region="$AWS_DEFAULT_REGION"
 export PACKER_LOG=1
