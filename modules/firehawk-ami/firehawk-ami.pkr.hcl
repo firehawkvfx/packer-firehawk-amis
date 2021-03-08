@@ -180,7 +180,13 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
 }
 
 build {
-  sources = ["source.amazon-ebs.amazon-linux-2-ami", "source.amazon-ebs.centos7-ami", "source.amazon-ebs.ubuntu18-ami", "source.amazon-ebs.openvpn-server-ami"]
+  sources = [
+    "source.amazon-ebs.amazon-linux-2-ami", 
+    "source.amazon-ebs.centos7-ami", 
+    "source.amazon-ebs.ubuntu18-ami", 
+    "source.deadline-db-ubuntu18-ami",
+    "source.amazon-ebs.openvpn-server-ami"
+    ]
 
   ### Open VPN - Wait for updates to finish and change daily update timer ###
 
