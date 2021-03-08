@@ -77,19 +77,31 @@ variable "centos7_ami" {
   type = string
 }
 
-# variable "provisioner_iam_profile_name" {
-#   type = string
-# }
-
+variable "provisioner_iam_profile_name" { # Required for some builds requiring S3 Installers
+  type = string
+}
 
 variable "test_consul" { # If a consul cluster is running, attempt to join the cluster. This can be useful for debugging, but will prevent inital builds if you have no infrastructure running yet.  This test may not also work unless the appropriate role is assigned.
   type    = bool
   default = false
 }
 
+variable "deadline_version" {
+  description = "The version of the deadline installer to aquire"
+  type = string
+  default = "10.1.9.2"
+}
+
+variable "installers_bucket" {
+  description = "The installer bucket to persist installations to"
+  type = string
+}
+
 locals {
   timestamp    = regex_replace(timestamp(), "[- TZ:]", "")
   template_dir = path.root
+  deadline_version = var.deadline_version
+  installers_bucket = var.installers_bucket
 }
 
 source "amazon-ebs" "openvpn-server-ami" {
@@ -136,6 +148,37 @@ source "amazon-ebs" "ubuntu18-ami" {
   ssh_username    = "ubuntu"
 }
 
+source "amazon-ebs" "deadline-db-ubuntu18-ami" {
+  ami_description = "An Ubuntu 18.04 AMI containing a Deadline DB server."
+  ami_name        = "firehawk-deadlinedb-ubuntu18-${local.timestamp}-{{uuid}}"
+  instance_type   = "t2.micro"
+  region          = "${var.aws_region}"
+  source_ami      = "${var.ubuntu18_ami}"
+  ssh_username    = "ubuntu"
+
+  iam_instance_profile = var.provisioner_iam_profile_name
+
+  launch_block_device_mappings {
+    device_name = "/dev/sda1"
+    volume_size = 40
+    volume_type = "gp2"
+    delete_on_termination = true
+  }
+  ami_block_device_mappings {
+    device_name  = "/dev/sdb"
+    virtual_name = "ephemeral0"
+  }
+  ami_block_device_mappings {
+    device_name  = "/dev/sdc"
+    virtual_name = "ephemeral1"
+  }
+  # assume_role { # Since we need to read files from s3, we require a role with read access.
+  #     role_arn     = "arn:aws:iam::972620357255:role/provisioner_instance_role_pipeid0" # This needs to be replaced with a terraform output
+  #     session_name = "SESSION_NAME"
+  #     # external_id  = "EXTERNAL_ID"
+  # }
+}
+
 build {
   sources = ["source.amazon-ebs.amazon-linux-2-ami", "source.amazon-ebs.centos7-ami", "source.amazon-ebs.ubuntu18-ami", "source.amazon-ebs.openvpn-server-ami"]
 
@@ -154,7 +197,7 @@ build {
     ]
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline_shebang   = "/bin/bash -e"
-    only             = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+    only             = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
 
@@ -175,7 +218,7 @@ build {
       "sudo systemctl --all list-timers apt-daily{,-upgrade}.timer"
     ]
     inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
   ### Public cert block to verify other consul agents ###
@@ -218,15 +261,62 @@ build {
   provisioner "shell" {
     inline         = ["sudo systemd-run --property='After=apt-daily.service apt-daily-upgrade.service' --wait /bin/true"]
     inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.ubuntu18-ami"]
+    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
   }
   # provisioner "shell" {
   #   inline         = ["echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections", "sudo apt-get install -y -q", "sudo apt-get -y update", "sudo apt-get install -y git"]
   #   inline_shebang = "/bin/bash -e"
-  #   only           = ["amazon-ebs.ubuntu16-ami", "amazon-ebs.ubuntu18-ami"]
+  #   only           = ["amazon-ebs.ubuntu16-ami", "amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
   # }
 
   ### End public cert block to verify other consul agents ###
+
+### Install Mongo / Deadline DB
+
+  provisioner "ansible" {
+    playbook_file = "./ansible/transparent-hugepages-disable.yml"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      # "user_deadlineuser_pw=${local.user_deadlineuser_pw} user_deadlineuser_name=deadlineuser variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost"
+      "resourcetier=${var.resourcetier} user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path = "./ansible/roles"
+    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
+    galaxy_file = "./requirements.yml"
+    only           = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
+
+  provisioner "ansible" {
+    playbook_file = "./ansible/deadline-db-install.yaml"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      # "user_deadlineuser_pw=${local.user_deadlineuser_pw} user_deadlineuser_name=deployuser variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul deadline_proxy_certificate_password=${local.deadline_proxy_certificate_password} installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
+      "resourcetier=${var.resourcetier} user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path = "./ansible/roles"
+    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
+    galaxy_file = "./requirements.yml"
+    only           = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
+
+  provisioner "ansible" {
+    playbook_file = "./ansible/deadlinercs.yaml"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      # "user_deadlineuser_pw=${local.user_deadlineuser_pw} user_deadlineuser_name=deployuser variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul deadline_proxy_certificate_password=${local.deadline_proxy_certificate_password} installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
+      "resourcetier=${var.resourcetier} user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path = "./ansible/roles"
+    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
+    galaxy_file = "./requirements.yml"
+    only           = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
 
   ### Open VPN install CLI.  This should be removed and tested as it is a duplicate process from the base ami.
 
@@ -291,7 +381,7 @@ build {
       "set -x; sudo cat /etc/systemd/resolved.conf",
       "set -x; sudo cat /etc/resolv.conf",
     ]
-    only = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+    only = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
   provisioner "shell" {
     inline = [

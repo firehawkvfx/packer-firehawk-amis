@@ -125,6 +125,7 @@ if [[ num_invalid -eq 0 ]]; then
   error_if_empty "SSM Parameter missing: vpn_cidr" "$TF_VAR_vpn_cidr"
 
   export TF_VAR_bucket_extension="$TF_VAR_resourcetier.$TF_VAR_global_bucket_extension"
+  export TF_VAR_installers_bucket="software.$TF_VAR_resourcetier.$TF_VAR_global_bucket_extension" # All installers should be kept in the same bucket.  If a main account is present, packer builds should trigger from the main account.
 else
   log_error "SSM parameters are not yet initialised.  You can init SSM parameters with the cloudformation template modules/cloudformation-cloud9-vault-iam/cloudformation_ssm_parameters_firehawk.yaml"
   return
