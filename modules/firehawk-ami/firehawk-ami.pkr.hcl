@@ -226,19 +226,6 @@ build {
     only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
-  ### Ensure aws works for root user.  This should be relocated to the base ami.
-
-  provisioner "shell" {
-    inline = [
-      "echo '...Correct links for AWS CLI'",
-      "set -x; which aws",
-      "sudo ln -s $(which aws) /usr/local/sbin/aws",
-      "sudo ls -ltriah /usr/local/sbin/aws"
-    ]
-    inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
-  }
-
   ### Public cert block to verify other consul agents ###
 
   # provisioner "shell" {
@@ -283,6 +270,37 @@ build {
   }
 
   ### End public cert block to verify other consul agents ###
+
+  ### Open VPN / Deadline DB install CLI.  This should be relocated to the base ami.
+
+  provisioner "ansible" {
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "variable_host=default variable_connect_as_user=$USER variable_user=$USER variable_become_user=$USER delegate_host=localhost",
+      "--skip-tags",
+      "user_access"
+    ]
+    playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only             = ["amazon-ebs.openvpn-server-ami","amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
+
+  # ### Ensure aws works for root user.  This should be relocated to the base ami.
+
+  # provisioner "shell" {
+  #   inline = [
+  #     "echo '...Correct links for AWS CLI'",
+  #     "set -x; which aws",
+  #     "sudo ln -s $(which aws) /usr/local/sbin/aws",
+  #     "sudo ls -ltriah /usr/local/sbin/aws"
+  #   ]
+  #   inline_shebang = "/bin/bash -e"
+  #   only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
+  # }
 
   ### Install Mongo / Deadline DB
 
@@ -329,24 +347,6 @@ build {
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
     galaxy_file      = "./requirements.yml"
     only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
-  }
-
-  ### Open VPN install CLI.  This should be removed and tested as it is a duplicate process from the base ami.
-
-  provisioner "ansible" {
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_host=default variable_connect_as_user=openvpnas variable_user=openvpnas variable_become_user=openvpnas delegate_host=localhost",
-      "--skip-tags",
-      "user_access"
-    ]
-    playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only             = ["amazon-ebs.openvpn-server-ami"]
   }
 
   ### This block will install Vault and Consul Agent
