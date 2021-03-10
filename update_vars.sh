@@ -84,6 +84,8 @@ export PACKER_LOG=1
 export PACKER_LOG_PATH="packerlog.log"
 export TF_VAR_provisioner_iam_profile_name="provisioner_instance_role_$TF_VAR_conflictkey"
 export PKR_VAR_provisioner_iam_profile_name="provisioner_instance_role_$TF_VAR_conflictkey"
+export TF_VAR_packer_iam_profile_name="packer_instance_role_$TF_VAR_conflictkey"
+export PKR_VAR_packer_iam_profile_name="packer_instance_role_$TF_VAR_conflictkey"
 
 # Terraform Vars
 export TF_VAR_general_use_ssh_key="$HOME/.ssh/id_rsa" # For debugging deployment of most resources- not for production use.
