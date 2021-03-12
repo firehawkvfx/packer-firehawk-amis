@@ -4,3 +4,6 @@
 [submodule "modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/fsx"]
 	path = modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/fsx
 	url = git@github.com:firehawkvfx/ansible_collection_fsx.git
+[submodule "modules/firehawk-base-ami"]
+	path = modules/firehawk-base-ami
+	url = git@github.com:firehawkvfx/firehawk-base-ami.git
