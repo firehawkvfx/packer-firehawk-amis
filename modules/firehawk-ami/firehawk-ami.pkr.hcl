@@ -145,11 +145,11 @@ source "amazon-ebs" "openvpn-server-ami" {
   # source_ami      = "${var.openvpn_server_base_ami}"
   source_ami_filter {
     filters = {
-      "ami_role" : "openvpn_server_base_ami",
-      "packer_template" : "firehawk-base-ami",
-      "commit_hash" : var.ingress_commit_hash,
-      "commit_hash_short" : var.ingress_commit_hash_short,
-      "resourcetier" : var.resourcetier,
+      "tag:ami_role" : "openvpn_server_base_ami",
+      "tag:packer_template" : "firehawk-base-ami",
+      "tag:commit_hash" : var.ingress_commit_hash,
+      "tag:commit_hash_short" : var.ingress_commit_hash_short,
+      "tag:resourcetier" : var.resourcetier,
     }
     most_recent = true
     owners      = [var.account_id]
@@ -173,11 +173,11 @@ source "amazon-ebs" "amazon-linux-2-ami" {
   # source_ami      = "${var.amazon_linux_2_ami}"
   source_ami_filter {
     filters = {
-      "ami_role" : "amazonlinux2_base_ami",
-      "packer_template" : "firehawk-base-ami",
-      "commit_hash" : var.ingress_commit_hash,
-      "commit_hash_short" : var.ingress_commit_hash_short,
-      "resourcetier" : var.resourcetier,
+      "tag:ami_role" : "amazonlinux2_base_ami",
+      "tag:packer_template" : "firehawk-base-ami",
+      "tag:commit_hash" : var.ingress_commit_hash,
+      "tag:commit_hash_short" : var.ingress_commit_hash_short,
+      "tag:resourcetier" : var.resourcetier,
     }
     most_recent = true
     owners      = [var.account_id]
@@ -197,11 +197,11 @@ source "amazon-ebs" "centos7-ami" {
   # source_ami      = "${var.centos7_ami}"
   source_ami_filter {
     filters = {
-      "ami_role" : "centos7_base_ami",
-      "packer_template" : "firehawk-base-ami",
-      "commit_hash" : var.ingress_commit_hash,
-      "commit_hash_short" : var.ingress_commit_hash_short,
-      "resourcetier" : var.resourcetier,
+      "tag:ami_role" : "centos7_base_ami",
+      "tag:packer_template" : "firehawk-base-ami",
+      "tag:commit_hash" : var.ingress_commit_hash,
+      "tag:commit_hash_short" : var.ingress_commit_hash_short,
+      "tag:resourcetier" : var.resourcetier,
     }
     most_recent = true
     owners      = [var.account_id]
@@ -219,11 +219,11 @@ source "amazon-ebs" "ubuntu18-ami" {
   # source_ami      = "${var.ubuntu18_ami}"
   source_ami_filter {
     filters = {
-      "ami_role" : "ubuntu18_base_ami",
-      "packer_template" : "firehawk-base-ami",
-      "commit_hash" : var.ingress_commit_hash,
-      "commit_hash_short" : var.ingress_commit_hash_short,
-      "resourcetier" : var.resourcetier,
+      "tag:ami_role" : "ubuntu18_base_ami",
+      "tag:packer_template" : "firehawk-base-ami",
+      "tag:commit_hash" : var.ingress_commit_hash,
+      "tag:commit_hash_short" : var.ingress_commit_hash_short,
+      "tag:resourcetier" : var.resourcetier,
     }
     most_recent = true
     owners      = [var.account_id]
@@ -241,11 +241,11 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
   # source_ami      = "${var.ubuntu18_ami}"
   source_ami_filter {
     filters = {
-      "ami_role" : "ubuntu18_base_ami",
-      "packer_template" : "firehawk-base-ami",
-      "commit_hash" : var.ingress_commit_hash,
-      "commit_hash_short" : var.ingress_commit_hash_short,
-      "resourcetier" : var.resourcetier,
+      "tag:ami_role" : "ubuntu18_base_ami",
+      "tag:packer_template" : "firehawk-base-ami",
+      "tag:commit_hash" : var.ingress_commit_hash,
+      "tag:commit_hash_short" : var.ingress_commit_hash_short,
+      "tag:resourcetier" : var.resourcetier,
     }
     most_recent = true
     owners      = [var.account_id]
