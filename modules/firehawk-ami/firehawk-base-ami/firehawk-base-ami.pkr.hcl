@@ -5,38 +5,39 @@
 # We also install any packages that will not likely require frequent modification (Python, Git).  If they do require significant/frequent/unreliable modification they do not belong here.
 
 variable "aws_region" {
-  type = string
+  type    = string
   default = null
 }
 variable "ami_role" {
   description = "A descriptive name for the purpose of the image."
-  type = string
+  type        = string
 }
 variable "commit_hash" {
   description = "The hash of the commit in the current git repository contining this file."
-  type = string
+  type        = string
 }
 variable "commit_hash_short" {
   description = "The hash of the commit in the current git repository contining this file."
-  type = string
+  type        = string
 }
 variable "resourcetier" {
   description = "The current environment ( dev / green / blue / main )"
-  type = string
+  type        = string
 }
 
 locals {
   timestamp    = regex_replace(timestamp(), "[- TZ:]", "")
   template_dir = path.root
   common_ami_tags = {
-      "packer_template": "firehawk-base-ami",
-      "commit_hash": var.commit_hash,
-      "commit_hash_short": var.commit_hash_short,
-      "resourcetier": var.resourcetier,
-    }
+    "packer_template" : "firehawk-base-ami",
+    "commit_hash" : var.commit_hash,
+    "commit_hash_short" : var.commit_hash_short,
+    "resourcetier" : var.resourcetier,
+  }
 }
 
 source "amazon-ebs" "amazon-linux-2-ami" {
+  tags            = merge({ "ami_role" : "amazonlinux2_base_ami" }, local.common_ami_tags)
   ami_description = "An Amazon Linux 2 AMI with basic updates."
   ami_name        = "firehawk-base-amazon-linux-2-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -53,10 +54,11 @@ source "amazon-ebs" "amazon-linux-2-ami" {
     owners      = ["amazon"]
   }
   ssh_username = "ec2-user"
-  tags = merge( map("ami_role", "amazonlinux2_base_ami") , local.common_ami_tags)
+
 }
 
 source "amazon-ebs" "centos7-ami" {
+  tags            = merge({ "ami_role" : "centos7_base_ami" }, local.common_ami_tags)
   ami_description = "A Cent OS 7 AMI with basic updates."
   ami_name        = "firehawk-base-centos7-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -70,11 +72,12 @@ source "amazon-ebs" "centos7-ami" {
     owners      = ["679593333241"]
   }
   user_data_file = "${local.template_dir}/cloud-init.yaml" # This is a fix for some instance types with Centos 7 and mounts causing errors.
-  ssh_username = "centos"
-  tags = merge( map("ami_role", "centos7_base_ami"), local.common_ami_tags)
+  ssh_username   = "centos"
+
 }
 
 source "amazon-ebs" "ubuntu18-ami" {
+  tags            = merge({ "ami_role" : "ubuntu18_base_ami" }, local.common_ami_tags)
   ami_description = "An Ubuntu 18.04 AMI with basic updates."
   ami_name        = "firehawk-base-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -91,15 +94,16 @@ source "amazon-ebs" "ubuntu18-ami" {
     owners      = ["099720109477"]
   }
   ssh_username = "ubuntu"
-  tags = merge( map("ami_role", "ubuntu18_base_ami"), local.common_ami_tags)
+
 }
 
 source "amazon-ebs" "base-openvpn-server-ami" {
+  tags            = merge({ "ami_role" : "openvpn_server_base_ami" }, local.common_ami_tags)
   ami_description = "An Open VPN Access Server AMI with basic updates"
   ami_name        = "firehawk-base-openvpn-server-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
-  user_data = <<EOF
+  user_data       = <<EOF
 #! /bin/bash
 admin_user=openvpnas
 admin_pw=''
@@ -113,7 +117,7 @@ EOF
     owners      = ["679593333241"]
   }
   ssh_username = "openvpnas"
-  tags = merge( map("ami_role", "openvpn_server_base_ami"), local.common_ami_tags)
+
 }
 
 build {
@@ -122,96 +126,96 @@ build {
     "source.amazon-ebs.amazon-linux-2-ami",
     "source.amazon-ebs.centos7-ami",
     "source.amazon-ebs.base-openvpn-server-ami",
-    ]
+  ]
 
-### Wait for cloud init ###
+  ### Wait for cloud init ###
 
   provisioner "shell" {
-    inline         = [
+    inline = [
       "echo 'Init success.'",
       "sudo echo 'Sudo test success.'",
       "unset HISTFILE",
       "history -cw",
       "echo === Waiting for Cloud-Init ===",
       "timeout 180 /bin/bash -c 'until stat /var/lib/cloud/instance/boot-finished &>/dev/null; do echo waiting...; sleep 6; done'",
-      ]
+    ]
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
-    inline_shebang = "/bin/bash -e"
+    inline_shebang   = "/bin/bash -e"
   }
 
-### Wait for apt daily update ###
+  ### Wait for apt daily update ###
 
   provisioner "shell" {
-    inline         = [
+    inline = [
       "echo === System Packages ===",
       "echo 'Connected success. Wait for updates to finish...'", # Open VPN AMI runs apt daily update which must end before we continue.
       "sudo systemd-run --property='After=apt-daily.service apt-daily-upgrade.service' --wait /bin/true; echo \"exit $?\""
-      ]
+    ]
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
-    inline_shebang = "/bin/bash -e"
-    only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.base-openvpn-server-ami"]
+    inline_shebang   = "/bin/bash -e"
+    only             = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.base-openvpn-server-ami"]
   }
 
-### Ensure openvpnas user is owner of their home dir to firx Open VPN AMI bug
+  ### Ensure openvpnas user is owner of their home dir to firx Open VPN AMI bug
 
   provisioner "shell" {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
-    inline         = [
+    inline = [
       "export SHOWCOMMANDS=true; set -x",
       "sudo cat /etc/systemd/system.conf",
       "sudo chown openvpnas:openvpnas /home/openvpnas; echo \"exit $?\"",
       "echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections; echo \"exit $?\"",
     ]
     inline_shebang = "/bin/bash -e"
-    only = ["amazon-ebs.base-openvpn-server-ami"]
+    only           = ["amazon-ebs.base-openvpn-server-ami"]
   }
 
-### Ensure Dialog is installed to fix open vpn image issues ###
+  ### Ensure Dialog is installed to fix open vpn image issues ###
 
   provisioner "shell" {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
-    valid_exit_codes = [0,1] # ignore exit code.  this requirement is a bug in the open vpn ami.
-    inline         = [
+    valid_exit_codes = [0, 1] # ignore exit code.  this requirement is a bug in the open vpn ami.
+    inline = [
       "sudo apt-get -y install dialog; echo \"exit $?\"", # supressing exit code - until dialog is installed, apt-get may produce non zero exit codes. In open vpn ami
       "sudo apt-get install -y -q; echo \"exit $?\""
     ]
     inline_shebang = "/bin/bash -e"
-    only = ["amazon-ebs.base-openvpn-server-ami"]
+    only           = ["amazon-ebs.base-openvpn-server-ami"]
   }
 
-### Update ###
+  ### Update ###
 
   provisioner "shell" {
-    inline_shebang = "/bin/bash -e"
+    inline_shebang   = "/bin/bash -e"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
-    inline         = [
+    inline = [
       "sudo apt-get -y update",
       "sudo apt-get install dpkg -y",
       "sudo apt-get --yes --force-yes -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade", # These args are required to fix a dpkg bug in the openvpn ami.
 
     ]
-    only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.base-openvpn-server-ami"]
+    only = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.base-openvpn-server-ami"]
   }
   provisioner "shell" {
-    inline_shebang = "/bin/bash -e"
+    inline_shebang   = "/bin/bash -e"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
-    inline         = [
+    inline = [
       "sudo yum update -y"
     ]
     only = ["amazon-ebs.amazon-linux-2-ami", "amazon-ebs.centos7-ami"]
   }
 
-### GIT ###
+  ### GIT ###
 
   provisioner "shell" {
     inline = [
       "sudo yum update -y",
       "sleep 5",
       "export CENTOS_MAIN_VERSION=$(cat /etc/centos-release | awk -F 'release[ ]*' '{print $2}' | awk -F '.' '{print $1}')",
-      "echo $CENTOS_MAIN_VERSION", # output should be "6" or "7"
+      "echo $CENTOS_MAIN_VERSION",                                                         # output should be "6" or "7"
       "sudo yum install -y https://repo.ius.io/ius-release-el$${CENTOS_MAIN_VERSION}.rpm", # Install IUS Repo and Epel-Release:
       "sudo yum install -y epel-release",
-      "sudo yum erase -y git*",       # re-install git:
+      "sudo yum erase -y git*", # re-install git:
       "sudo yum install -y git-core",
       "git --version"
     ]
@@ -225,12 +229,12 @@ build {
     only = ["amazon-ebs.amazon-linux-2-ami"]
   }
 
-### Python 3 & PIP ###
+  ### Python 3 & PIP ###
 
   provisioner "shell" {
-    inline_shebang = "/bin/bash -e"
+    inline_shebang   = "/bin/bash -e"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
-    inline         = [ 
+    inline = [
       "sudo apt-get -y install python3",
       "sudo apt-get -y install python-apt",
       "sudo apt install -y python3-pip",
@@ -240,7 +244,7 @@ build {
       "sudo apt-get install -y git",
       "echo '...Finished bootstrapping'"
     ]
-    only = ["amazon-ebs.ubuntu18-ami","amazon-ebs.base-openvpn-server-ami"]
+    only = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.base-openvpn-server-ami"]
   }
   provisioner "shell" {
     inline = [
@@ -251,20 +255,20 @@ build {
     only = ["amazon-ebs.amazon-linux-2-ami", "amazon-ebs.centos7-ami"]
   }
 
-### Cleanup
+  ### Cleanup
   provisioner "shell" {
-    inline_shebang = "/bin/bash -e"
+    inline_shebang   = "/bin/bash -e"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
-    inline         = [
+    inline = [
       "sudo rm -fr /tmp/*"
     ]
   }
-  
+
   post-processor "manifest" {
-      output = "${local.template_dir}/manifest.json"
-      strip_path = true
-      custom_data = {
-        timestamp = "${local.timestamp}"
-      }
+    output     = "${local.template_dir}/manifest.json"
+    strip_path = true
+    custom_data = {
+      timestamp = "${local.timestamp}"
+    }
   }
 }
