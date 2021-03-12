@@ -28,20 +28,9 @@ data "terraform_remote_state" "installers_bucket" { # read the arn with data.ter
     region = data.aws_region.current.name
   }
 }
-data "terraform_remote_state" "firehawk_base_ami" { # read the arn with data.terraform_remote_state.provisioner_profile.outputs.instance_role_arn, or read the profile name with data.terraform_remote_state.provisioner_profile.outputs.instance_profile_name
-  backend = "s3"
-  config = {
-    bucket = "state.terraform.${var.bucket_extension_vault}"
-    key    = "${var.resourcetier}/firehawk-base-ami/terraform.tfstate"
-    region = data.aws_region.current.name
-  }
-}
 output "instance_profile_name" {
     value = data.terraform_remote_state.provisioner_profile.outputs.instance_profile_name
 }
 output "installers_bucket" {
     value = data.terraform_remote_state.installers_bucket.outputs.bucket_name
-}
-output "firehawk_ami_map" {
-    value = data.terraform_remote_state.provisioner_profile.outputs.firehawk_ami_map
 }
