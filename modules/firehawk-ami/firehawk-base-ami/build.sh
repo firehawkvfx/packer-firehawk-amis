@@ -12,6 +12,10 @@ export PKR_VAR_aws_region="$AWS_DEFAULT_REGION"
 export PACKER_LOG=1
 export PACKER_LOG_PATH="$SCRIPTDIR/packerlog.log"
 
+export PKR_VAR_ami_role="$(basename $SCRIPTDIR)"
+export PKR_VAR_commit_hash="$(git rev-parse HEAD)"
+export PKR_VAR_commit_hash_short="$(git rev-parse --short HEAD)"
+
 export PKR_VAR_manifest_path="$SCRIPTDIR/manifest.json"
 
 mkdir -p $SCRIPTDIR/tmp/log
