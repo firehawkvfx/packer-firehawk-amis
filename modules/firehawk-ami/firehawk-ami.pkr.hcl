@@ -41,10 +41,6 @@ variable "account_id" {
   type = string
 }
 
-variable "resourcetier" { # May be used to isolate or aquire some environment specific resources.
-  type = string
-}
-
 variable "consul_download_url" {
   type    = string
   default = ""
