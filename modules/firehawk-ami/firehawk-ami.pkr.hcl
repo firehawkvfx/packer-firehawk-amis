@@ -107,14 +107,15 @@ locals {
   deadline_version  = var.deadline_version
   installers_bucket = var.installers_bucket
   common_ami_tags = {
-      "packer_template": "firehawk-ami",
-      "commit_hash": var.commit_hash,
-      "commit_hash_short": var.commit_hash_short,
-      "resourcetier": var.resourcetier,
-    }
+    "packer_template" : "firehawk-ami",
+    "commit_hash" : var.commit_hash,
+    "commit_hash_short" : var.commit_hash_short,
+    "resourcetier" : var.resourcetier,
+  }
 }
 
 source "amazon-ebs" "openvpn-server-ami" {
+  tags            = merge({ "ami_role" : "firehawk_openvpn_server_ami" }, local.common_ami_tags)
   ami_description = "An Open VPN Access Server AMI configured for Firehawk"
   ami_name        = "firehawk-openvpn-server-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -122,11 +123,11 @@ source "amazon-ebs" "openvpn-server-ami" {
   # source_ami      = "${var.openvpn_server_base_ami}"
   source_ami_filter {
     filters = {
-      "ami_role": "openvpn_server_base_ami",
-      "packer_template": "firehawk-base-ami",
-      "commit_hash": var.commit_hash,
-      "commit_hash_short": var.commit_hash_short,
-      "resourcetier": var.resourcetier,
+      "ami_role" : "openvpn_server_base_ami",
+      "packer_template" : "firehawk-base-ami",
+      "commit_hash" : var.commit_hash,
+      "commit_hash_short" : var.commit_hash_short,
+      "resourcetier" : var.resourcetier,
     }
     most_recent = true
     owners      = [var.account_id]
@@ -138,10 +139,11 @@ admin_user=openvpnas
 admin_pw="$(openssl rand -base64 12)"
 EOF
   ssh_username = "openvpnas"
-  tags = merge( "ami_role", "firehawk_openvpn_server_ami", local.common_ami_tags)
+
 }
 
 source "amazon-ebs" "amazon-linux-2-ami" {
+  tags            = merge({ "ami_role" : "firehawk_amazonlinux2_ami" }, local.common_ami_tags)
   ami_description = "An Amazon Linux 2 AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-bastion-amazon-linux-2-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -149,22 +151,23 @@ source "amazon-ebs" "amazon-linux-2-ami" {
   # source_ami      = "${var.amazon_linux_2_ami}"
   source_ami_filter {
     filters = {
-      "ami_role": "amazonlinux2_base_ami",
-      "packer_template": "firehawk-base-ami",
-      "commit_hash": var.commit_hash,
-      "commit_hash_short": var.commit_hash_short,
-      "resourcetier": var.resourcetier,
+      "ami_role" : "amazonlinux2_base_ami",
+      "packer_template" : "firehawk-base-ami",
+      "commit_hash" : var.commit_hash,
+      "commit_hash_short" : var.commit_hash_short,
+      "resourcetier" : var.resourcetier,
     }
     most_recent = true
     owners      = [var.account_id]
   }
-  ssh_username    = "ec2-user"
-  tags = merge( "ami_role", "firehawk_amazonlinux2_ami", local.common_ami_tags)
+  ssh_username = "ec2-user"
+
 }
 
 #could not parse template for following block: "template: generated:4: function \"clean_resource_name\" not defined"
 
 source "amazon-ebs" "centos7-ami" {
+  tags            = merge({ "ami_role" : "firehawk_centos7_ami" }, local.common_ami_tags)
   ami_description = "A Cent OS 7 AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-bastion-centos7-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -172,20 +175,21 @@ source "amazon-ebs" "centos7-ami" {
   # source_ami      = "${var.centos7_ami}"
   source_ami_filter {
     filters = {
-      "ami_role": "centos7_base_ami",
-      "packer_template": "firehawk-base-ami",
-      "commit_hash": var.commit_hash,
-      "commit_hash_short": var.commit_hash_short,
-      "resourcetier": var.resourcetier,
+      "ami_role" : "centos7_base_ami",
+      "packer_template" : "firehawk-base-ami",
+      "commit_hash" : var.commit_hash,
+      "commit_hash_short" : var.commit_hash_short,
+      "resourcetier" : var.resourcetier,
     }
     most_recent = true
     owners      = [var.account_id]
   }
-  ssh_username    = "centos"
-  tags = merge( "ami_role", "firehawk_centos7_ami", local.common_ami_tags)
+  ssh_username = "centos"
+
 }
 
 source "amazon-ebs" "ubuntu18-ami" {
+  tags            = merge({ "ami_role" : "firehawk_ubuntu18_ami" }, local.common_ami_tags)
   ami_description = "An Ubuntu 18.04 AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-bastion-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -193,20 +197,21 @@ source "amazon-ebs" "ubuntu18-ami" {
   # source_ami      = "${var.ubuntu18_ami}"
   source_ami_filter {
     filters = {
-      "ami_role": "ubuntu18_base_ami",
-      "packer_template": "firehawk-base-ami",
-      "commit_hash": var.commit_hash,
-      "commit_hash_short": var.commit_hash_short,
-      "resourcetier": var.resourcetier,
+      "ami_role" : "ubuntu18_base_ami",
+      "packer_template" : "firehawk-base-ami",
+      "commit_hash" : var.commit_hash,
+      "commit_hash_short" : var.commit_hash_short,
+      "resourcetier" : var.resourcetier,
     }
     most_recent = true
     owners      = [var.account_id]
   }
-  ssh_username    = "ubuntu"
-  tags = merge( "ami_role", "firehawk_ubuntu18_ami", local.common_ami_tags)
+  ssh_username = "ubuntu"
+
 }
 
 source "amazon-ebs" "deadline-db-ubuntu18-ami" {
+  tags            = merge({ "ami_role" : "firehawk_deadlinedb_ami" }, local.common_ami_tags)
   ami_description = "An Ubuntu 18.04 AMI with Deadline DB ${var.deadline_version} server."
   ami_name        = "firehawk-deadlinedb-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -214,17 +219,17 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
   # source_ami      = "${var.ubuntu18_ami}"
   source_ami_filter {
     filters = {
-      "ami_role": "ubuntu18_base_ami",
-      "packer_template": "firehawk-base-ami",
-      "commit_hash": var.commit_hash,
-      "commit_hash_short": var.commit_hash_short,
-      "resourcetier": var.resourcetier,
+      "ami_role" : "ubuntu18_base_ami",
+      "packer_template" : "firehawk-base-ami",
+      "commit_hash" : var.commit_hash,
+      "commit_hash_short" : var.commit_hash_short,
+      "resourcetier" : var.resourcetier,
     }
     most_recent = true
     owners      = [var.account_id]
   }
-  ssh_username    = "ubuntu"
-  tags = merge( "ami_role", "firehawk_deadlinedb_ami", local.common_ami_tags)
+  ssh_username = "ubuntu"
+
 
   iam_instance_profile = var.provisioner_iam_profile_name
 
