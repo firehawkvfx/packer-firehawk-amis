@@ -50,8 +50,6 @@ export PKR_VAR_provisioner_iam_profile_name="$(terraform output instance_profile
 echo "Using profile: $PKR_VAR_provisioner_iam_profile_name"
 export PKR_VAR_installers_bucket="$(terraform output installers_bucket)"
 echo "Using installers bucket: $PKR_VAR_installers_bucket"
-export PKR_VAR_firehawk_ami_map="$(terraform output firehawk_ami_map)"
-echo "Using Firehawk AMI map: $PKR_VAR_firehawk_ami_map"
 
 cd $SCRIPTDIR
 
