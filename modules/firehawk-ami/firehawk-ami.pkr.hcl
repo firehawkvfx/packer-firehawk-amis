@@ -6,6 +6,32 @@ variable "aws_region" {
   default = null
 }
 
+variable "ami_role" {
+  description = "A descriptive name for the purpose of the image."
+  type        = string
+}
+variable "commit_hash" {
+  description = "The hash of the commit in the current git repository contining this file."
+  type        = string
+}
+variable "commit_hash_short" {
+  description = "The hash of the commit in the current git repository contining this file."
+  type        = string
+}
+variable "ingress_commit_hash" {
+  description = "The hash of the commit in the git repository contining the source file."
+  type        = string
+}
+variable "ingress_commit_hash_short" {
+  description = "The hash of the commit in the git repository contining the source file."
+  type        = string
+}
+variable "resourcetier" {
+  description = "The current environment ( dev / green / blue / main )"
+  type        = string
+}
+
+
 variable "ca_public_key_path" {
   type    = string
   default = "/home/ec2-user/.ssh/tls/ca.crt.pem"
@@ -125,8 +151,8 @@ source "amazon-ebs" "openvpn-server-ami" {
     filters = {
       "ami_role" : "openvpn_server_base_ami",
       "packer_template" : "firehawk-base-ami",
-      "commit_hash" : var.commit_hash,
-      "commit_hash_short" : var.commit_hash_short,
+      "commit_hash" : var.ingress_commit_hash,
+      "commit_hash_short" : var.ingress_commit_hash_short,
       "resourcetier" : var.resourcetier,
     }
     most_recent = true
@@ -153,8 +179,8 @@ source "amazon-ebs" "amazon-linux-2-ami" {
     filters = {
       "ami_role" : "amazonlinux2_base_ami",
       "packer_template" : "firehawk-base-ami",
-      "commit_hash" : var.commit_hash,
-      "commit_hash_short" : var.commit_hash_short,
+      "commit_hash" : var.ingress_commit_hash,
+      "commit_hash_short" : var.ingress_commit_hash_short,
       "resourcetier" : var.resourcetier,
     }
     most_recent = true
@@ -177,8 +203,8 @@ source "amazon-ebs" "centos7-ami" {
     filters = {
       "ami_role" : "centos7_base_ami",
       "packer_template" : "firehawk-base-ami",
-      "commit_hash" : var.commit_hash,
-      "commit_hash_short" : var.commit_hash_short,
+      "commit_hash" : var.ingress_commit_hash,
+      "commit_hash_short" : var.ingress_commit_hash_short,
       "resourcetier" : var.resourcetier,
     }
     most_recent = true
@@ -199,8 +225,8 @@ source "amazon-ebs" "ubuntu18-ami" {
     filters = {
       "ami_role" : "ubuntu18_base_ami",
       "packer_template" : "firehawk-base-ami",
-      "commit_hash" : var.commit_hash,
-      "commit_hash_short" : var.commit_hash_short,
+      "commit_hash" : var.ingress_commit_hash,
+      "commit_hash_short" : var.ingress_commit_hash_short,
       "resourcetier" : var.resourcetier,
     }
     most_recent = true
@@ -221,8 +247,8 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
     filters = {
       "ami_role" : "ubuntu18_base_ami",
       "packer_template" : "firehawk-base-ami",
-      "commit_hash" : var.commit_hash,
-      "commit_hash_short" : var.commit_hash_short,
+      "commit_hash" : var.ingress_commit_hash,
+      "commit_hash_short" : var.ingress_commit_hash_short,
       "resourcetier" : var.resourcetier,
     }
     most_recent = true

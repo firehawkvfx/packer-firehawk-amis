@@ -15,6 +15,10 @@ export PKR_VAR_ami_role="$(basename $SCRIPTDIR)"
 export PKR_VAR_commit_hash="$(git rev-parse HEAD)"
 export PKR_VAR_commit_hash_short="$(git rev-parse --short HEAD)"
 export PKR_VAR_account_id=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep -oP '(?<="accountId" : ")[^"]*(?=")')
+cd $SCRIPTDIR/../firehawk-base-ami
+export PKR_VAR_ingress_commit_hash="$(git rev-parse HEAD)" # the commit hash for incoming amis
+export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
+cd $SCRIPTDIR
 
 # manifest="$SCRIPTDIR/firehawk-base-ami/manifest.json"
 # if [[ -f "$manifest" ]]; then
