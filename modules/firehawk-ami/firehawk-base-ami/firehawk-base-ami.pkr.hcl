@@ -28,12 +28,12 @@ variable "resourcetier" {
 locals {
   timestamp    = regex_replace(timestamp(), "[- TZ:]", "")
   template_dir = path.root
-  common_ami_tags = tomap( {
+  common_ami_tags = {
       "ami_role": "firehawk-base-ami",
       "commit_hash": var.commit_hash,
       "commit_hash_short": var.commit_hash_short,
       "resourcetier": var.resourcetier,
-    } )
+    }
 }
 
 source "amazon-ebs" "amazon-linux-2-ami" {
