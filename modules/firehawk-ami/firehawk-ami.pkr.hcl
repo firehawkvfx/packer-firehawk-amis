@@ -1,5 +1,5 @@
-# Ensure you first build the ./base-ami first to produce a manifest.
-# The base-ami is used to build this ami.
+# Ensure you first build the ./firehawk-base-ami first to produce a manifest.
+# The firehawk-base-ami is used to build this ami.
 
 variable "aws_region" {
   type    = string

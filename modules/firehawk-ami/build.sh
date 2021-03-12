@@ -7,7 +7,7 @@ cd $SCRIPTDIR
 
 export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
 
-manifest="$SCRIPTDIR/base-ami/manifest.json"
+manifest="$SCRIPTDIR/firehawk-base-ami/manifest.json"
 if [[ -f "$manifest" ]]; then
     export PKR_VAR_centos7_ami="$(jq -r '.builds[] | select(.name == "centos7-ami") | .artifact_id' "$manifest" | tail -1 | cut -d ":" -f2)"
     echo "Found centos7_ami in manifest: PKR_VAR_centos7_ami=$PKR_VAR_centos7_ami"

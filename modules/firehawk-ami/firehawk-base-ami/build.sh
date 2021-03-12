@@ -16,6 +16,6 @@ export PKR_VAR_manifest_path="$SCRIPTDIR/manifest.json"
 
 mkdir -p $SCRIPTDIR/tmp/log
 rm -f $PKR_VAR_manifest_path
-packer build "$@" $SCRIPTDIR/base-ami.pkr.hcl
+packer build "$@" $SCRIPTDIR/firehawk-base-ami.pkr.hcl
 
 cd $EXECDIR
