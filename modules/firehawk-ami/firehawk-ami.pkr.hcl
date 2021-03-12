@@ -11,6 +11,10 @@ variable "ca_public_key_path" {
   default = "/home/ec2-user/.ssh/tls/ca.crt.pem"
 }
 
+variable "account_id" {
+  type = string
+}
+
 variable "resourcetier" { # May be used to isolate or aquire some environment specific resources.
   type = string
 }
@@ -61,21 +65,21 @@ variable "consul_cluster_tag_value" {
   default = ""
 }
 
-variable "openvpn_server_base_ami" {
-  type = string
-}
+# variable "openvpn_server_base_ami" {
+#   type = string
+# }
 
-variable "amazon_linux_2_ami" {
-  type = string
-}
+# variable "amazon_linux_2_ami" {
+#   type = string
+# }
 
-variable "ubuntu18_ami" {
-  type = string
-}
+# variable "ubuntu18_ami" {
+#   type = string
+# }
 
-variable "centos7_ami" {
-  type = string
-}
+# variable "centos7_ami" {
+#   type = string
+# }
 
 variable "provisioner_iam_profile_name" { # Required for some builds requiring S3 Installers
   type = string
@@ -102,6 +106,12 @@ locals {
   template_dir      = path.root
   deadline_version  = var.deadline_version
   installers_bucket = var.installers_bucket
+  common_ami_tags = {
+      "packer_template": "firehawk-ami",
+      "commit_hash": var.commit_hash,
+      "commit_hash_short": var.commit_hash_short,
+      "resourcetier": var.resourcetier,
+    }
 }
 
 source "amazon-ebs" "openvpn-server-ami" {
@@ -109,7 +119,18 @@ source "amazon-ebs" "openvpn-server-ami" {
   ami_name        = "firehawk-openvpn-server-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
-  source_ami      = "${var.openvpn_server_base_ami}"
+  # source_ami      = "${var.openvpn_server_base_ami}"
+  source_ami_filter {
+    filters = {
+      "ami_role": "openvpn_server_base_ami",
+      "packer_template": "firehawk-base-ami",
+      "commit_hash": var.commit_hash,
+      "commit_hash_short": var.commit_hash_short,
+      "resourcetier": var.resourcetier,
+    }
+    most_recent = true
+    owners      = [var.account_id]
+  }
   # We generate a random pass for the image build.  It will never need to be reused.  When the ami is started, the password is reset to a vault provided value.
   user_data    = <<EOF
 #! /bin/bash
@@ -117,6 +138,7 @@ admin_user=openvpnas
 admin_pw="$(openssl rand -base64 12)"
 EOF
   ssh_username = "openvpnas"
+  tags = merge( "ami_role", "firehawk_openvpn_server_ami", local.common_ami_tags)
 }
 
 source "amazon-ebs" "amazon-linux-2-ami" {
@@ -124,8 +146,20 @@ source "amazon-ebs" "amazon-linux-2-ami" {
   ami_name        = "firehawk-bastion-amazon-linux-2-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
-  source_ami      = "${var.amazon_linux_2_ami}"
+  # source_ami      = "${var.amazon_linux_2_ami}"
+  source_ami_filter {
+    filters = {
+      "ami_role": "amazonlinux2_base_ami",
+      "packer_template": "firehawk-base-ami",
+      "commit_hash": var.commit_hash,
+      "commit_hash_short": var.commit_hash_short,
+      "resourcetier": var.resourcetier,
+    }
+    most_recent = true
+    owners      = [var.account_id]
+  }
   ssh_username    = "ec2-user"
+  tags = merge( "ami_role", "firehawk_amazonlinux2_ami", local.common_ami_tags)
 }
 
 #could not parse template for following block: "template: generated:4: function \"clean_resource_name\" not defined"
@@ -135,8 +169,20 @@ source "amazon-ebs" "centos7-ami" {
   ami_name        = "firehawk-bastion-centos7-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
-  source_ami      = "${var.centos7_ami}"
+  # source_ami      = "${var.centos7_ami}"
+  source_ami_filter {
+    filters = {
+      "ami_role": "centos7_base_ami",
+      "packer_template": "firehawk-base-ami",
+      "commit_hash": var.commit_hash,
+      "commit_hash_short": var.commit_hash_short,
+      "resourcetier": var.resourcetier,
+    }
+    most_recent = true
+    owners      = [var.account_id]
+  }
   ssh_username    = "centos"
+  tags = merge( "ami_role", "firehawk_centos7_ami", local.common_ami_tags)
 }
 
 source "amazon-ebs" "ubuntu18-ami" {
@@ -144,8 +190,20 @@ source "amazon-ebs" "ubuntu18-ami" {
   ami_name        = "firehawk-bastion-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
-  source_ami      = "${var.ubuntu18_ami}"
+  # source_ami      = "${var.ubuntu18_ami}"
+  source_ami_filter {
+    filters = {
+      "ami_role": "ubuntu18_base_ami",
+      "packer_template": "firehawk-base-ami",
+      "commit_hash": var.commit_hash,
+      "commit_hash_short": var.commit_hash_short,
+      "resourcetier": var.resourcetier,
+    }
+    most_recent = true
+    owners      = [var.account_id]
+  }
   ssh_username    = "ubuntu"
+  tags = merge( "ami_role", "firehawk_ubuntu18_ami", local.common_ami_tags)
 }
 
 source "amazon-ebs" "deadline-db-ubuntu18-ami" {
@@ -153,8 +211,20 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
   ami_name        = "firehawk-deadlinedb-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
-  source_ami      = "${var.ubuntu18_ami}"
+  # source_ami      = "${var.ubuntu18_ami}"
+  source_ami_filter {
+    filters = {
+      "ami_role": "ubuntu18_base_ami",
+      "packer_template": "firehawk-base-ami",
+      "commit_hash": var.commit_hash,
+      "commit_hash_short": var.commit_hash_short,
+      "resourcetier": var.resourcetier,
+    }
+    most_recent = true
+    owners      = [var.account_id]
+  }
   ssh_username    = "ubuntu"
+  tags = merge( "ami_role", "firehawk_deadlinedb_ami", local.common_ami_tags)
 
   iam_instance_profile = var.provisioner_iam_profile_name
 

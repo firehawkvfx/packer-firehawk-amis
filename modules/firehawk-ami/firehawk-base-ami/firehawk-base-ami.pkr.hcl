@@ -29,7 +29,7 @@ locals {
   timestamp    = regex_replace(timestamp(), "[- TZ:]", "")
   template_dir = path.root
   common_ami_tags = {
-      "ami_role": "firehawk-base-ami",
+      "packer_template": "firehawk-base-ami",
       "commit_hash": var.commit_hash,
       "commit_hash_short": var.commit_hash_short,
       "resourcetier": var.resourcetier,
@@ -53,7 +53,7 @@ source "amazon-ebs" "amazon-linux-2-ami" {
     owners      = ["amazon"]
   }
   ssh_username = "ec2-user"
-  tags = local.common_ami_tags
+  tags = merge( "ami_role", "amazonlinux2_base_ami", local.common_ami_tags)
 }
 
 source "amazon-ebs" "centos7-ami" {
@@ -71,7 +71,7 @@ source "amazon-ebs" "centos7-ami" {
   }
   user_data_file = "${local.template_dir}/cloud-init.yaml" # This is a fix for some instance types with Centos 7 and mounts causing errors.
   ssh_username = "centos"
-  tags = local.common_ami_tags
+  tags = merge( "ami_role", "centos7_base_ami", local.common_ami_tags)
 }
 
 source "amazon-ebs" "ubuntu18-ami" {
@@ -91,7 +91,7 @@ source "amazon-ebs" "ubuntu18-ami" {
     owners      = ["099720109477"]
   }
   ssh_username = "ubuntu"
-  tags = local.common_ami_tags
+  tags = merge( "ami_role", "ubuntu18_base_ami", local.common_ami_tags)
 }
 
 source "amazon-ebs" "base-openvpn-server-ami" {
@@ -113,7 +113,7 @@ EOF
     owners      = ["679593333241"]
   }
   ssh_username = "openvpnas"
-  tags = local.common_ami_tags
+  tags = merge( "ami_role", "openvpn_server_base_ami", local.common_ami_tags)
 }
 
 build {
