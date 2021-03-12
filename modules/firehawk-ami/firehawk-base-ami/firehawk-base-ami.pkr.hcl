@@ -53,7 +53,7 @@ source "amazon-ebs" "amazon-linux-2-ami" {
     owners      = ["amazon"]
   }
   ssh_username = "ec2-user"
-  tags = var.common_ami_tags
+  tags = local.common_ami_tags
 }
 
 source "amazon-ebs" "centos7-ami" {
@@ -71,7 +71,7 @@ source "amazon-ebs" "centos7-ami" {
   }
   user_data_file = "${local.template_dir}/cloud-init.yaml" # This is a fix for some instance types with Centos 7 and mounts causing errors.
   ssh_username = "centos"
-  tags = var.common_ami_tags
+  tags = local.common_ami_tags
 }
 
 source "amazon-ebs" "ubuntu18-ami" {
@@ -91,7 +91,7 @@ source "amazon-ebs" "ubuntu18-ami" {
     owners      = ["099720109477"]
   }
   ssh_username = "ubuntu"
-  tags = var.common_ami_tags
+  tags = local.common_ami_tags
 }
 
 source "amazon-ebs" "base-openvpn-server-ami" {
@@ -113,7 +113,7 @@ EOF
     owners      = ["679593333241"]
   }
   ssh_username = "openvpnas"
-  tags = var.common_ami_tags
+  tags = local.common_ami_tags
 }
 
 build {
