@@ -33,7 +33,7 @@ locals {
       "commit_hash": var.commit_hash,
       "commit_hash_short": var.commit_hash_short,
       "resourcetier": var.resourcetier,
-    }
+    } )
 }
 
 source "amazon-ebs" "amazon-linux-2-ami" {
