@@ -131,7 +131,9 @@ else
   return
 fi
 
-export TF_VAR_common_tags=$(jq -n -f "$SCRIPTDIR/common_tags.json" \
+common_tags_path="$SCRIPTDIR/common_tags.json"
+echo "read: $common_tags_path"
+export TF_VAR_common_tags=$(jq -n -f "$common_tags_path" \
   --arg environment "$TF_VAR_environment" \
   --arg resourcetier "$TF_VAR_resourcetier" \
   --arg conflictkey "$TF_VAR_conflictkey" \
