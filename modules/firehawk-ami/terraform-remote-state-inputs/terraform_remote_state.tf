@@ -12,15 +12,15 @@ variable "vpcname_vault" {
     type = string
 }
 data "aws_region" "current" {}
-data "terraform_remote_state" "provisioner_profile" { # read the arn with data.terraform_remote_state.provisioner_profile.outputs.instance_role_arn, or read the profile name with data.terraform_remote_state.provisioner_profile.outputs.instance_profile_name
+data "terraform_remote_state" "packer_profile" { # read the arn with data.terraform_remote_state.packer_profile.outputs.instance_role_arn, or read the profile name with data.terraform_remote_state.packer_profile.outputs.instance_profile_name
   backend = "s3"
   config = {
     bucket = "state.terraform.${var.bucket_extension_vault}"
-    key    = "${var.resourcetier_vault}/${var.vpcname_vault}-terraform-aws-iam-profile-provisioner/terraform.tfstate"
+    key    = "${var.resourcetier_vault}/${var.vpcname_vault}-terraform-aws-iam-profile-packer/terraform.tfstate"
     region = data.aws_region.current.name
   }
 }
-data "terraform_remote_state" "installers_bucket" { # read the arn with data.terraform_remote_state.provisioner_profile.outputs.instance_role_arn, or read the profile name with data.terraform_remote_state.provisioner_profile.outputs.instance_profile_name
+data "terraform_remote_state" "installers_bucket" {
   backend = "s3"
   config = {
     bucket = "state.terraform.${var.bucket_extension_vault}"
@@ -29,7 +29,7 @@ data "terraform_remote_state" "installers_bucket" { # read the arn with data.ter
   }
 }
 output "instance_profile_name" {
-    value = data.terraform_remote_state.provisioner_profile.outputs.instance_profile_name
+    value = data.terraform_remote_state.packer_profile.outputs.instance_profile_name
 }
 output "installers_bucket" {
     value = data.terraform_remote_state.installers_bucket.outputs.bucket_name
