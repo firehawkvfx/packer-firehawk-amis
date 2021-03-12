@@ -87,22 +87,6 @@ variable "consul_cluster_tag_value" {
   default = ""
 }
 
-# variable "openvpn_server_base_ami" {
-#   type = string
-# }
-
-# variable "amazon_linux_2_ami" {
-#   type = string
-# }
-
-# variable "ubuntu18_ami" {
-#   type = string
-# }
-
-# variable "centos7_ami" {
-#   type = string
-# }
-
 variable "provisioner_iam_profile_name" { # Required for some builds requiring S3 Installers
   type = string
 }
@@ -210,6 +194,28 @@ source "amazon-ebs" "centos7-ami" {
 
 }
 
+source "amazon-ebs" "centos7-rendernode-ami" {
+  tags            = merge({ "ami_role" : "firehawk_centos7_rendernode_ami" }, local.common_ami_tags)
+  ami_description = "A Cent OS 7 AMI rendernode."
+  ami_name        = "firehawk-bastion-centos7-${local.timestamp}-{{uuid}}"
+  instance_type   = "t2.micro"
+  region          = "${var.aws_region}"
+  # source_ami      = "${var.centos7_ami}"
+  source_ami_filter {
+    filters = {
+      "tag:ami_role" : "centos7_base_ami",
+      "tag:packer_template" : "firehawk-base-ami",
+      "tag:commit_hash" : var.ingress_commit_hash,
+      "tag:commit_hash_short" : var.ingress_commit_hash_short,
+      "tag:resourcetier" : var.resourcetier,
+    }
+    most_recent = true
+    owners      = [var.account_id]
+  }
+  ssh_username = "centos"
+
+}
+
 source "amazon-ebs" "ubuntu18-ami" {
   tags            = merge({ "ami_role" : "firehawk_ubuntu18_ami" }, local.common_ami_tags)
   ami_description = "An Ubuntu 18.04 AMI that will accept connections from hosts with TLS Certs."
@@ -280,6 +286,7 @@ build {
   sources = [
     "source.amazon-ebs.amazon-linux-2-ami",
     "source.amazon-ebs.centos7-ami",
+    "source.amazon-ebs.centos7-rendernode-ami",
     "source.amazon-ebs.ubuntu18-ami",
     "source.amazon-ebs.deadline-db-ubuntu18-ami",
     "source.amazon-ebs.openvpn-server-ami"
@@ -478,7 +485,7 @@ build {
       # "sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
       "sudo yum -y install bind-utils jq"
     ]
-    only = ["amazon-ebs.centos7-ami"]
+    only = ["amazon-ebs.centos7-ami", "amazon-ebs.centos7-rendernode-ami"]
   }
 
   ### Install Consul
@@ -512,7 +519,7 @@ build {
       "/tmp/terraform-aws-consul/modules/install-dnsmasq/install-dnsmasq",
       "sudo systemctl restart dnsmasq",
     ]
-    only = ["amazon-ebs.ubuntu16-ami", "amazon-ebs.amazon-linux-2-ami", "amazon-ebs.centos7-ami"]
+    only = ["amazon-ebs.ubuntu16-ami", "amazon-ebs.amazon-linux-2-ami", "amazon-ebs.centos7-ami", "amazon-ebs.centos7-rendernode-ami"]
   }
   provisioner "shell" {
     inline = [
@@ -520,7 +527,7 @@ build {
       "sudo rm -fr /etc/sysconfig/network-scripts/ifcfg-eth0", # this may need to be removed from the image. having a leftover network interface file here if the interface is not present can cause dns issues and slowdowns with sudo.
       "sudo sed -i 's/sudo //g' /opt/consul/bin/run-consul"    # strip sudo for when we run consul. sudo on centos takes 25 seconds due to a bad AMI build. https://bugs.centos.org/view.php?id=18066
     ]
-    only = ["amazon-ebs.centos7-ami"]
+    only = ["amazon-ebs.centos7-ami", "amazon-ebs.centos7-rendernode-ami"]
   }
   provisioner "shell" { # Generate certificates with vault.
     inline = [
@@ -565,6 +572,37 @@ build {
     galaxy_file      = "./requirements.yml"
     only             = ["amazon-ebs.openvpn-server-ami"]
   }
+
+### Configure Centos user and render user
+
+  provisioner "ansible" {
+    playbook_file = "./ansible/newuser_deadlineuser.yaml"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=centos variable_user=deployuser sudo=true add_to_group_syscontrol=true create_ssh_key=false variable_uid=${local.deployuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path = "./ansible/roles"
+    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
+    galaxy_file = "./requirements.yml"
+    only = ["amazon-ebs.centos7-rendernode-ami"]
+  }
+
+  provisioner "ansible" {
+    playbook_file = "./ansible/newuser_deadlineuser.yaml"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=centos variable_user=deadlineuser sudo=false add_to_group_syscontrol=false create_ssh_key=false variable_uid=${local.deadlineuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path = "./ansible/roles"
+    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
+    galaxy_file = "./requirements.yml"
+    only = ["amazon-ebs.centos7-rendernode-ami"]
+  }
+
   post-processor "manifest" {
     output     = "${local.template_dir}/manifest.json"
     strip_path = true
