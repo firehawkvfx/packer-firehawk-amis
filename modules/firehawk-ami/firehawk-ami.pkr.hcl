@@ -107,6 +107,23 @@ variable "installers_bucket" {
   type        = string
 }
 
+# Required for render node AMI
+variable "sesi_client_id" {
+  description = "The client ID generated from your Side FX Account to automatically download Houdini."
+  type = string
+}
+
+variable "sesi_client_secret_key" {
+  description = "The secret key generated from your Side FX Account to automatically download Houdini."
+  type = string
+}
+
+variable "houdini_license_server_address" {
+  description = "The IP or host name of your Houdini license server (IP Address is recommended to simplify usage across sites with DNS)."
+  type = string
+}
+
+
 locals {
   timestamp         = regex_replace(timestamp(), "[- TZ:]", "")
   template_dir      = path.root
@@ -122,6 +139,9 @@ locals {
   deployuser_uid = "9004"
   deadlineuser_uid = "9001"
   houdini_build = "daily"
+  sesi_client_id = var.sesi_client_id
+  sesi_client_secret_key = var.sesi_client_secret_key
+  houdini_license_server_address = var.houdini_license_server_address
 }
 
 source "amazon-ebs" "openvpn-server-ami" {
@@ -426,23 +446,6 @@ build {
     only = ["amazon-ebs.centos7-rendernode-ami"]
   }
 
-  ### Install Houdini ### Requires you create a SESI API Key
-  provisioner "ansible" {
-    playbook_file = "./ansible/collections/ansible_collections/firehawkvfx/houdini/houdini_module.yaml"
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "houdini_build=${local.houdini_build}",
-      "--tags",
-      "install_houdini"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path = "./ansible/roles"
-    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
-    galaxy_file = "./requirements.yml"
-    only = ["amazon-ebs.centos7-rendernode-ami"]
-  }
-
   ### Open VPN / Deadline DB / Centos install CLI.  This should be relocated to the base ami, and done purely with bash now instead.
   provisioner "ansible" {
     extra_arguments = [
@@ -516,7 +519,22 @@ build {
     only = ["amazon-ebs.centos7-rendernode-ami"]
   }
 
-
+  ### Install Houdini ### Requires you create a SESI API Key to auto download.
+  provisioner "ansible" {
+    playbook_file = "./ansible/collections/ansible_collections/firehawkvfx/houdini/houdini_module.yaml"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "houdini_build=${local.houdini_build}",
+      "--tags",
+      "install_houdini"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path = "./ansible/roles"
+    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
+    galaxy_file = "./requirements.yml"
+    only = ["amazon-ebs.centos7-rendernode-ami"]
+  }
   
 
 

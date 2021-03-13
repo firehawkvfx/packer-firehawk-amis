@@ -12,7 +12,7 @@
 # ansible-playbook -i ansible/inventory ansible/ansible_collections/firehawkvfx/houdini/houdini_module.yaml -v --extra-vars "variable_host=workstation1 variable_user=deadlineuser hostname=workstation1 ansible_become_pass=sompass"
 
 - hosts: "{{ variable_host | default('role_node_centos') }}"
-  remote_user: "{{ variable_connect_as_user | default('centos') }}"
+  remote_user: "{{ variable_connect_as_user | default(ansible_user) }}"
   gather_facts: "{{ variable_gather_facts | default('false') }}"
   become: true
 
@@ -21,8 +21,8 @@
 
     vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/ansible_collections/firehawkvfx/houdini/vars/main.yml", "vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
 
-  vars_files:
-    - /deployuser/ansible/group_vars/all/vars
+  # vars_files:
+  #   - /deployuser/ansible/group_vars/all/vars
 
   tasks:
   - name: aquire vars from secrets path before using defaults for softnas hosts 1
@@ -46,8 +46,8 @@
   vars:
     vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/ansible_collections/firehawkvfx/houdini/vars/main.yml", "vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
 
-  vars_files:
-    - /deployuser/ansible/group_vars/all/vars
+  # vars_files:
+  #   - /deployuser/ansible/group_vars/all/vars
 
   tasks:
   - name: aquire vars from secrets path before using defaults for softnas hosts 1
@@ -132,15 +132,15 @@
 ### Houdini Install
 
 - hosts: "{{ variable_host | default('role_node_centos') }}"
-  remote_user: "{{ variable_connect_as_user | default('centos') }}"
+  remote_user: "{{ variable_connect_as_user | default(ansible_user) }}"
   gather_facts: "{{ variable_gather_facts | default('false') }}"
   become: true
   
   vars:
     vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/ansible_collections/firehawkvfx/houdini/vars/main.yml", "vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
 
-  vars_files:
-    - /deployuser/ansible/group_vars/all/vars
+  # vars_files:
+  #   - /deployuser/ansible/group_vars/all/vars
 
   tasks:
   - name: aquire vars from secrets path before using defaults
@@ -187,8 +187,8 @@
     houdini_install_type: 'node'
     vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/ansible_collections/firehawkvfx/houdini/vars/main.yml", "vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
 
-  vars_files:
-    - /deployuser/ansible/group_vars/all/vars
+  # vars_files:
+  #   - /deployuser/ansible/group_vars/all/vars
 
   tasks:
   - name: aquire vars from secrets path before using defaults
