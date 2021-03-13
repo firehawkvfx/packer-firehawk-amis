@@ -426,9 +426,9 @@ build {
     only = ["amazon-ebs.centos7-rendernode-ami"]
   }
 
-  ### Install Houdini
+  ### Install Houdini ### Requires you create a SESI API Key
   provisioner "ansible" {
-    playbook_file = "./ansible/ansible_collections/firehawkvfx/houdini/houdini_module.yaml"
+    playbook_file = "./ansible/collections/ansible_collections/firehawkvfx/houdini/houdini_module.yaml"
     extra_arguments = [
       "-v",
       "--extra-vars",
