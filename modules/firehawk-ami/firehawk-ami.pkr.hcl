@@ -380,7 +380,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_host=default variable_connect_as_user={{user `SUDO_USER`}} variable_user={{user `SUDO_USER`}} variable_become_user={{user `SUDO_USER`}} delegate_host=localhost",
+      "variable_host=default variable_connect_as_user={{user `USER`}} variable_user={{user `USER`}} variable_become_user={{user `USER`}} delegate_host=localhost",
       "--skip-tags",
       "user_access"
     ]
@@ -395,7 +395,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_host=default variable_connect_as_user={{user `SUDO_USER`}} variable_user={{user `SUDO_USER`}} variable_become_user={{user `SUDO_USER`}} delegate_host=localhost",
+      "variable_host=default variable_connect_as_user={{user `USER`}} variable_user={{user `USER`}} variable_become_user={{user `USER`}} delegate_host=localhost",
       "--skip-tags",
       "user_access"
     ]
