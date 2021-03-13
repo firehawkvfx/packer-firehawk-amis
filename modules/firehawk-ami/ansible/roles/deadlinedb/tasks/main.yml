@@ -103,6 +103,8 @@
     fi
   vars:
     aws_executable: "~/.local/bin/aws"
+  args:
+    executable: /bin/bash
   tags:
   - install
   - sync_installers
