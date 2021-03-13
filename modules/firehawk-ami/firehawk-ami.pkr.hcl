@@ -302,18 +302,18 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
 
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
-    volume_size           = 40
+    volume_size           = 20
     volume_type           = "gp2"
     delete_on_termination = true
   }
-  ami_block_device_mappings {
-    device_name  = "/dev/sdb"
-    virtual_name = "ephemeral0"
-  }
-  ami_block_device_mappings {
-    device_name  = "/dev/sdc"
-    virtual_name = "ephemeral1"
-  }
+  # ami_block_device_mappings {
+  #   device_name  = "/dev/sdb"
+  #   virtual_name = "ephemeral0"
+  # }
+  # ami_block_device_mappings {
+  #   device_name  = "/dev/sdc"
+  #   virtual_name = "ephemeral1"
+  # }
   # assume_role { # Since we need to read files from s3, we require a role with read access.
   #     role_arn     = "arn:aws:iam::972620357255:role/provisioner_instance_role_pipeid0" # This needs to be replaced with a terraform output
   #     session_name = "SESSION_NAME"
