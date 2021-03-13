@@ -516,7 +516,7 @@ build {
       # "sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
       # "sudo yum -y install awscli"
       "python3 -m pip install --user --upgrade awscli",
-      "sudo ln -s /usr/local/bin/aws /usr/local/sbin/aws",
+      "sudo ln -s /usr/local/sbin/aws /usr/local/bin/aws",
       "which aws",
       # "aws_path=/usr/local/bin/aws"
     ]
