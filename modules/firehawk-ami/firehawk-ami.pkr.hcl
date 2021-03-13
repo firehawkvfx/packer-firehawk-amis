@@ -238,6 +238,8 @@ source "amazon-ebs" "centos7-rendernode-ami" {
   }
   ssh_username = "centos"
 
+  iam_instance_profile = var.provisioner_iam_profile_name # provide read and write s3 access for updating and retrieving installers
+
 }
 
 source "amazon-ebs" "ubuntu18-ami" {
@@ -281,7 +283,6 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
     owners      = [var.account_id]
   }
   ssh_username = "ubuntu"
-
 
   iam_instance_profile = var.provisioner_iam_profile_name
 
