@@ -375,12 +375,12 @@ build {
 
   ### End public cert block to verify other consul agents ###
 
-  ### Open VPN / Deadline DB install CLI.  This should be relocated to the base ami, and done purely with bash now instead.
+  ### Open VPN / Deadline DB / Centos install CLI.  This should be relocated to the base ami, and done purely with bash now instead.
   provisioner "ansible" {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_host=default variable_connect_as_user={{user `USER`}} variable_user={{user `USER`}} variable_become_user={{user `USER`}} delegate_host=localhost",
+      "variable_host=default variable_connect_as_user=openvpnas variable_user=openvpnas variable_become_user=openvpnas delegate_host=localhost",
       "--skip-tags",
       "user_access"
     ]
@@ -395,7 +395,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_host=default variable_connect_as_user={{user `USER`}} variable_user={{user `USER`}} variable_become_user={{user `USER`}} delegate_host=localhost",
+      "variable_host=default variable_connect_as_user=ubuntu variable_user=ubuntu variable_become_user=ubuntu delegate_host=localhost",
       "--skip-tags",
       "user_access"
     ]
@@ -405,6 +405,21 @@ build {
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
     galaxy_file      = "./requirements.yml"
     only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
+  provisioner "ansible" {
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "variable_host=default variable_connect_as_user=centos variable_user=centos variable_become_user=centos delegate_host=localhost",
+      "--skip-tags",
+      "user_access"
+    ]
+    playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only             = ["amazon-ebs.centos7-rendernode-ami"]
   }
 
   # ### Ensure aws works for root user.  This should be relocated to the base ami.
