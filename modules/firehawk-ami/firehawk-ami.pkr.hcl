@@ -240,6 +240,20 @@ source "amazon-ebs" "centos7-rendernode-ami" {
 
   iam_instance_profile = var.provisioner_iam_profile_name # provide read and write s3 access for updating and retrieving installers
 
+  launch_block_device_mappings {
+    device_name           = "/dev/sda1"
+    volume_size           = 16
+    volume_type           = "gp2"
+    delete_on_termination = true
+  }
+  ami_block_device_mappings {
+    device_name  = "/dev/sdb"
+    virtual_name = "ephemeral0"
+  }
+  ami_block_device_mappings {
+    device_name  = "/dev/sdc"
+    virtual_name = "ephemeral1"
+  }
 }
 
 source "amazon-ebs" "ubuntu18-ami" {
