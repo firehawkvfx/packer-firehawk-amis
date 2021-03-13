@@ -531,7 +531,7 @@ build {
     ]
     collections_path = "./ansible/collections"
     roles_path = "./ansible/roles"
-    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
+    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key}" ]
     galaxy_file = "./requirements.yml"
     only = ["amazon-ebs.centos7-rendernode-ami"]
   }
