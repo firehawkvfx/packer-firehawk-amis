@@ -523,9 +523,9 @@ build {
   provisioner "ansible" {
     playbook_file = "./ansible/collections/ansible_collections/firehawkvfx/houdini/houdini_module.yaml"
     extra_arguments = [
-      "-v",
+      "-vv",
       "--extra-vars",
-      "resourcetier=${var.resourcetier} variable_host=default houdini_build=${local.houdini_build} sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key} houdini_license_server_address=${var.houdini_license_server_address} user_deadlineuser_pw=''",
+      "resourcetier=${var.resourcetier} variable_host=default houdini_build=${local.houdini_build} sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key} houdini_license_server_address=${var.houdini_license_server_address} user_deadlineuser_pw='' package_python_interpreter=/usr/bin/python2.7",
       "--tags",
       "install_houdini"
     ]
