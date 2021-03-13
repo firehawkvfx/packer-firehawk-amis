@@ -6,6 +6,7 @@
   become: true
 
   vars:
+    user_deadlineuser_pw: ""
     my_password: "{{ user_deadlineuser_pw }}"
     no_extension: "{{ deadline_linux_installers_tar | splitext | first }}"
     basename: "{{ no_extension.split('/')[-1] }}"
