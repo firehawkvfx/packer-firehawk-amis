@@ -280,7 +280,7 @@ source "amazon-ebs" "ubuntu18-ami" {
 source "amazon-ebs" "ubuntu18-vault-consul-server-ami" {
   tags            = merge({ "ami_role" : "firehawk_ubuntu18_vault_consul_server_ami" }, local.common_ami_tags)
   ami_description = "An Ubuntu 18.04 AMI Vault and Consul Server."
-  ami_name        = "firehawk-bastion-ubuntu18-${local.timestamp}-{{uuid}}"
+  ami_name        = "firehawk-vault-consul-server-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
   # source_ami      = "${var.ubuntu18_ami}"
