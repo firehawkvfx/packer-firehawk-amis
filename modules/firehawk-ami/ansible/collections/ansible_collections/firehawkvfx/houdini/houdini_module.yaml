@@ -18,7 +18,7 @@
 
   vars:
     ansible_become_pass: "{{ user_deadlineuser_pw }}"
-
+    secrets_path: "{{ playbook_dir }}" # if not defined, retarget to this path.  This allows local installs (not cloud) to inherit user prefs.
     vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
 # consider abs path with:
 # {{role_path}}
@@ -144,6 +144,7 @@
   become: true
   
   vars:
+    secrets_path: "{{ playbook_dir }}"
     vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
 
   # vars_files:
