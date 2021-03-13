@@ -2,6 +2,6 @@
 # vars file for roles/houdini_module
 
 exclude: "*"
-
+aws_executable: aws
 ansible_become_pass: "{{ user_deadlineuser_pw }}"
 ansible_password: "{{ user_deadlineuser_pw }}"
