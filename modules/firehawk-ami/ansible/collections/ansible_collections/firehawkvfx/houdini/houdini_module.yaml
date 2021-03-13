@@ -175,7 +175,7 @@
 
   - name: Install Deadline
     include_role:
-      name: firehawkvfx.deadline.configure_deadline_houdini_role
+      name: configure_deadline_houdini_role
       apply:
         tags:
           - install_deadline_db
