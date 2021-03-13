@@ -347,7 +347,7 @@ build {
     "source.amazon-ebs.centos7-ami",
     "source.amazon-ebs.centos7-rendernode-ami",
     "source.amazon-ebs.ubuntu18-ami",
-    "source.ubuntu18-vault-consul-server-ami",
+    "source.amazon-ebs.ubuntu18-vault-consul-server-ami",
     "source.amazon-ebs.deadline-db-ubuntu18-ami",
     "source.amazon-ebs.openvpn-server-ami"
   ]
