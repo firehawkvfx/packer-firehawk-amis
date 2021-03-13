@@ -275,7 +275,27 @@ source "amazon-ebs" "ubuntu18-ami" {
     owners      = [var.account_id]
   }
   ssh_username = "ubuntu"
+}
 
+source "amazon-ebs" "ubuntu18-vault-consul-server-ami" {
+  tags            = merge({ "ami_role" : "firehawk_ubuntu18_vault_consul_server_ami" }, local.common_ami_tags)
+  ami_description = "An Ubuntu 18.04 AMI Vault and Consul Server."
+  ami_name        = "firehawk-bastion-ubuntu18-${local.timestamp}-{{uuid}}"
+  instance_type   = "t2.micro"
+  region          = "${var.aws_region}"
+  # source_ami      = "${var.ubuntu18_ami}"
+  source_ami_filter {
+    filters = {
+      "tag:ami_role" : "ubuntu18_base_ami",
+      "tag:packer_template" : "firehawk-base-ami",
+      "tag:commit_hash" : var.ingress_commit_hash,
+      "tag:commit_hash_short" : var.ingress_commit_hash_short,
+      "tag:resourcetier" : var.resourcetier,
+    }
+    most_recent = true
+    owners      = [var.account_id]
+  }
+  ssh_username = "ubuntu"
 }
 
 source "amazon-ebs" "deadline-db-ubuntu18-ami" {
@@ -327,6 +347,7 @@ build {
     "source.amazon-ebs.centos7-ami",
     "source.amazon-ebs.centos7-rendernode-ami",
     "source.amazon-ebs.ubuntu18-ami",
+    "source.ubuntu18-vault-consul-server-ami",
     "source.amazon-ebs.deadline-db-ubuntu18-ami",
     "source.amazon-ebs.openvpn-server-ami"
   ]
@@ -346,7 +367,7 @@ build {
     ]
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline_shebang   = "/bin/bash -e"
-    only             = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+    only             = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.ubuntu18-vault-consul-server-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
   provisioner "file" { # fix apt upgrades to not hold up boot
@@ -366,7 +387,7 @@ build {
       "sudo systemctl --all list-timers apt-daily{,-upgrade}.timer"
     ]
     inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.ubuntu18-vault-consul-server-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
   ### Public cert block to verify other consul agents ###
@@ -387,6 +408,7 @@ build {
     destination = "/tmp/ca.crt.pem"
     source      = "${var.ca_public_key_path}"
   }
+  ### Clients only require the CA cert.
   provisioner "shell" {
     inline = [
       "echo \"hostname: $(sudo hostnamectl)\"",
@@ -407,10 +429,28 @@ build {
     ]
     inline_shebang = "/bin/bash -e"
   }
+  # ### Only Vault and Consul servers should have the private keys.
+  # provisioner "shell" {
+  #   inline         = [
+  #     "if [[ '${var.install_auth_signing_script}' == 'true' ]]; then",
+  #     "sudo mv /tmp/sign-request.py /opt/vault/scripts/",
+  #     "else",
+  #     "sudo rm /tmp/sign-request.py",
+  #     "fi",
+  #     "sudo mv /tmp/ca.crt.pem /opt/vault/tls/",
+  #     "sudo mv /tmp/vault.crt.pem /opt/vault/tls/",
+  #     "sudo mv /tmp/vault.key.pem /opt/vault/tls/",
+  #     "sudo chown -R vault:vault /opt/vault/tls/",
+  #     "sudo chmod -R 600 /opt/vault/tls",
+  #     "sudo chmod 700 /opt/vault/tls",
+  #     "sudo /tmp/terraform-aws-vault/modules/update-certificate-store/update-certificate-store --cert-file-path /opt/vault/tls/ca.crt.pem"]
+  #   inline_shebang = "/bin/bash -e"
+  # }
+
   provisioner "shell" {
     inline         = ["sudo systemd-run --property='After=apt-daily.service apt-daily-upgrade.service' --wait /bin/true"]
     inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
+    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.ubuntu18-vault-consul-server-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
   ### End public cert block to verify other consul agents ###
@@ -636,7 +676,7 @@ build {
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
-  ### This block will install Vault and Consul Agent
+  ### This block will install Vault and Consul Agent for DNS
 
   provisioner "shell" { # Vault client probably wont be installed on bastions in future, but most hosts that will authenticate will require it.
     inline = [
@@ -683,6 +723,12 @@ build {
     ]
     only = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
+  # The servers dont require the same config for DNS to function 
+  provisioner "shell" {
+    inline = ["/tmp/terraform-aws-consul/modules/setup-systemd-resolved/setup-systemd-resolved"]
+    only   = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
+  }
+
   provisioner "shell" {
     inline = [
       "/tmp/terraform-aws-consul/modules/install-dnsmasq/install-dnsmasq",
