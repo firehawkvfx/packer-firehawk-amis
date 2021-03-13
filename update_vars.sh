@@ -108,8 +108,9 @@ get_parameters=$( aws ssm get-parameters --names \
     "/firehawk/resourcetier/${TF_VAR_resourcetier}/global_bucket_extension" \
     "/firehawk/resourcetier/${TF_VAR_resourcetier}/combined_vpcs_cidr" \
     "/firehawk/resourcetier/${TF_VAR_resourcetier}/vpn_cidr" \
-    "/firehawk/resourcetier/${TF_VAR_resourcetier}/houdinilicenseserveraddress" \
-    "/firehawk/resourcetier/${TF_VAR_resourcetier}/sesiclientid" )
+    "/firehawk/resourcetier/${TF_VAR_resourcetier}/houdini_license_server_address" \
+    "/firehawk/resourcetier/${TF_VAR_resourcetier}/sesi_client_id" )
+
 num_invalid=$(echo $get_parameters | jq '.InvalidParameters| length')
 if [[ $num_invalid -eq 0 ]]; then
   export TF_VAR_onsite_public_ip=$(echo $get_parameters | jq ".Parameters[]| select(.Name == \"/firehawk/resourcetier/${TF_VAR_resourcetier}/onsite_public_ip\")|.Value" --raw-output)
@@ -123,12 +124,12 @@ if [[ $num_invalid -eq 0 ]]; then
   export TF_VAR_vpn_cidr=$(echo $get_parameters | jq ".Parameters[]| select(.Name == \"/firehawk/resourcetier/${TF_VAR_resourcetier}/vpn_cidr\")|.Value" --raw-output)
   error_if_empty "SSM Parameter missing: vpn_cidr" "$TF_VAR_vpn_cidr"
 
-  export TF_VAR_houdinilicenseserveraddress=$(echo $get_parameters | jq ".Parameters[]| select(.Name == \"/firehawk/resourcetier/${TF_VAR_resourcetier}/houdinilicenseserveraddress\")|.Value" --raw-output)
-  export PKR_VAR_houdinilicenseserveraddress="$TF_VAR_houdinilicenseserveraddress"
-  error_if_empty "SSM Parameter missing: houdinilicenseserveraddress" "$TF_VAR_houdinilicenseserveraddress"
-  export TF_VAR_sesiclientid=$(echo $get_parameters | jq ".Parameters[]| select(.Name == \"/firehawk/resourcetier/${TF_VAR_resourcetier}/sesiclientid\")|.Value" --raw-output)
-  export PKR_VAR_sesiclientid="$TF_VAR_sesiclientid"
-  error_if_empty "SSM Parameter missing: sesiclientid" "$TF_VAR_sesiclientid"
+  export TF_VAR_houdini_license_server_address=$(echo $get_parameters | jq ".Parameters[]| select(.Name == \"/firehawk/resourcetier/${TF_VAR_resourcetier}/houdini_license_server_address\")|.Value" --raw-output)
+  export PKR_VAR_houdini_license_server_address="$TF_VAR_houdini_license_server_address"
+  error_if_empty "SSM Parameter missing: houdini_license_server_address" "$TF_VAR_houdini_license_server_address"
+  export TF_VAR_sesi_client_id=$(echo $get_parameters | jq ".Parameters[]| select(.Name == \"/firehawk/resourcetier/${TF_VAR_resourcetier}/sesi_client_id\")|.Value" --raw-output)
+  export PKR_VAR_sesi_client_id="$TF_VAR_sesi_client_id"
+  error_if_empty "SSM Parameter missing: sesi_client_id" "$TF_VAR_sesi_client_id"
 
   export TF_VAR_bucket_extension="$TF_VAR_resourcetier.$TF_VAR_global_bucket_extension"
   export TF_VAR_installers_bucket="software.$TF_VAR_resourcetier.$TF_VAR_global_bucket_extension" # All installers should be kept in the same bucket.  If a main account is present, packer builds should trigger from the main account.
