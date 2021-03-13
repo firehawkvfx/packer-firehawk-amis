@@ -51,15 +51,15 @@
   shell: |
     cd /opt/houdini_install_script/
     . /opt/houdini_install_script/exit_test.sh
-    python /opt/houdini_install_script/download_houdini.py -b {{ houdini_version_item.houdini_build }}; exit_test
+    sesi_client_id={{ sesi_client_id }} sesi_client_secret_key={{ sesi_client_secret_key }} python /opt/houdini_install_script/download_houdini.py -b {{ houdini_version_item.houdini_build }}; exit_test
   register: houdini_query_out
   become: true
   when: houdini_version_item.houdini_auto_version
-  environment:
-    # sesi_client_id: "{{ lookup('env','sesi_client_id') }}"
-    # sesi_client_secret_key: "{{ lookup('env','sesi_client_secret_key') }}"
-    sesi_client_id: sesi_client_id
-    sesi_client_secret_key: sesi_client_secret_key
+  # environment:
+  #   # sesi_client_id: "{{ lookup('env','sesi_client_id') }}"
+  #   # sesi_client_secret_key: "{{ lookup('env','sesi_client_secret_key') }}"
+  #   sesi_client_id: sesi_client_id
+  #   sesi_client_secret_key: sesi_client_secret_key
 
 - name: Python output
   debug:
