@@ -146,7 +146,7 @@ get_secret_strings=$(aws secretsmanager get-secret-value --secret-id "$sesi_clie
 if [[ $? -eq 0 ]]; then
   export TF_VAR_sesi_client_secret_key=$(echo $get_secret_strings | jq ".SecretString" --raw-output)
   error_if_empty "Secretsmanager secret missing: TF_VAR_sesi_client_secret_key" "$TF_VAR_sesi_client_secret_key"
-  export PKR_VAR_sesi_client_secret_key="$sesi_client_secret_key"
+  export PKR_VAR_sesi_client_secret_key="$TF_VAR_sesi_client_secret_key"
 else
   log_error "Error retrieving: $sesi_client_secret_key_path"
   return
