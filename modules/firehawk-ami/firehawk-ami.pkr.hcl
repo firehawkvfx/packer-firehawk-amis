@@ -118,6 +118,9 @@ locals {
     "commit_hash_short" : var.commit_hash_short,
     "resourcetier" : var.resourcetier,
   }
+  syscontrol_gid = "9003"
+  deployuser_uid = "9004"
+  deadlineuser_uid = "9001"
 }
 
 source "amazon-ebs" "openvpn-server-ami" {
