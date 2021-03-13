@@ -115,7 +115,7 @@
 
 - name: 's3-sync pull houdini installer {{ installers_bucket }}'
   import_role:
-    name: firehawkvfx.core.s3_sync
+    name: s3_sync
   vars:
     mode: "pull"
     bucket: "{{ installers_bucket }}"
@@ -291,7 +291,7 @@
 
 - name: 's3-sync pull houdini installer {{ installers_bucket }}'
   import_role:
-    name: firehawkvfx.core.s3_sync
+    name: s3_sync
   vars:
     mode: "push"
     bucket: "{{ installers_bucket }}"
