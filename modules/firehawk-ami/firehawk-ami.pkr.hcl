@@ -623,7 +623,7 @@ build {
   provisioner "ansible" {
     playbook_file = "./ansible/collections/ansible_collections/firehawkvfx/houdini/deadline_db_houdini_plugin.yml"
     extra_arguments = [
-      "-v",
+      "-vvv",
       "--extra-vars",
       "resourcetier=${var.resourcetier} variable_host=default houdini_build=${local.houdini_build}",
       "--tags",
