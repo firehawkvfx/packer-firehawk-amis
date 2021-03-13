@@ -10,6 +10,7 @@
   hostname:
     name: "{{ set_hostname }}"
   when: set_hostname is defined
+  become: true
 
 - name: Update hosts file with regex if ubuntu to handle correctly.  Otherwise this https://github.com/ansible/ansible-modules-core/issues/2308
   lineinfile:
@@ -18,6 +19,7 @@
     regexp: '^127\.0\.0\.1.*localhost.*'
     # regexp: "^127\.0\.0\.1.*localhost.*$"
   when: set_hostname is defined and ( ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' )
+  become: true
 
 - name: set preserve hostname in cloud.cfg
   lineinfile:
@@ -25,11 +27,13 @@
     line: "preserve_hostname: true"
     regexp: ".*preserve_hostname.*"
   when: set_hostname is defined and ( ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' )
+  become: true
 
 - name: "Ensure a key exists" # This may need to be cleaned up.  ssh need initialisation for deadline to work.
   openssh_keypair:
     path: "/etc/ssh/init_key"
     mode: '0600'
+  become: true
     # owner: deployuser
   # delegate_to: "{{ delegate_host }}"
   # become: true
