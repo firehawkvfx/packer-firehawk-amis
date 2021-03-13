@@ -110,7 +110,7 @@
 
 - name: Copy Houdini auto install script to remote host from ansible control.
   copy:
-    src: /deployuser/scripts/exit_test.sh
+    src: "{{ role_path }}/scripts/exit_test.sh"
     dest: /opt/houdini_install_script/
     mode: u=rx,g=rx,o-wx
     owner: "{{ variable_user }}"
