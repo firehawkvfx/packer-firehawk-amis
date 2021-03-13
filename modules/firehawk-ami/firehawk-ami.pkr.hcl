@@ -121,6 +121,7 @@ locals {
   syscontrol_gid = "9003"
   deployuser_uid = "9004"
   deadlineuser_uid = "9001"
+  houdini_build = "daily"
 }
 
 source "amazon-ebs" "openvpn-server-ami" {
@@ -417,6 +418,23 @@ build {
       "-v",
       "--extra-vars",
       "user_deadlineuser_name=deadlineuser variable_host=default variable_connect_as_user=centos variable_user=deadlineuser sudo=false add_to_group_syscontrol=false create_ssh_key=false variable_uid=${local.deadlineuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path = "./ansible/roles"
+    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
+    galaxy_file = "./requirements.yml"
+    only = ["amazon-ebs.centos7-rendernode-ami"]
+  }
+
+  ### Install Houdini
+  provisioner "ansible" {
+    playbook_file = "./ansible/ansible_collections/firehawkvfx/houdini/houdini_module.yaml"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "houdini_build=${local.houdini_build}"
+      "--tags",
+      "install_houdini"
     ]
     collections_path = "./ansible/collections"
     roles_path = "./ansible/roles"
