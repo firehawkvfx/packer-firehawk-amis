@@ -401,7 +401,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=centos variable_user=deployuser sudo=true add_to_group_syscontrol=true create_ssh_key=false variable_uid=${local.deployuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
+      "user_deadlineuser_name=deadlineuser variable_host=default variable_connect_as_user=centos variable_user=deployuser sudo=true add_to_group_syscontrol=true create_ssh_key=false variable_uid=${local.deployuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
     ]
     collections_path = "./ansible/collections"
     roles_path = "./ansible/roles"
@@ -415,7 +415,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=centos variable_user=deadlineuser sudo=false add_to_group_syscontrol=false create_ssh_key=false variable_uid=${local.deadlineuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
+      "user_deadlineuser_name=deadlineuser variable_host=default variable_connect_as_user=centos variable_user=deadlineuser sudo=false add_to_group_syscontrol=false create_ssh_key=false variable_uid=${local.deadlineuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
     ]
     collections_path = "./ansible/collections"
     roles_path = "./ansible/roles"
@@ -475,7 +475,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_host=default variable_connect_as_user=centos variable_user=centos variable_become_user=deadlineuser delegate_host=localhost",
+      "variable_host=default variable_connect_as_user=centos variable_user=centos variable_become_user=deadlineuser delegate_host=localhost package_python_interpreter=/usr/bin/python2.7", # Centos7 requires Py2.7 for Ansible packages.
       "--skip-tags",
       "user_access"
     ]
