@@ -44,6 +44,7 @@
   tags:
     - packages
   when: not skip_packages and ( ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' )
+  become: true
   vars:
     ansible_python_interpreter: "{{ package_python_interpreter }}"
 
@@ -59,6 +60,7 @@
   tags:
     - packages
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  become: true
   vars:
     ansible_python_interpreter: "{{ package_python_interpreter }}"
 
@@ -67,6 +69,7 @@
     name: python-pip
     state: latest
   when: not skip_packages
+  become: true
   vars:
     ansible_python_interpreter: "{{ package_python_interpreter }}"
 
