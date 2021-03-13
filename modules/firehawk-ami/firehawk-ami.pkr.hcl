@@ -380,7 +380,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_host=default variable_connect_as_user=openvpnas variable_user=openvpnas variable_become_user=openvpnas delegate_host=localhost",
+      "variable_host=default variable_connect_as_user={{user `SUDO_USER`}} variable_user={{user `SUDO_USER`}} variable_become_user={{user `SUDO_USER`}} delegate_host=localhost",
       "--skip-tags",
       "user_access"
     ]
@@ -395,7 +395,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_host=default variable_connect_as_user=ubuntu variable_user=ubuntu variable_become_user=ubuntu delegate_host=localhost",
+      "variable_host=default variable_connect_as_user={{user `SUDO_USER`}} variable_user={{user `SUDO_USER`}} variable_become_user={{user `SUDO_USER`}} delegate_host=localhost",
       "--skip-tags",
       "user_access"
     ]
