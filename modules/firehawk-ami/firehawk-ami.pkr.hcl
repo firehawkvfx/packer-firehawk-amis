@@ -376,21 +376,49 @@ build {
   ### End public cert block to verify other consul agents ###
 
   ### Configure deadlineuser for render service ###
+  # provisioner "ansible" {
+  #   extra_arguments = [
+  #     "-v",
+  #     "--extra-vars",
+  #     "set_selinux=disabled", # TODO Enable this and test once all services function.
+  #     "variable_host=default variable_connect_as_user=centos variable_user=deadlineuser variable_become_user=centos",
+  #     "--skip-tags",
+  #     "user_access"
+  #   ]
+  #   playbook_file    = "./ansible/newuser_deadlineuser.yaml"
+  #   collections_path = "./ansible/collections"
+  #   roles_path       = "./ansible/roles"
+  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+  #   galaxy_file      = "./requirements.yml"
+  #   only             = ["amazon-ebs.centos7-rendernode-ami"]
+  # }
+
   provisioner "ansible" {
+    playbook_file = "./ansible/newuser_deadlineuser.yaml"
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "set_selinux=disabled", # TODO Enable this and test once all services function.
-      "variable_host=default variable_connect_as_user=centos variable_user=deadlineuser variable_become_user=centos",
-      "--skip-tags",
-      "user_access"
+      "user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=centos variable_user=deployuser sudo=true add_to_group_syscontrol=true create_ssh_key=false variable_uid=${local.deployuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
     ]
-    playbook_file    = "./ansible/newuser_deadlineuser.yaml"
     collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only             = ["amazon-ebs.centos7-rendernode-ami"]
+    roles_path = "./ansible/roles"
+    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
+    galaxy_file = "./requirements.yml"
+    only = ["amazon-ebs.centos7-rendernode-ami"]
+  }
+
+  provisioner "ansible" {
+    playbook_file = "./ansible/newuser_deadlineuser.yaml"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=centos variable_user=deadlineuser sudo=false add_to_group_syscontrol=false create_ssh_key=false variable_uid=${local.deadlineuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path = "./ansible/roles"
+    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
+    galaxy_file = "./requirements.yml"
+    only = ["amazon-ebs.centos7-rendernode-ami"]
   }
 
   ### Open VPN / Deadline DB / Centos install CLI.  This should be relocated to the base ami, and done purely with bash now instead.
