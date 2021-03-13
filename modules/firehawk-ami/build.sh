@@ -45,12 +45,12 @@ mkdir -p "$SCRIPTDIR/tmp/log"
 # export PKR_VAR_manifest_path="$SCRIPTDIR/manifest.json"
 # rm -f $PKR_VAR_manifest_path
 
-# [[ "${BASH_SOURCE[0]}" != "${0}" ]] && echo "script ${BASH_SOURCE[0]} is being sourced ..."
+[[ "${BASH_SOURCE[0]}" != "${0}" ]] && sourced=1 || sourced=0
 
-(return 0 2>/dev/null) && sourced=1 || sourced=0
+# (return 0 2>/dev/null) && sourced=1 || sourced=0
 echo "Script sourced: $sourced"
 
-if [[ $sourced -eq 0 ]]; then
+if [[ "$sourced" -eq 0 ]]; then
     packer build "$@" $SCRIPTDIR/firehawk-ami.pkr.hcl
 fi
 cd $EXECDIR
