@@ -25,8 +25,13 @@
 
   # vars_files:
   #   - /deployuser/ansible/group_vars/all/vars
+  
 
   tasks:
+  - name: test connection
+    debug:
+      var: vars_files_locs
+
   - name: aquire vars from secrets path before using defaults for softnas hosts 1
     include_vars: "{{ item }}"
     with_first_found: "{{ vars_files_locs }}"
