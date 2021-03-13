@@ -246,14 +246,14 @@ source "amazon-ebs" "centos7-rendernode-ami" {
     volume_type           = "gp2"
     delete_on_termination = true
   }
-  ami_block_device_mappings {
-    device_name  = "/dev/sdb"
-    virtual_name = "ephemeral0"
-  }
-  ami_block_device_mappings {
-    device_name  = "/dev/sdc"
-    virtual_name = "ephemeral1"
-  }
+  # ami_block_device_mappings {
+  #   device_name  = "/dev/sdb"
+  #   virtual_name = "ephemeral0"
+  # }
+  # ami_block_device_mappings {
+  #   device_name  = "/dev/sdc"
+  #   virtual_name = "ephemeral1"
+  # }
 }
 
 source "amazon-ebs" "ubuntu18-ami" {
