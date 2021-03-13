@@ -432,7 +432,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "houdini_build=${local.houdini_build}"
+      "houdini_build=${local.houdini_build}",
       "--tags",
       "install_houdini"
     ]
