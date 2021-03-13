@@ -462,36 +462,36 @@ build {
   }
 
   ### Open VPN / Deadline DB / Centos install CLI.  This should be relocated to the base ami, and done purely with bash now instead.
-  provisioner "ansible" {
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_host=default variable_connect_as_user=openvpnas variable_user=openvpnas variable_become_user=openvpnas delegate_host=localhost",
-      "--skip-tags",
-      "user_access"
-    ]
-    playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only             = ["amazon-ebs.openvpn-server-ami"]
-  }
-  provisioner "ansible" {
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_host=default variable_connect_as_user=ubuntu variable_user=ubuntu variable_become_user=ubuntu delegate_host=localhost",
-      "--skip-tags",
-      "user_access"
-    ]
-    playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
-  }
+  # provisioner "ansible" {
+  #   extra_arguments = [
+  #     "-v",
+  #     "--extra-vars",
+  #     "variable_host=default variable_connect_as_user=openvpnas variable_user=openvpnas variable_become_user=openvpnas delegate_host=localhost",
+  #     "--skip-tags",
+  #     "user_access"
+  #   ]
+  #   playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
+  #   collections_path = "./ansible/collections"
+  #   roles_path       = "./ansible/roles"
+  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+  #   galaxy_file      = "./requirements.yml"
+  #   only             = ["amazon-ebs.openvpn-server-ami"]
+  # }
+  # provisioner "ansible" {
+  #   extra_arguments = [
+  #     "-v",
+  #     "--extra-vars",
+  #     "variable_host=default variable_connect_as_user=ubuntu variable_user=ubuntu variable_become_user=ubuntu delegate_host=localhost",
+  #     "--skip-tags",
+  #     "user_access"
+  #   ]
+  #   playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
+  #   collections_path = "./ansible/collections"
+  #   roles_path       = "./ansible/roles"
+  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+  #   galaxy_file      = "./requirements.yml"
+  #   only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  # }
   # provisioner "ansible" {
   #   extra_arguments = [
   #     "-v",
@@ -528,8 +528,15 @@ build {
     ### Centos 7 - jq required and the dig command is also required
     inline = [
       # "sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
-      # "sudo yum -y install awscli"
-      # "set -x; python3 -m pip install --upgrade awscli",
+      "python3 -m pip install --user --upgrade awscli",
+    ]
+    only = ["amazon-ebs.openvpn-server-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
+
+  provisioner "shell" {
+    ### Centos 7 - jq required and the dig command is also required
+    inline = [
+      # "sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
       "python3 -m pip install --user --upgrade awscli",
     ]
     only = ["amazon-ebs.centos7-rendernode-ami"]
