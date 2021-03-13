@@ -19,15 +19,16 @@
     # set -x
     cd ~
     
-    echo "aws sts get-caller-identity"
-    aws sts get-caller-identity
-
     filename="{{ filename }}"
     
     echo "become user {{ sync_user }}"
     echo "whoami $(whoami)"
     echo "pwd: $(pwd)"
     echo "PATH: $PATH"
+
+    echo "aws sts get-caller-identity"
+    aws sts get-caller-identity
+
     cd {{ basedir }}
     exit_code=$?
     echo "pwd: $(pwd)"
@@ -49,7 +50,6 @@
         echo "ls word count is not 0, file_in_bucket: $file_in_bucket"
       fi
     }
-
     
     echo "Use filename: $filename"
     if [[ "$filename" == *"*"* ]]; then
@@ -118,7 +118,7 @@
         fi
       fi
     fi
-  become_user: "{{ sync_user }}"
+  # become_user: "{{ sync_user }}"
   # become: true # this priveledge escalation shouldn't be necesary, but resolved a sync issue when pulling locally.
   register: output
   changed_when:
