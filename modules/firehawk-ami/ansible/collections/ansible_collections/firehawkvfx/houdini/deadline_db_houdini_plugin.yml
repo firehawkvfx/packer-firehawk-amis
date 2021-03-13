@@ -10,7 +10,7 @@
     no_extension: "{{ deadline_linux_installers_tar | splitext | first }}"
     basename: "{{ no_extension.split('/')[-1] }}"
     houdini_install_type: 'node'
-    vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/ansible_collections/firehawkvfx/houdini/vars/main.yml", "vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
+    vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
 
   # vars_files:
   #   - /deployuser/ansible/group_vars/all/vars
