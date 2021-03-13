@@ -456,36 +456,45 @@ build {
     galaxy_file      = "./requirements.yml"
     only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
-  provisioner "ansible" {
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_host=default variable_connect_as_user=centos variable_user=centos variable_become_user=centos delegate_host=localhost",
-      "--skip-tags",
-      "user_access"
+  # provisioner "ansible" {
+  #   extra_arguments = [
+  #     "-v",
+  #     "--extra-vars",
+  #     "variable_host=default variable_connect_as_user=centos variable_user=centos variable_become_user=centos delegate_host=localhost",
+  #     "--skip-tags",
+  #     "user_access"
+  #   ]
+  #   playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
+  #   collections_path = "./ansible/collections"
+  #   roles_path       = "./ansible/roles"
+  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+  #   galaxy_file      = "./requirements.yml"
+  #   only             = ["amazon-ebs.centos7-rendernode-ami"]
+  # }
+  # # Install for deadline user and sudo user.
+  # provisioner "ansible" {
+  #   extra_arguments = [
+  #     "-v",
+  #     "--extra-vars",
+  #     "variable_host=default variable_connect_as_user=centos variable_user=centos variable_become_user=deadlineuser delegate_host=localhost package_python_interpreter=/usr/bin/python2.7", # Centos7 requires Py2.7 for Ansible packages.
+  #     "--skip-tags",
+  #     "user_access"
+  #   ]
+  #   playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
+  #   collections_path = "./ansible/collections"
+  #   roles_path       = "./ansible/roles"
+  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+  #   galaxy_file      = "./requirements.yml"
+  #   only             = ["amazon-ebs.centos7-rendernode-ami"]
+  # }
+
+  provisioner "shell" {
+    ### Centos 7 - jq required and the dig command is also required
+    inline = [
+      # "sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
+      "sudo yum -y install awscli"
     ]
-    playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only             = ["amazon-ebs.centos7-rendernode-ami"]
-  }
-  # Install for deadline user and sudo user.
-  provisioner "ansible" {
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_host=default variable_connect_as_user=centos variable_user=centos variable_become_user=deadlineuser delegate_host=localhost package_python_interpreter=/usr/bin/python2.7", # Centos7 requires Py2.7 for Ansible packages.
-      "--skip-tags",
-      "user_access"
-    ]
-    playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only             = ["amazon-ebs.centos7-rendernode-ami"]
+    only = ["amazon-ebs.centos7-rendernode-ami"]
   }
 
 
@@ -564,7 +573,6 @@ build {
     ]
   }
   provisioner "shell" {
-
     ### Centos 7 - jq required and the dig command is also required
     inline = [
       # "sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
