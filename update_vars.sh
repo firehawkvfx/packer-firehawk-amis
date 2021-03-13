@@ -110,7 +110,7 @@ get_parameters=$( aws ssm get-parameters --names \
 
 num_invalid=$(echo $get_parameters | jq '.InvalidParameters| length')
 
-if [[ num_invalid -eq 0 ]]; then
+if [[ $num_invalid -eq 0 ]]; then
   export TF_VAR_onsite_public_ip=$(echo $get_parameters | jq ".Parameters[]| select(.Name == \"/firehawk/resourcetier/${TF_VAR_resourcetier}/onsite_public_ip\")|.Value" --raw-output)
   error_if_empty "SSM Parameter missing: onsite_public_ip" "$TF_VAR_onsite_public_ip"
   export TF_VAR_onsite_private_subnet_cidr=$(echo $get_parameters | jq ".Parameters[]| select(.Name == \"/firehawk/resourcetier/${TF_VAR_resourcetier}/onsite_private_subnet_cidr\")|.Value" --raw-output)
