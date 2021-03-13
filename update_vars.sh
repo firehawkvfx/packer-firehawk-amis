@@ -101,15 +101,16 @@ export PKR_VAR_consul_cluster_tag_key="$consul_cluster_tag_key"
 export TF_VAR_consul_cluster_name="$consul_cluster_tag_value"
 export PKR_VAR_consul_cluster_tag_value="$consul_cluster_tag_value"
 
+# Retrieve SSM parameters set by cloudformation
 get_parameters=$( aws ssm get-parameters --names \
     "/firehawk/resourcetier/${TF_VAR_resourcetier}/onsite_public_ip" \
     "/firehawk/resourcetier/${TF_VAR_resourcetier}/onsite_private_subnet_cidr" \
     "/firehawk/resourcetier/${TF_VAR_resourcetier}/global_bucket_extension" \
     "/firehawk/resourcetier/${TF_VAR_resourcetier}/combined_vpcs_cidr" \
-    "/firehawk/resourcetier/${TF_VAR_resourcetier}/vpn_cidr" )
-
+    "/firehawk/resourcetier/${TF_VAR_resourcetier}/vpn_cidr" \
+    "/firehawk/resourcetier/${TF_VAR_resourcetier}/houdinilicenseserveraddress" \
+    "/firehawk/resourcetier/${TF_VAR_resourcetier}/sesiclientid" )
 num_invalid=$(echo $get_parameters | jq '.InvalidParameters| length')
-
 if [[ $num_invalid -eq 0 ]]; then
   export TF_VAR_onsite_public_ip=$(echo $get_parameters | jq ".Parameters[]| select(.Name == \"/firehawk/resourcetier/${TF_VAR_resourcetier}/onsite_public_ip\")|.Value" --raw-output)
   error_if_empty "SSM Parameter missing: onsite_public_ip" "$TF_VAR_onsite_public_ip"
@@ -122,12 +123,31 @@ if [[ $num_invalid -eq 0 ]]; then
   export TF_VAR_vpn_cidr=$(echo $get_parameters | jq ".Parameters[]| select(.Name == \"/firehawk/resourcetier/${TF_VAR_resourcetier}/vpn_cidr\")|.Value" --raw-output)
   error_if_empty "SSM Parameter missing: vpn_cidr" "$TF_VAR_vpn_cidr"
 
+  export TF_VAR_houdinilicenseserveraddress=$(echo $get_parameters | jq ".Parameters[]| select(.Name == \"/firehawk/resourcetier/${TF_VAR_resourcetier}/houdinilicenseserveraddress\")|.Value" --raw-output)
+  export PKR_VAR_houdinilicenseserveraddress="$TF_VAR_houdinilicenseserveraddress"
+  error_if_empty "SSM Parameter missing: houdinilicenseserveraddress" "$TF_VAR_houdinilicenseserveraddress"
+  export TF_VAR_sesiclientid=$(echo $get_parameters | jq ".Parameters[]| select(.Name == \"/firehawk/resourcetier/${TF_VAR_resourcetier}/sesiclientid\")|.Value" --raw-output)
+  export PKR_VAR_sesiclientid="$TF_VAR_sesiclientid"
+  error_if_empty "SSM Parameter missing: sesiclientid" "$TF_VAR_sesiclientid"
+
   export TF_VAR_bucket_extension="$TF_VAR_resourcetier.$TF_VAR_global_bucket_extension"
   export TF_VAR_installers_bucket="software.$TF_VAR_resourcetier.$TF_VAR_global_bucket_extension" # All installers should be kept in the same bucket.  If a main account is present, packer builds should trigger from the main account.
   export TF_VAR_bucket_extension_vault="$TF_VAR_resourcetier.$TF_VAR_global_bucket_extension" # WARNING: if vault is deployed in a seperate tier for use, then this will probably need to become an SSM driven parameter from the template
   # export PKR_VAR_installers_bucket="$TF_VAR_installers_bucket"
 else
   log_error "SSM parameters are not yet initialised.  You can init SSM parameters with the cloudformation template modules/cloudformation-cloud9-vault-iam/cloudformation_ssm_parameters_firehawk.yaml"
+  return
+fi
+
+# retrieve secretsmanager secrets
+sesi_client_secret_key_path="/firehawk/resourcetier/${TF_VAR_resourcetier}/sesi_client_secret_key"
+get_secret_strings=$(aws secretsmanager get-secret-value --secret-id "$sesi_client_secret_key_path")
+if [[ $? -eq 0 ]]; then
+  export TF_VAR_sesi_client_secret_key=$(echo $get_secret_strings | jq ".SecretString" --raw-output)
+  error_if_empty "Secretsmanager secret missing: TF_VAR_sesi_client_secret_key" "$TF_VAR_sesi_client_secret_key"
+  export PKR_VAR_sesi_client_secret_key="$sesi_client_secret_key"
+else
+  log_error "Error retrieving: $sesi_client_secret_key_path"
   return
 fi
 
