@@ -492,7 +492,8 @@ build {
     ### Centos 7 - jq required and the dig command is also required
     inline = [
       # "sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
-      "sudo yum -y install awscli"
+      # "sudo yum -y install awscli"
+      "python3 -m pip install --user --upgrade awscli"
     ]
     only = ["amazon-ebs.centos7-rendernode-ami"]
   }
