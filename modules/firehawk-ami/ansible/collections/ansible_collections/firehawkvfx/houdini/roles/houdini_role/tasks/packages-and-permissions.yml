@@ -100,7 +100,7 @@
 
 - name: Copy Houdini auto install script to remote host from ansible control.
   copy:
-    src: /deployuser/modules/node_centos/modules/houdini_install_script/
+    src: "{{ role_path }}/houdini_install_script/"
     dest: /opt/houdini_install_script/
     mode: u=rwX,g=rwX,o-wx
     owner: "{{ variable_user }}"
