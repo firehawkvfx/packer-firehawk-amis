@@ -108,7 +108,7 @@
     directory_mode: yes
   become: true
 
-- name: Copy Houdini auto install script to remote host from ansible control.
+- name: Copy exit_test script to remote host from ansible control.
   copy:
     src: "{{ role_path }}/scripts/exit_test.sh"
     dest: /opt/houdini_install_script/

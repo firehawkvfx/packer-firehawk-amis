@@ -519,7 +519,7 @@ build {
     only = ["amazon-ebs.centos7-rendernode-ami"]
   }
 
-  ### Install Houdini ### Requires you create a SESI API Key to auto download.
+  ### Install Houdini ### Requires you create a SESI API Key on the Side FX website to auto download.
   provisioner "ansible" {
     playbook_file = "./ansible/collections/ansible_collections/firehawkvfx/houdini/houdini_module.yaml"
     extra_arguments = [

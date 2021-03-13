@@ -6,7 +6,7 @@
   tags: install_houdini
 
 - name: install houdini for items in list
-  include: houdini-install.yml
+  include: "{{ playbook_dir }}/houdini-install.yml"
   loop: "{{ houdini_version_list }}"
   loop_control:
     loop_var: houdini_version_item
@@ -14,7 +14,7 @@
   tags: install_houdini
 
 - name: install houdini server for items in list
-  include: houdini-install.yml
+  include: "{{ playbook_dir }}/houdini-install.yml"
   loop: "{{ houdini_license_server_version_list }}"
   loop_control:
     loop_var: houdini_version_item
