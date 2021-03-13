@@ -21,25 +21,6 @@ export PKR_VAR_account_id=$(curl -s http://169.254.169.254/latest/dynamic/instan
 cd $SCRIPTDIR/../firehawk-base-ami
 export PKR_VAR_ingress_commit_hash="$(git rev-parse HEAD)" # the commit hash for incoming amis
 export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
-cd $SCRIPTDIR
-
-# manifest="$SCRIPTDIR/firehawk-base-ami/manifest.json"
-# if [[ -f "$manifest" ]]; then
-#     export PKR_VAR_centos7_ami="$(jq -r '.builds[] | select(.name == "centos7-ami") | .artifact_id' "$manifest" | tail -1 | cut -d ":" -f2)"
-#     echo "Found centos7_ami in manifest: PKR_VAR_centos7_ami=$PKR_VAR_centos7_ami"
-
-#     export PKR_VAR_ubuntu18_ami="$(jq -r '.builds[] | select(.name == "ubuntu18-ami") | .artifact_id' "$manifest" | tail -1 | cut -d ":" -f2)"
-#     echo "Found ubuntu18_ami in manifest: PKR_VAR_ubuntu18_ami=$PKR_VAR_ubuntu18_ami"
-
-#     export PKR_VAR_amazon_linux_2_ami="$(jq -r '.builds[] | select(.name == "amazon-linux-2-ami") | .artifact_id' "$manifest" | tail -1 | cut -d ":" -f2)"
-#     echo "Found amazon_linux_2_ami in manifest: PKR_VAR_amazon_linux_2_ami=$PKR_VAR_amazon_linux_2_ami"
-
-#     export PKR_VAR_openvpn_server_base_ami="$(jq -r '.builds[] | select(.name == "base-openvpn-server-ami") | .artifact_id' "$manifest" | tail -1 | cut -d ":" -f2)"
-#     echo "Found openvpn_server_base_ami in manifest: PKR_VAR_openvpn_server_base_ami=$PKR_VAR_openvpn_server_base_ami"
-# else
-#     echo "Manifest for base ami does not exist.  Build the base ami and try again."
-#     exit 1
-# fi
 
 cd $SCRIPTDIR/terraform-remote-state-inputs
 terraform init \
@@ -57,6 +38,9 @@ cd $SCRIPTDIR
 export PKR_VAR_aws_region="$AWS_DEFAULT_REGION"
 export PACKER_LOG=1
 export PACKER_LOG_PATH="$SCRIPTDIR/packerlog.log"
+
+# ansible log path
+mkdir -p "$SCRIPTDIR/tmp/log"
 
 # export PKR_VAR_manifest_path="$SCRIPTDIR/manifest.json"
 # rm -f $PKR_VAR_manifest_path
