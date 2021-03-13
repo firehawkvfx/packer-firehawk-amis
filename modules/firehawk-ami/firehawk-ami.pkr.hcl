@@ -525,7 +525,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "houdini_build=${local.houdini_build}",
+      "houdini_build=${local.houdini_build} sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key} houdini_license_server_address=${var.houdini_license_server_address}",
       "--tags",
       "install_houdini"
     ]
