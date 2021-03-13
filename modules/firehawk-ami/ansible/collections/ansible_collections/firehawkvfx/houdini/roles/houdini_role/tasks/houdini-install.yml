@@ -295,7 +295,7 @@
   tags:
     - sync_installers
 
-- name: 's3-sync pull houdini installer {{ installers_bucket }}'
+- name: 's3-sync push houdini installer {{ installers_bucket }}'
   import_role:
     name: s3_sync
   vars:

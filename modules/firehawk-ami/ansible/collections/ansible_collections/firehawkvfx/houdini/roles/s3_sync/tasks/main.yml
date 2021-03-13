@@ -16,7 +16,9 @@
 
 - name: "Sync S3 {{ mode }} {{ basedir }}/{{ filename }} s3://{{ bucket }}/" # warning: there appears to be a bug with ansible that may result in variable user being defined at the include_role level not setting the sync_user var correctly.  consider this if errors should occur.
   shell: |
+    # The next line is supposed to fix a problem using aws cli, but it does not https://github.com/ansible/ansible/issues/71520
     . /etc/profile && echo $PATH
+    # Instead we provide the full path to the ansible executable in centos with var 'aws_executable'
     # set -x
     cd ~
     
