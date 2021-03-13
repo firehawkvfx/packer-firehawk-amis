@@ -517,8 +517,8 @@ build {
       # "sudo yum -y install awscli"
       "set -x; python3 -m pip install --upgrade awscli",
       "python3 -m pip install --user --upgrade awscli",
-      "sudo ln -s /usr/local/bin/aws /usr/local/sbin/aws",
-      "which aws"
+      # "sudo ln -s /usr/local/bin/aws /usr/local/sbin/aws",
+      # "which aws"
       # "aws_path=/usr/local/bin/aws"
     ]
     only = ["amazon-ebs.centos7-rendernode-ami"]
