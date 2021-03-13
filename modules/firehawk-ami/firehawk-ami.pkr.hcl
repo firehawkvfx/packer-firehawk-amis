@@ -515,11 +515,8 @@ build {
     inline = [
       # "sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
       # "sudo yum -y install awscli"
-      "set -x; python3 -m pip install --upgrade awscli",
+      # "set -x; python3 -m pip install --upgrade awscli",
       "python3 -m pip install --user --upgrade awscli",
-      # "sudo ln -s /usr/local/bin/aws /usr/local/sbin/aws",
-      # "which aws"
-      # "aws_path=/usr/local/bin/aws"
     ]
     only = ["amazon-ebs.centos7-rendernode-ami"]
   }

@@ -288,8 +288,10 @@
   shell: |
     . /etc/profile && echo $PATH
     echo "PATH: $PATH"
-    aws sts get-caller-identity
+    {{ aws_executable }} sts get-caller-identity
   become_user: "{{ variable_user }}"
+  vars:
+    aws_executable: "~/.local/bin/aws"
   tags:
     - sync_installers
 
