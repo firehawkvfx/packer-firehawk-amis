@@ -74,12 +74,6 @@ else
 fi
 export TF_VAR_firehawk_path=$SCRIPTDIR
 
-# # Packer Vars
-# if [[ -f "$SCRIPTDIR/modules/terraform-aws-vault/examples/vault-consul-ami/manifest.json" ]]; then
-#     export PKR_VAR_vault_consul_ami="$(jq -r '.builds[] | select(.name == "ubuntu18-ami") | .artifact_id' $SCRIPTDIR/modules/terraform-aws-vault/examples/vault-consul-ami/manifest.json | tail -1 | cut -d ":" -f2)"
-#     echo "Found vault_consul_ami in manifest: PKR_VAR_vault_consul_ami=$PKR_VAR_vault_consul_ami"
-#     export TF_VAR_vault_consul_ami_id=$PKR_VAR_vault_consul_ami
-# fi
 export PACKER_LOG=1
 export PACKER_LOG_PATH="packerlog.log"
 export TF_VAR_provisioner_iam_profile_name="provisioner_instance_role_$TF_VAR_conflictkey"
@@ -90,6 +84,12 @@ export PKR_VAR_packer_iam_profile_name="packer_instance_role_$TF_VAR_conflictkey
 # Terraform Vars
 export TF_VAR_general_use_ssh_key="$HOME/.ssh/id_rsa" # For debugging deployment of most resources- not for production use.
 export TF_VAR_aws_private_key_path="$TF_VAR_general_use_ssh_key"
+public_key_path="$HOME/.ssh/id_rsa.pub"
+if [[ ! -f $public_key_path ]] ; then
+    echo "File $public_key_path is not there, aborting. Ensure you have initialised a keypair with ssh-keygen"
+    return
+fi
+export TF_VAR_vault_public_key=$(cat $public_key_path)
 
 export TF_VAR_log_dir="$SCRIPTDIR/tmp/log"; mkdir -p $TF_VAR_log_dir
 
