@@ -464,6 +464,7 @@ build {
       "else",
       "sudo rm /tmp/sign-request.py",
       "fi",
+      "sudo mkdir -p /opt/vault/tls/",
       "sudo mv /tmp/ca.crt.pem /opt/vault/tls/",
       "sudo mv /tmp/vault.crt.pem /opt/vault/tls/",
       "sudo mv /tmp/vault.key.pem /opt/vault/tls/",
