@@ -386,7 +386,7 @@ build {
     ]
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline_shebang   = "/bin/bash -e"
-    only             = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.ubuntu18-vault-consul-server-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+    only             = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
   provisioner "file" { # fix apt upgrades to not hold up boot
@@ -406,7 +406,7 @@ build {
       "sudo systemctl --all list-timers apt-daily{,-upgrade}.timer"
     ]
     inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.ubuntu18-vault-consul-server-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
   ### Public cert block to verify other consul agents ###
@@ -511,7 +511,7 @@ build {
   provisioner "shell" {
     inline         = ["sudo systemd-run --property='After=apt-daily.service apt-daily-upgrade.service' --wait /bin/true"]
     inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.ubuntu18-vault-consul-server-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
+    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
   ### End public cert block to verify other consul agents ###
@@ -758,13 +758,10 @@ build {
       " /tmp/terraform-aws-consul/modules/install-consul/install-consul --download-url ${var.consul_download_url};",
       "else",
       " /tmp/terraform-aws-consul/modules/install-consul/install-consul --version ${var.consul_version};",
-      "fi"
-    ]
+      "fi"]
   }
 
   ### Consul DNS config.
-
-
 
   provisioner "shell" { # configure systemd-resolved per https://unix.stackexchange.com/questions/442598/how-to-configure-systemd-resolved-and-systemd-networkd-to-use-local-dns-server-f
     inline = [
@@ -782,8 +779,8 @@ build {
 
   provisioner "shell" {
     inline = [
-      "/tmp/terraform-aws-consul/modules/install-dnsmasq/install-dnsmasq",
-      "sudo systemctl restart dnsmasq",
+      "/tmp/terraform-aws-consul/modules/install-dnsmasq/install-dnsmasq"
+      # "sudo systemctl restart dnsmasq", # if this fixes vault server, but breaks other clients, inspect further.
     ]
     only = ["amazon-ebs.ubuntu16-ami", "amazon-ebs.amazon-linux-2-ami", "amazon-ebs.centos7-ami", "amazon-ebs.centos7-rendernode-ami"]
   }
