@@ -427,12 +427,12 @@ build {
     ]
     inline_shebang = "/bin/bash -e"
     only           = [
-      "source.amazon-ebs.amazon-linux-2-ami",
-      "source.amazon-ebs.centos7-ami",
-      "source.amazon-ebs.centos7-rendernode-ami",
-      "source.amazon-ebs.ubuntu18-ami",
-      "source.amazon-ebs.deadline-db-ubuntu18-ami",
-      "source.amazon-ebs.openvpn-server-ami"
+      "amazon-ebs.amazon-linux-2-ami",
+      "amazon-ebs.centos7-ami",
+      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.ubuntu18-ami",
+      "amazon-ebs.deadline-db-ubuntu18-ami",
+      "amazon-ebs.openvpn-server-ami"
     ]
   }
   # ### Only Vault and Consul servers should have the private keys.
