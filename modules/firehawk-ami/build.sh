@@ -42,14 +42,9 @@ export PACKER_LOG_PATH="$SCRIPTDIR/packerlog.log"
 # ansible log path
 mkdir -p "$SCRIPTDIR/tmp/log"
 
-# export PKR_VAR_manifest_path="$SCRIPTDIR/manifest.json"
-# rm -f $PKR_VAR_manifest_path
-
-# [[ "${BASH_SOURCE[0]}" != "${0}" ]] && sourced=1 || sourced=0
-
+# If sourced, dont execute
 (return 0 2>/dev/null) && sourced=1 || sourced=0
 echo "Script sourced: $sourced"
-
 if [[ "$sourced" -eq 0 ]]; then
     packer build "$@" $SCRIPTDIR/firehawk-ami.pkr.hcl
 fi
