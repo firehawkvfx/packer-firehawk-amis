@@ -3,7 +3,10 @@
 
 variable "aws_region" {
   type    = string
-  default = null
+}
+
+variable "account_id" {
+  type = string
 }
 
 variable "ami_role" {
@@ -36,20 +39,6 @@ variable "ca_public_key_path" {
   default = "/home/ec2-user/.ssh/tls/ca.crt.pem"
 }
 
-variable "tls_private_key_path" {
-  type    = string
-  default = "/home/ec2-user/.ssh/tls/vault.key.pem"
-}
-
-variable "tls_public_key_path" {
-  type    = string
-  default = "/home/ec2-user/.ssh/tls/vault.crt.pem"
-}
-
-variable "account_id" {
-  type = string
-}
-
 variable "consul_download_url" {
   type    = string
   default = ""
@@ -68,6 +57,16 @@ variable "consul_version" {
 variable "install_auth_signing_script" {
   type    = string
   default = "true"
+}
+
+variable "tls_private_key_path" {
+  type    = string
+  default = "/home/ec2-user/.ssh/tls/vault.key.pem"
+}
+
+variable "tls_public_key_path" {
+  type    = string
+  default = "/home/ec2-user/.ssh/tls/vault.crt.pem"
 }
 
 variable "vault_download_url" {
@@ -473,12 +472,10 @@ build {
   provisioner "shell" {
     inline         = [
       "if [[ '${var.install_auth_signing_script}' == 'true' ]]; then",
-      "sudo mkdir -p /opt/vault/scripts/",
       "sudo mv /tmp/sign-request.py /opt/vault/scripts/",
       "else",
       "sudo rm /tmp/sign-request.py",
       "fi",
-      "sudo mkdir -p /opt/vault/tls/",
       "sudo mv /tmp/ca.crt.pem /opt/vault/tls/",
       "sudo mv /tmp/vault.crt.pem /opt/vault/tls/",
       "sudo mv /tmp/vault.key.pem /opt/vault/tls/",
@@ -486,6 +483,16 @@ build {
       "sudo chmod -R 600 /opt/vault/tls",
       "sudo chmod 700 /opt/vault/tls",
       "sudo /tmp/terraform-aws-vault/modules/update-certificate-store/update-certificate-store --cert-file-path /opt/vault/tls/ca.crt.pem"]
+    inline_shebang = "/bin/bash -e"
+    only           = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
+  }
+
+  provisioner "shell" {
+    inline         = ["sudo apt-get install -y git",
+      "if [[ '${var.install_auth_signing_script}' == 'true' ]]; then",
+      "sudo apt-get install -y python-pip",
+      "LC_ALL=C && sudo pip install boto3",
+      "fi"]
     inline_shebang = "/bin/bash -e"
     only           = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
   }
@@ -744,7 +751,9 @@ build {
     ]
   }
 
-  ### Generate certificates with vault.
+  ### Consul DNS config.
+
+
 
   provisioner "shell" { # configure systemd-resolved per https://unix.stackexchange.com/questions/442598/how-to-configure-systemd-resolved-and-systemd-networkd-to-use-local-dns-server-f
     inline = [
@@ -758,10 +767,7 @@ build {
     only = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
   # The servers dont require the same config for DNS to function 
-  provisioner "shell" {
-    inline = ["/tmp/terraform-aws-consul/modules/setup-systemd-resolved/setup-systemd-resolved"]
-    only   = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
-  }
+
 
   provisioner "shell" {
     inline = [
@@ -769,6 +775,10 @@ build {
       "sudo systemctl restart dnsmasq",
     ]
     only = ["amazon-ebs.ubuntu16-ami", "amazon-ebs.amazon-linux-2-ami", "amazon-ebs.centos7-ami", "amazon-ebs.centos7-rendernode-ami"]
+  }
+  provisioner "shell" {
+    inline = ["/tmp/terraform-aws-consul/modules/setup-systemd-resolved/setup-systemd-resolved"]
+    only   = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
   }
   provisioner "shell" {
     inline = [
