@@ -411,8 +411,6 @@ build {
   ### Clients only require the CA cert.
   provisioner "shell" {
     inline = [
-      "echo \"hostname: $(sudo hostnamectl)\"",
-      "sudo cat /etc/hostname",
       "if [[ '${var.install_auth_signing_script}' == 'true' ]]; then",
       "sudo mkdir -p /opt/vault/scripts/",
       "sudo mv /tmp/sign-request.py /opt/vault/scripts/",
@@ -451,6 +449,8 @@ build {
       "sudo chown -R vault:vault /opt/vault/tls/",
       "sudo chmod -R 600 /opt/vault/tls",
       "sudo chmod 700 /opt/vault/tls",
+      "git config --global advice.detachedHead false", # disable warning about detached head because we dont care, it is a software installation
+      "git clone --branch ${var.vault_module_version} https://github.com/hashicorp/terraform-aws-vault.git /tmp/terraform-aws-vault", # This can be replaced with a local copy if required.
       "sudo /tmp/terraform-aws-vault/modules/update-certificate-store/update-certificate-store --cert-file-path /opt/vault/tls/ca.crt.pem"]
     inline_shebang = "/bin/bash -e"
     only           = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
