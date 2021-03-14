@@ -31,10 +31,19 @@ variable "resourcetier" {
   type        = string
 }
 
-
 variable "ca_public_key_path" {
   type    = string
   default = "/home/ec2-user/.ssh/tls/ca.crt.pem"
+}
+
+variable "tls_private_key_path" {
+  type    = string
+  default = "/home/ec2-user/.ssh/tls/vault.key.pem"
+}
+
+variable "tls_public_key_path" {
+  type    = string
+  default = "/home/ec2-user/.ssh/tls/vault.crt.pem"
 }
 
 variable "account_id" {
@@ -436,9 +445,21 @@ build {
     ]
   }
   # ### Only Vault and Consul servers should have the private keys.
+  provisioner "file" {
+    destination = "/tmp/vault.crt.pem"
+    source      = "${var.tls_public_key_path}"
+    only           = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
+  }
+  provisioner "file" {
+    destination = "/tmp/vault.key.pem"
+    source      = "${var.tls_private_key_path}"
+    only           = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
+  }
+
   provisioner "shell" {
     inline         = [
       "if [[ '${var.install_auth_signing_script}' == 'true' ]]; then",
+      "sudo mkdir -p /opt/vault/scripts/",
       "sudo mv /tmp/sign-request.py /opt/vault/scripts/",
       "else",
       "sudo rm /tmp/sign-request.py",
