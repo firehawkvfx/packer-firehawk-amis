@@ -292,28 +292,28 @@ source "amazon-ebs" "ubuntu18-vault-consul-server-ami" {
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
   # source_ami      = "${var.ubuntu18_ami}"
-  # source_ami_filter { # Uses firehawk base ami
-  #   filters = {
-  #     "tag:ami_role" : "ubuntu18_base_ami",
-  #     "tag:packer_template" : "firehawk-base-ami",
-  #     "tag:commit_hash" : var.ingress_commit_hash,
-  #     "tag:commit_hash_short" : var.ingress_commit_hash_short,
-  #     "tag:resourcetier" : var.resourcetier,
-  #   }
-  #   most_recent = true
-  #   owners      = [var.account_id]
-  # }
-  source_ami_filter { # uses default ami from hashicorp template
+  source_ami_filter { # Uses firehawk base ami
     filters = {
-      architecture                       = "x86_64"
-      "block-device-mapping.volume-type" = "gp2"
-      name                               = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"
-      root-device-type                   = "ebs"
-      virtualization-type                = "hvm"
+      "tag:ami_role" : "ubuntu18_base_ami",
+      "tag:packer_template" : "firehawk-base-ami",
+      "tag:commit_hash" : var.ingress_commit_hash,
+      "tag:commit_hash_short" : var.ingress_commit_hash_short,
+      "tag:resourcetier" : var.resourcetier,
     }
     most_recent = true
-    owners      = ["099720109477"]
+    owners      = [var.account_id]
   }
+  # source_ami_filter { # uses default ami from hashicorp template
+  #   filters = {
+  #     architecture                       = "x86_64"
+  #     "block-device-mapping.volume-type" = "gp2"
+  #     name                               = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"
+  #     root-device-type                   = "ebs"
+  #     virtualization-type                = "hvm"
+  #   }
+  #   most_recent = true
+  #   owners      = ["099720109477"]
+  # }
   ssh_username = "ubuntu"
 }
 
