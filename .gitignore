@@ -1,1 +1,8 @@
 .DS_Store
+**/manifest.json
+**/packerlog.log
+**/.terraform/
+**/terraform.tfstate
+**/tfplan
+modules/firehawk-ami/tmp/
+tmp/
