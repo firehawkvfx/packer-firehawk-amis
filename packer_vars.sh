@@ -34,6 +34,7 @@ function error_if_empty {
   return
 }
 
+
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" # The directory of this script
 
 # # Region is required for AWS CLI
