@@ -51,13 +51,13 @@ export PKR_VAR_ingress_commit_hash="$(git rev-parse HEAD)" # the commit hash for
 export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
 
 cd $SCRIPTDIR/terraform-remote-state-inputs
-terraform init \
+terragrunt init \
     -input=false
-terraform plan -out=tfplan -input=false
-terraform apply -input=false tfplan
-export PKR_VAR_provisioner_iam_profile_name="$(terraform output instance_profile_name)"
+terragrunt plan -out=tfplan -input=false
+terragrunt apply -input=false tfplan
+export PKR_VAR_provisioner_iam_profile_name="$(terragrunt output instance_profile_name)"
 echo "Using profile: $PKR_VAR_provisioner_iam_profile_name"
-export PKR_VAR_installers_bucket="$(terraform output installers_bucket)"
+export PKR_VAR_installers_bucket="$(terragrunt output installers_bucket)"
 echo "Using installers bucket: $PKR_VAR_installers_bucket"
 
 cd $SCRIPTDIR
