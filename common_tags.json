@@ -7,5 +7,6 @@
     "owner": "\($owner)",
     "region": "\($region)",
     "vpcname": "\($vpcname)",
-    "terraform": "true"
+    "sslexpiry" "\($sslexpiry)",
+    "terraform": "false"
 }

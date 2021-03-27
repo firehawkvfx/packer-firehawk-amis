@@ -1,12 +1,40 @@
 #!/bin/bash
 set -e
 
+function log {
+  local -r level="$1"
+  local -r message="$2"
+  local -r timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+  >&2 echo -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
+}
+
+function log_info {
+  local -r message="$1"
+  log "INFO" "$message"
+}
+
+function log_warn {
+  local -r message="$1"
+  log "WARN" "$message"
+}
+
+function log_error {
+  local -r message="$1"
+  log "ERROR" "$message"
+}
+
+function error_if_empty {
+  if [[ -z "$2" ]]; then
+    log_error "$1"
+  fi
+  return
+}
+
 EXECDIR="$(pwd)"
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" # The directory of this script
 cd $SCRIPTDIR
 source ../../update_vars.sh
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" # The directory of this script
-
 
 export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
 # AMI TAGS
@@ -38,6 +66,18 @@ cd $SCRIPTDIR
 export PKR_VAR_aws_region="$AWS_DEFAULT_REGION"
 export PACKER_LOG=1
 export PACKER_LOG_PATH="$SCRIPTDIR/packerlog.log"
+
+# retrieve secretsmanager secrets
+sesi_client_secret_key_path="/firehawk/resourcetier/${TF_VAR_resourcetier}/sesi_client_secret_key"
+get_secret_strings=$(aws secretsmanager get-secret-value --secret-id "$sesi_client_secret_key_path")
+if [[ $? -eq 0 ]]; then
+  export TF_VAR_sesi_client_secret_key=$(echo $get_secret_strings | jq ".SecretString" --raw-output)
+  error_if_empty "Secretsmanager secret missing: TF_VAR_sesi_client_secret_key" "$TF_VAR_sesi_client_secret_key"
+  export PKR_VAR_sesi_client_secret_key="$TF_VAR_sesi_client_secret_key"
+else
+  log_error "Error retrieving: $sesi_client_secret_key_path"
+  return
+fi
 
 # ansible log path
 mkdir -p "$SCRIPTDIR/tmp/log"

@@ -4,11 +4,9 @@
 variable "aws_region" {
   type    = string
 }
-
 variable "account_id" {
   type = string
 }
-
 variable "ami_role" {
   description = "A descriptive name for the purpose of the image."
   type        = string
@@ -33,52 +31,42 @@ variable "resourcetier" {
   description = "The current environment ( dev / green / blue / main )"
   type        = string
 }
-
 variable "ca_public_key_path" {
   type    = string
   default = "/home/ec2-user/.ssh/tls/ca.crt.pem"
 }
-
 variable "consul_download_url" {
   type    = string
   default = ""
 }
-
 variable "consul_module_version" {
   type    = string
   default = "v0.8.0"
 }
-
 variable "consul_version" {
   type    = string
   default = "1.8.4"
 }
-
 variable "install_auth_signing_script" {
   type    = string
   default = "true"
 }
-
 variable "tls_private_key_path" {
   type    = string
   default = "/home/ec2-user/.ssh/tls/vault.key.pem"
 }
-
 variable "tls_public_key_path" {
   type    = string
   default = "/home/ec2-user/.ssh/tls/vault.crt.pem"
 }
-
 variable "vault_download_url" {
   type    = string
   default = ""
 }
-
 variable "vault_version" {
   type    = string
   default = "1.5.5"
 }
-
 variable "vault_module_version" { # The hashicorp github module version to clone.
   default = "firehawk_v0.0.1" # from "v0.13.11", this resolves consul dns issues on start.  This is likely resolved by Hashicorp now.
 }
@@ -89,48 +77,43 @@ variable "consul_cluster_tag_key" {
   type    = string
   default = ""
 }
-
 variable "consul_cluster_tag_value" {
   type    = string
   default = ""
 }
-
 variable "provisioner_iam_profile_name" { # Required for some builds requiring S3 Installers
   type = string
 }
-
 variable "test_consul" { # If a consul cluster is running, attempt to join the cluster. This can be useful for debugging, but will prevent inital builds if you have no infrastructure running yet.  This test may not also work unless the appropriate role is assigned.
   type    = bool
   default = false
 }
-
 variable "deadline_version" {
   description = "The version of the deadline installer to aquire"
   type        = string
   default     = "10.1.9.2"
 }
-
 variable "installers_bucket" {
   description = "The installer bucket to persist installations to"
   type        = string
 }
-
 # Required for render node AMI
 variable "sesi_client_id" {
   description = "The client ID generated from your Side FX Account to automatically download Houdini."
   type = string
 }
-
 variable "sesi_client_secret_key" {
   description = "The secret key generated from your Side FX Account to automatically download Houdini."
   type = string
 }
-
 variable "houdini_license_server_address" {
   description = "The IP or host name of your Houdini license server (IP Address is recommended to simplify usage across sites with DNS)."
   type = string
 }
-
+variable "SSL_expiry" {
+  description = "The Expiry resulting from the TTL on the SSL Certificates"
+  type = string
+}
 
 locals {
   timestamp         = regex_replace(timestamp(), "[- TZ:]", "")
@@ -142,6 +125,7 @@ locals {
     "commit_hash" : var.commit_hash,
     "commit_hash_short" : var.commit_hash_short,
     "resourcetier" : var.resourcetier,
+    "sslexpiry": var.SSL_expiry
   }
   syscontrol_gid = "9003"
   deployuser_uid = "9004"
