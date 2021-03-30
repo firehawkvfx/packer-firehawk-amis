@@ -370,7 +370,7 @@ build {
     ]
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline_shebang   = "/bin/bash -e"
-    only             = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+    only             = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami", "amazon-ebs.ubuntu18-vault-consul-server-ami"]
   }
 
   provisioner "file" { # fix apt upgrades to not hold up boot
