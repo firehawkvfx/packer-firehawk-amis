@@ -121,6 +121,7 @@ sudo apt-get install -y python-openssl
 sudo rm -frv "/home/${deadlineuser_name}/Downloads/SSLGeneration" # if this is a repeated install, clear the keys
 git clone https://github.com/ThinkboxSoftware/SSLGeneration.git "/home/${deadlineuser_name}/Downloads/SSLGeneration"
 cd /home/$deadlineuser_name/Downloads/SSLGeneration
+ssl_keygen_path="/home/${deadlineuser_name}/Downloads/SSLGeneration/keys"
 
 # CA
 python ssl_gen.py --ca --cert-org "$cert_org" --cert-ou "$cert_ou"
