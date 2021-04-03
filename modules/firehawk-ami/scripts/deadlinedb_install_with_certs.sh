@@ -173,6 +173,53 @@ sudo $deadline_installer_dir/$deadline_db_installer_filename \
 # replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    PEMKeyFile:" " $deadline_certificates_location/$server_cert_basename.pem"
 # replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  authorization:" " enabled" # ? not sure what this should be
 
+# After DB install, certs exist here
+# ls -ltriah /opt/Thinkbox/DeadlineDatabase10/certs/
+# total 24K
+# 522562 drwxr-xr-x 4 root   root   4.0K Apr  3 23:27 ..
+# 768030 -r--r----- 1 ubuntu ubuntu 1.2K Apr  3 23:27 ca.crt
+# 768038 -r--r----- 1 ubuntu ubuntu 3.3K Apr  3 23:27 Deadline10Client.pfx
+# 768034 -r--r----- 1 ubuntu ubuntu 2.9K Apr  3 23:27 deadlinedb.service.consul.pem
+# 768036 -r--r----- 1 ubuntu ubuntu 3.0K Apr  3 23:27 mongo_client.pem
+
+# and after RCS:
+# ls -ltriah /opt/Thinkbox/certs/
+# total 20K
+# 521283 -r-------- 1 ubuntu root   1.2K Apr  3 23:29 ca.crt
+# 521289 -r-------- 1 ubuntu root   3.3K Apr  3 23:29 deadlinedb.service.consul.pfx
+# 521292 -r-------- 1 root   root   3.3K Apr  3 23:29 Deadline10RemoteClient.pfx
+
+# config file state:
+#MongoDB config file
+# systemLog:
+#   destination: file
+#   # Mongo DB's output will be logged here.
+#   path: /opt/Thinkbox/DeadlineDatabase10/mongo/data/logs/log.txt
+#   # Default to quiet mode to limit log output size. Set to 'false' when debugging.
+#   quiet: true
+#   # Increase verbosity level for more debug messages (max: 5)
+#   verbosity: 0
+# net:
+#   # Port MongoDB will listen on for incoming connections
+#   port: 27100
+#   ipv6: true
+#   ssl:
+#     # SSL/TLS options
+#     mode: requireSSL
+#     # If enabling TLS, the below options need to be set:
+#     PEMKeyFile: /opt/Thinkbox/DeadlineDatabase10/certs/deadlinedb.service.consul.pem
+#     CAFile: /opt/Thinkbox/DeadlineDatabase10/certs/ca.crt
+#   # By default mongo will only use localhost, this will allow us to use the IP Address
+#   bindIpAll: true
+# storage:
+#   # Database files will be stored here
+#   dbPath: /opt/Thinkbox/DeadlineDatabase10/mongo/data
+#   engine: wiredTiger
+# security:
+#   authorization: enabled
+
+sudo chown ubuntu:ubuntu /opt/Thinkbox/DeadlineDatabase10/certs/*
+
 # finalize permissions post install:
 sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/
 sudo chmod u+rX,g+rX,o-rwx /opt/Thinkbox/
