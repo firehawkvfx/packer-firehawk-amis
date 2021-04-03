@@ -97,10 +97,11 @@ fi
 # Directories and permissions
 
 sudo mkdir -p /opt/Thinkbox
+sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox
 sudo chmod u=rwX,g=rX,o-rwx /opt/Thinkbox
+
 deadline_certificates_location="/opt/Thinkbox/certs"
 sudo mkdir -p "$deadline_certificates_location"
-
 sudo chown $deadlineuser_name:$deadlineuser_name $deadline_certificates_location
 sudo chmod u=rwX,g=rX,o-rwx "$deadline_certificates_location"
 
