@@ -502,7 +502,7 @@ build {
 
   provisioner "shell" {
     inline         = ["sudo apt-get install -y git",
-      "apt-get install python-openssl"
+      "apt-get install python-openssl",
       "cd /home/ubuntu/Downloads",
       "git clone https://github.com/ThinkboxSoftware/SSLGeneration.git", # https://docs.thinkboxsoftware.com/products/deadline/10.1/1_User%20Manual/manual/proxy-sslgen.html?highlight=ssl%20certificate%20generation
       # python ssl_gen.py --ca --cert-org "Firehawk VFX" --cert-ou "CG
