@@ -69,6 +69,10 @@ END
   sudo python3 -c "$PYTHON_CODE"
 }
 
+# ensure directory exists
+sudo mkdir -p "/home/$deadlineuser_name/Downloads"
+sudo chown $deadlineuser_name:$deadlineuser_name "/home/$deadlineuser_name/Downloads"
+
 # Download mongo
 if [[ -f "$mongo_installer_tgz" ]]; then
     echo "File already exists: $mongo_installer_tgz"
@@ -91,11 +95,15 @@ else
 fi
 
 # Directories and permissions
+
 sudo mkdir -p /opt/Thinkbox
 sudo chmod u=rwX,g=rX,o-rwx /opt/Thinkbox
 deadline_certificates_location="/opt/Thinkbox/certs"
 sudo mkdir -p "$deadline_certificates_location"
+
+sudo chown $deadlineuser_name:$deadlineuser_name $deadline_certificates_location
 sudo chmod u=rwX,g=rX,o-rwx "$deadline_certificates_location"
+
 sudo mkdir -p $deadline_installer_dir
 
 # Install Deadline DB
@@ -141,7 +149,7 @@ python ssl_gen.py --client --cert-name $deadline_client_certificate_basename
 python ssl_gen.py --pfx --cert-name $deadline_client_certificate_basename
 
 # Relocate certs
-sudo rm -frv /opt/Thinkbox/certs/* # Remove invalid previous certs if present
+sudo rm -frv $deadline_certificates_location/* # Remove invalid previous certs if present
 sudo mv -v keys/* "$deadline_certificates_location"
 # Certs Permissions
 sudo chmod u=r,g=r,o=r "${deadline_certificates_location}/${deadline_client_certificate}"
@@ -163,8 +171,8 @@ replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  autho
 sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/
 sudo chmod u+rX,g+rX,o-rwx /opt/Thinkbox/
 
-sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/certs
-sudo chmod u+rX,g+rX,o-rwx /opt/Thinkbox/certs
+sudo chown $deadlineuser_name:$deadlineuser_name $deadline_certificates_location
+sudo chmod u+rX,g+rX,o-rwx $deadline_certificates_location
 
 sudo chown -R $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/DeadlineRepository10
 sudo chmod -R u=rX,g=rX,o-rwx /opt/Thinkbox/DeadlineRepository10
