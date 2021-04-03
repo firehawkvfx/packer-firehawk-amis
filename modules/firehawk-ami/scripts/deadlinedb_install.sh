@@ -29,6 +29,10 @@ deadline_db_installer_filename="DeadlineRepository-${deadline_version}-linux-x64
 deadline_client_installer_filename="DeadlineClient-${deadline_version}-linux-x64-installer.run"
 mongo_installer_tgz="/home/$deadlineuser_name/Downloads/$(basename $mongo_url)"
 
+# set hostname
+cat /etc/hosts | grep -m 1 "127.0.0.1   $host_name" || echo "127.0.0.1   $host_name" | sudo tee -a /etc/hosts
+sudo hostnamectl set-hostname $host_name
+
 # Functions
 function replace_line() {
   local -r filepath=$1
@@ -175,8 +179,8 @@ sudo chown -R $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/DeadlineReposi
 sudo chmod -R u=rwX,g=rwX,o-rwx /opt/Thinkbox/DeadlineRepository10/reports
 
 # Restart Deadline / Mongo service
-sudo service Deadline10db start
 sudo systemctl daemon-reload
+sudo service Deadline10db start
 
 # Directories and Permissions
 sudo apt-get install -y xdg-utils
