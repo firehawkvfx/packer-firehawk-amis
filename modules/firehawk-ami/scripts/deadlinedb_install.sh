@@ -127,7 +127,7 @@ python ssl_gen.py --ca --cert-org "$cert_org" --cert-ou "$cert_ou"
 # Server Cert
 python ssl_gen.py --server --cert-name "$server_cert_basename"
 # Create PEM key - undocumented by Thinkbox
-cat "${ssl_keygen_path}/${server_cert_basename}.crt" "${ssl_keygen_path}/${server_cert_basename}.key" > "${ssl_keygen_path}/${server_cert_basename}.pem"
+cat "${ssl_keygen_path}/${server_cert_basename}.crt" "${ssl_keygen_path}/${server_cert_basename}.key" | sudo tee "${ssl_keygen_path}/${server_cert_basename}.pem"
 # RCS proxy cert
 python ssl_gen.py --client --cert-name "$deadline_proxy_certificate_basename"
 python ssl_gen.py --pfx --cert-name "$deadline_proxy_certificate_basename"
