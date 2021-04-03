@@ -689,35 +689,35 @@ build {
     only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
-  provisioner "ansible" {
-    playbook_file = "./ansible/deadline-db-install.yaml"
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      # "user_deadlineuser_pw=${local.user_deadlineuser_pw} user_deadlineuser_name=deployuser variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul deadline_proxy_certificate_password=${local.deadline_proxy_certificate_password} installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
-      "resourcetier=${var.resourcetier} user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
-  }
+  # provisioner "ansible" { # Temp disable dealine and rcs install until immutability is achieved.
+  #   playbook_file = "./ansible/deadline-db-install.yaml"
+  #   extra_arguments = [
+  #     "-v",
+  #     "--extra-vars",
+  #     # "user_deadlineuser_pw=${local.user_deadlineuser_pw} user_deadlineuser_name=deployuser variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul deadline_proxy_certificate_password=${local.deadline_proxy_certificate_password} installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
+  #     "resourcetier=${var.resourcetier} user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
+  #   ]
+  #   collections_path = "./ansible/collections"
+  #   roles_path       = "./ansible/roles"
+  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+  #   galaxy_file      = "./requirements.yml"
+  #   only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  # }
 
-  provisioner "ansible" {
-    playbook_file = "./ansible/deadlinercs.yaml"
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      # "user_deadlineuser_pw=${local.user_deadlineuser_pw} user_deadlineuser_name=deployuser variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul deadline_proxy_certificate_password=${local.deadline_proxy_certificate_password} installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
-      "resourcetier=${var.resourcetier} user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
-  }
+  # provisioner "ansible" {
+  #   playbook_file = "./ansible/deadlinercs.yaml"
+  #   extra_arguments = [
+  #     "-v",
+  #     "--extra-vars",
+  #     # "user_deadlineuser_pw=${local.user_deadlineuser_pw} user_deadlineuser_name=deployuser variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul deadline_proxy_certificate_password=${local.deadline_proxy_certificate_password} installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
+  #     "resourcetier=${var.resourcetier} user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost openfirehawkserver=deadlinedb.service.consul installers_bucket=${local.installers_bucket} deadline_version=${local.deadline_version} reinstallation=false"
+  #   ]
+  #   collections_path = "./ansible/collections"
+  #   roles_path       = "./ansible/roles"
+  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+  #   galaxy_file      = "./requirements.yml"
+  #   only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  # }
 
   ### Install Houdini Plugin for deadline DB ###
   provisioner "ansible" {
