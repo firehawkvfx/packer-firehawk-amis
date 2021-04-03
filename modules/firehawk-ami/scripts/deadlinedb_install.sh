@@ -3,6 +3,7 @@
 # User vars
 cert_org="Firehawk VFX"
 cert_ou="CG"
+installers_bucket="software.dev.firehawkvfx.com"
 deadlineuser_name="ubuntu"
 deadline_version="10.1.9.2"
 mongo_url="https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-3.6.19.tgz"
@@ -70,7 +71,15 @@ fi
 if [[ -f "$deadline_linux_installers_tar" ]]; then
     echo "File already exists: $deadline_linux_installers_tar"
 else
-    aws s3api get-object --bucket thinkbox-installers --key "Deadline/$deadline_version/Linux/$deadline_linux_installers_basename" "$deadline_linux_installers_tar"
+    aws s3api head-object --bucket $installers_bucket --key "Deadline-${deadline_version}-linux-installers.tar"
+    exit_code=$?
+    if [[ $exit_code -eq 0 ]]; then
+        echo "...Downloading Deadline from: $installers_bucket"
+        aws s3api get-object --bucket $installers_bucket --key "${deadline_linux_installers_filename}" "${deadline_linux_installers_tar}"
+    else
+        echo "...Downloading Deadline from: thinkbox-installers"
+        aws s3api get-object --bucket thinkbox-installers --key "Deadline/${deadline_version}/Linux/${deadline_linux_installers_basename}" "${deadline_linux_installers_tar}"
+    fi
 fi
 
 # Directories and permissions
