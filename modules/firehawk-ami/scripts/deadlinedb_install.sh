@@ -118,7 +118,7 @@ sudo $deadline_installer_dir/$deadline_db_installer_filename \
 
 # Generate Certs
 sudo apt-get install -y python-openssl
-rm -frv "/home/${deadlineuser_name}/Downloads/SSLGeneration" # if this is a repeated install, clear the keys
+sudo rm -frv "/home/${deadlineuser_name}/Downloads/SSLGeneration" # if this is a repeated install, clear the keys
 git clone https://github.com/ThinkboxSoftware/SSLGeneration.git "/home/${deadlineuser_name}/Downloads/SSLGeneration"
 cd /home/$deadlineuser_name/Downloads/SSLGeneration
 
