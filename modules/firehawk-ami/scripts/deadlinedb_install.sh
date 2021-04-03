@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -e
+pwd=$(pwd)
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" # The directory of this script
+
 # User vars
 cert_org="Firehawk VFX"
 cert_ou="CG"
@@ -91,7 +95,7 @@ sudo chmod u=rwX,g=rX,o-rwx "$deadline_certificates_location"
 sudo mkdir -p $deadline_installer_dir
 
 # Install Deadline DB
-tar -xvf $deadline_linux_installers_tar -C $deadline_installer_dir
+sudo tar -xvf $deadline_linux_installers_tar -C $deadline_installer_dir
 cd $deadline_installer_dir
 sudo $deadline_installer_dir/$deadline_db_installer_filename \
 --mode unattended \
@@ -114,11 +118,10 @@ sudo $deadline_installer_dir/$deadline_db_installer_filename \
 
 # Generate Certs
 sudo apt-get install -y python-openssl
-ssl_keygen_path="/home/$deadlineuser_name/Downloads/SSLGeneration/keys"
-mkdir -p "$ssl_keygen_path"
-rm -fv "${ssl_keygen_path}/*" # if this is a repeated install, clear the keays
+rm -frv "/home/${deadlineuser_name}/Downloads/SSLGeneration" # if this is a repeated install, clear the keys
 git clone https://github.com/ThinkboxSoftware/SSLGeneration.git "/home/${deadlineuser_name}/Downloads/SSLGeneration"
 cd /home/$deadlineuser_name/Downloads/SSLGeneration
+
 # CA
 python ssl_gen.py --ca --cert-org "$cert_org" --cert-ou "$cert_ou"
 # Server Cert
@@ -149,7 +152,7 @@ replace_line "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "   
 replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "    CAFile:" " $deadline_certificates_location/ca.crt"
 replace_line "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    #PEMKeyFile:" "    PEMKeyFile: ERROR_DURING_REPALCEMENT" # if you can read this result, something went wrong
 replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    PEMKeyFile:" " $deadline_certificates_location/$server_cert_basename.pem"
-replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  authorization:" " enabled"
+replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  authorization:" " disabled" # ? not sure what this should be
 
 # finalize permissions post install:
 sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/
@@ -274,3 +277,4 @@ echo "Validate that a connection with the database can be established with the c
 # --proxyrootdir {{ deadline_proxy_root_dir }} \
 # --proxycertificate {{ deadline_certificates_location }}/{{ deadline_proxy_certificate }}
 
+cd $pwd
