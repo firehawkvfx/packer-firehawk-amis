@@ -176,7 +176,6 @@ sudo chmod -R u=rwX,g=rwX,o-rwx /opt/Thinkbox/DeadlineRepository10/reports
 
 # Restart Deadline / Mongo service
 sudo service Deadline10db start
-sudo service Deadline10db enabled
 sudo systemctl daemon-reload
 
 # Directories and Permissions
