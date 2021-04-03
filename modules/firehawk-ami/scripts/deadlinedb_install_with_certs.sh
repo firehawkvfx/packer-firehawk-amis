@@ -15,12 +15,12 @@ deadline_version="10.1.9.2"
 mongo_url="https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-3.6.19.tgz"
 dbport="27100"
 host_name="deadlinedb.service.consul"
-server_cert_basename="Deadline10Server"
 deadline_client_certificate="Deadline10Client.pfx"
 deadline_proxy_certificate="Deadline10RemoteClient.pfx"
-deadline_proxy_root_dir="deadlinedb.service.consul:4433"
 
 # Script vars (implicit)
+server_cert_basename="$host_name"
+deadline_proxy_root_dir="$host_name:4433"
 deadline_client_certificate_basename="${deadline_client_certificate%.*}"
 deadline_proxy_certificate_basename="${deadline_proxy_certificate%.*}"
 deadline_linux_installers_tar="/tmp/Deadline-${deadline_version}-linux-installers.tar" # temp dir since we just keep the extracted contents for repeat installs.
