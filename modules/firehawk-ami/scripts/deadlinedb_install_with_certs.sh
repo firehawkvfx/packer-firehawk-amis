@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This installs certificates with the DB.
+
 set -e
 pwd=$(pwd)
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" # The directory of this script
@@ -126,47 +128,50 @@ sudo $deadline_installer_dir/$deadline_db_installer_filename \
 --dbauth true \
 --certgen_outdir /opt/Thinkbox/DeadlineDatabase10/certs \
 --createX509dbuser true \
---requireSSL false \
---dbssl false
+--requireSSL true \
+--dbssl true \
+--dbpassword avaultpassword \
+--certgen_password avaultpassword \
+--dbcertpass avaultpassword
 
-# Generate Certs
-sudo apt-get install -y python-openssl
-sudo rm -frv "/home/${deadlineuser_name}/Downloads/SSLGeneration" # if this is a repeated install, clear the keys
-git clone https://github.com/ThinkboxSoftware/SSLGeneration.git "/home/${deadlineuser_name}/Downloads/SSLGeneration"
-cd /home/$deadlineuser_name/Downloads/SSLGeneration
-ssl_keygen_path="/home/${deadlineuser_name}/Downloads/SSLGeneration/keys"
+# # Generate Certs
+# sudo apt-get install -y python-openssl
+# sudo rm -frv "/home/${deadlineuser_name}/Downloads/SSLGeneration" # if this is a repeated install, clear the keys
+# git clone https://github.com/ThinkboxSoftware/SSLGeneration.git "/home/${deadlineuser_name}/Downloads/SSLGeneration"
+# cd /home/$deadlineuser_name/Downloads/SSLGeneration
+# ssl_keygen_path="/home/${deadlineuser_name}/Downloads/SSLGeneration/keys"
 
-# CA
-python ssl_gen.py --ca --cert-org "$cert_org" --cert-ou "$cert_ou"
-# Server Cert
-python ssl_gen.py --server --cert-name "$server_cert_basename"
-# Create PEM key - undocumented by Thinkbox
-cat "${ssl_keygen_path}/${server_cert_basename}.crt" "${ssl_keygen_path}/${server_cert_basename}.key" | sudo tee "${ssl_keygen_path}/${server_cert_basename}.pem"
-# RCS proxy cert
-python ssl_gen.py --client --cert-name "$deadline_proxy_certificate_basename"
-python ssl_gen.py --pfx --cert-name "$deadline_proxy_certificate_basename"
-# Remote Client Cert ? not sure how this works yet, sinc RCS is supposed to create that.
-python ssl_gen.py --client --cert-name $deadline_client_certificate_basename
-python ssl_gen.py --pfx --cert-name $deadline_client_certificate_basename
+# # CA
+# python ssl_gen.py --ca --cert-org "$cert_org" --cert-ou "$cert_ou"
+# # Server Cert
+# python ssl_gen.py --server --cert-name "$server_cert_basename"
+# # Create PEM key - undocumented by Thinkbox
+# cat "${ssl_keygen_path}/${server_cert_basename}.crt" "${ssl_keygen_path}/${server_cert_basename}.key" | sudo tee "${ssl_keygen_path}/${server_cert_basename}.pem"
+# # RCS proxy cert
+# python ssl_gen.py --client --cert-name "$deadline_proxy_certificate_basename"
+# python ssl_gen.py --pfx --cert-name "$deadline_proxy_certificate_basename"
+# # Remote Client Cert ? not sure how this works yet, sinc RCS is supposed to create that.
+# python ssl_gen.py --client --cert-name $deadline_client_certificate_basename
+# python ssl_gen.py --pfx --cert-name $deadline_client_certificate_basename
 
-# Relocate certs
-sudo rm -frv $deadline_certificates_location/* # Remove invalid previous certs if present
-sudo mv -v keys/* "$deadline_certificates_location"
-# Certs Permissions
-sudo chmod u=r,g=r,o=r "${deadline_certificates_location}/${deadline_client_certificate}"
-sudo chmod o-rwx ${deadline_certificates_location}/*.pem
-sudo chmod o-rwx ${deadline_certificates_location}/*.key
-sudo chmod o-rwx ${deadline_certificates_location}/*.pfx
+# # Relocate certs
+# sudo rm -frv $deadline_certificates_location/* # Remove invalid previous certs if present
+# sudo mv -v keys/* "$deadline_certificates_location"
+# # Certs Permissions
+# sudo chmod u=r,g=r,o=r "${deadline_certificates_location}/${deadline_client_certificate}"
+# sudo chmod o-rwx ${deadline_certificates_location}/*.pem
+# sudo chmod o-rwx ${deadline_certificates_location}/*.key
+# sudo chmod o-rwx ${deadline_certificates_location}/*.pfx
 
 # stop service before updating config.
-sudo service Deadline10db stop
+# sudo service Deadline10db stop
 # Configure Mongo : /opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf
-replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"        "    mode:" " requireSSL"
-replace_line "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "    #CAFile:" "    CAFile: ERROR_DURING_REPALCEMENT" # if you can read this result, something went wrong
-replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "    CAFile:" " $deadline_certificates_location/ca.crt"
-replace_line "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    #PEMKeyFile:" "    PEMKeyFile: ERROR_DURING_REPALCEMENT" # if you can read this result, something went wrong
-replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    PEMKeyFile:" " $deadline_certificates_location/$server_cert_basename.pem"
-replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  authorization:" " disabled" # ? not sure what this should be
+# replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"        "    mode:" " requireSSL"
+# replace_line "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "    #CAFile:" "    CAFile: ERROR_DURING_REPLACEMENT" # if you can read this result, something went wrong
+# replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "    CAFile:" " $deadline_certificates_location/ca.crt"
+# replace_line "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    #PEMKeyFile:" "    PEMKeyFile: ERROR_DURING_REPLACEMENT" # if you can read this result, something went wrong
+# replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    PEMKeyFile:" " $deadline_certificates_location/$server_cert_basename.pem"
+# replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  authorization:" " enabled" # ? not sure what this should be
 
 # finalize permissions post install:
 sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/
@@ -209,6 +214,7 @@ sudo $deadline_installer_dir/$deadline_client_installer_filename \
 --connectiontype Repository \
 --repositorydir /opt/Thinkbox/DeadlineRepository10/ \
 --dbsslcertificate "${deadline_certificates_location}/${deadline_client_certificate}" \
+--dbsslpassword avaultpassword \
 --licensemode UsageBased \
 --daemonuser "$deadlineuser_name" \
 --connserveruser "$deadlineuser_name" \
@@ -217,9 +223,11 @@ sudo $deadline_installer_dir/$deadline_client_installer_filename \
 --enabletls true \
 --tlscertificates generate  \
 --generatedcertdir "${deadline_certificates_location}/" \
+--clientcert_pass avaultpassword \
 --slavestartup false \
+--proxycertificatepassword avaultpassword \
 --proxyrootdir $deadline_proxy_root_dir \
---proxycertificate $deadline_certificates_location/$deadline_proxy_certificate_basename.pfx
+--proxycertificate $deadline_certificates_location/$deadline_proxy_certificate
 
 # Configure /var/lib/Thinkbox/Deadline10/deadline.ini
 replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchPulseAtStartup=" "True"
@@ -234,60 +242,6 @@ replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/
 sudo service deadline10launcher restart
 
 echo "Validate that a connection with the database can be established with the config"
-/opt/Thinkbox/DeadlineDatabase10/mongo/application/bin/deadline_mongo --eval 'printjson(db.getCollectionNames())'
-
-
-# For posterity:
-
-# Generate certs with install - deprecated
-
-# sudo $deadline_db_installer_filename \
-# --mode unattended \
-# --debuglevel 2 \
-# --prefix /opt/Thinkbox/DeadlineRepository10 \
-# --setpermissions true \
-# --installmongodb true \
-# --prepackagedDB $mongo_installer_tgz \
-# --dbOverwrite true \
-# --mongodir /opt/Thinkbox/DeadlineDatabase10 \
-# --dbListeningPort $dbport \
-# --certgen_outdir /opt/Thinkbox/DeadlineDatabase10/certs \
-# --certgen_password avaultpassword \
-# --createX509dbuser true \
-# --requireSSL true \
-# --dbhost $host_name \
-# --dbport $dbport \
-# --dbuser $deadlineuser_name \
-# --dbpassword avaultpassword \
-# --dbauth true \
-# --dbcertpass avaultpassword \
-# --dbssl true
-
-# deprecated method to install RCS with certs
-
-# sudo $deadline_installer_dir/$deadline_db_installer_filename \
-# --mode unattended \
-# --launcherdaemon true \
-# --enable-components proxyconfig \
-# --servercert {{ deadline_server_certificates_location }}/{{ deadline_client_certificate }} \
-# --debuglevel 2 \
-# --prefix /opt/Thinkbox/Deadline10 \
-# --connectiontype Repository \
-# --repositorydir /opt/Thinkbox/DeadlineRepository10/ \
-# --dbsslcertificate {{ deadline_server_certificates_location }}/{{ deadline_client_certificate }} \
-# --dbsslpassword avaultpassword \
-# --licensemode UsageBased \
-# --daemonuser {{ user_deadlineuser_name }} \
-# --connserveruser {{ user_deadlineuser_name }} \
-# --httpport 8080 \
-# --tlsport 4433 \
-# --enabletls true \
-# --tlscertificates generate  \
-# --generatedcertdir {{ deadline_certificates_location }}/ \
-# --clientcert_pass avaultpassword \
-# --slavestartup false \
-# --proxycertificatepassword avaultpassword \
-# --proxyrootdir {{ deadline_proxy_root_dir }} \
-# --proxycertificate {{ deadline_certificates_location }}/{{ deadline_proxy_certificate }}
+/opt/Thinkbox/DeadlineDatabase10/mongo/application/bin/deadline_mongo --sslPEMKeyPassword "avaultpassword" --eval 'printjson(db.getCollectionNames())'
 
 cd $pwd
