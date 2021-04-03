@@ -498,6 +498,21 @@ build {
     only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
+  ### requirements for deadline SSL
+
+  provisioner "shell" {
+    inline         = ["sudo apt-get install -y git",
+      "apt-get install python-openssl"
+      "cd /home/ubuntu/Downloads",
+      "git clone https://github.com/ThinkboxSoftware/SSLGeneration.git", # https://docs.thinkboxsoftware.com/products/deadline/10.1/1_User%20Manual/manual/proxy-sslgen.html?highlight=ssl%20certificate%20generation
+      # python ssl_gen.py --ca --cert-org "Firehawk VFX" --cert-ou "CG
+      # python ssl_gen.py --server --cert-name server
+      # python ssl_gen.py --client --cert-name client
+      # python ssl_gen.py --pfx --cert-name client # deposit the keys/client.pfx file to vault.  nodes will collect this on boot.
+    inline_shebang = "/bin/bash -e"
+    only           = ["amazon-ebs.amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
+
   ### End public cert block to verify other consul agents ###
 
   ### Configure deadlineuser for render service ###
