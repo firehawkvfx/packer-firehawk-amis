@@ -151,6 +151,11 @@ python ssl_gen.py --ca --cert-org "$cert_org" --cert-ou "$cert_ou"
 python ssl_gen.py --server --cert-name "$server_cert_basename"
 # Create PEM key - undocumented by Thinkbox
 cat "${ssl_keygen_path}/${server_cert_basename}.crt" "${ssl_keygen_path}/${server_cert_basename}.key" | sudo tee "${ssl_keygen_path}/${server_cert_basename}.pem"
+# mongo client pem file is undocumented.  Try this.
+python ssl_gen.py --server --cert-name mongo_client
+# Create PEM key - undocumented by Thinkbox
+cat "${ssl_keygen_path}/mongo_client.crt" "${ssl_keygen_path}/mongo_client.key" | sudo tee "${ssl_keygen_path}/mongo_client.pem"
+
 # # RCS proxy cert
 # python ssl_gen.py --client --cert-name "$deadline_proxy_certificate_basename"
 # python ssl_gen.py --pfx --cert-name "$deadline_proxy_certificate_basename"
@@ -159,9 +164,15 @@ python ssl_gen.py --client --cert-name $deadline_client_certificate_basename
 python ssl_gen.py --pfx --cert-name $deadline_client_certificate_basename
 
 # Relocate certs
-sudo rm -frv $deadline_certificates_location/* # Remove invalid previous certs if present
-sudo mv -v keys/* "$deadline_certificates_location"
+# sudo rm -frv $deadline_certificates_location/* # Remove invalid previous certs if present
+
+sudo mv -v "${ssl_keygen_path}/ca.crt" "$deadline_certificates_location"
+sudo mv -v "${ssl_keygen_path}/$deadline_client_certificate" "$deadline_certificates_location"
+sudo mv -v "${ssl_keygen_path}/${server_cert_basename}.pem" "$deadline_certificates_location"
+sudo mv -v "${ssl_keygen_path}/mongo_client.pem" "$deadline_certificates_location"
+
 # Certs Permissions
+sudo chown $deadlineuser_name:$deadlineuser_name $deadline_certificates_location/*
 sudo chmod u=r,g=r,o=r "${deadline_certificates_location}/${deadline_client_certificate}"
 sudo chmod o-rwx ${deadline_certificates_location}/*.pem
 sudo chmod o-rwx ${deadline_certificates_location}/*.key
@@ -175,7 +186,73 @@ replace_line "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "   
 replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "    CAFile:" " $deadline_certificates_location/ca.crt"
 replace_line "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    #PEMKeyFile:" "    PEMKeyFile: ERROR_DURING_REPLACEMENT" # if you can read this result, something went wrong
 replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    PEMKeyFile:" " $deadline_certificates_location/$server_cert_basename.pem"
-replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  authorization:" " disabled" # ? not sure what this should be
+replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  authorization:" " enabled" # ? not sure what this should be
+
+# After DB install, certs exist here 
+# ls -ltriah /opt/Thinkbox/DeadlineDatabase10/certs/
+# total 48K
+# 521278 drwxr-xr-x 4 root   root   4.0K Apr  4 00:39 ..
+# 772994 -rw-rw---- 1 ubuntu ubuntu 1.7K Apr  4 00:40 ca.key
+# 772993 -rw-rw-r-- 1 ubuntu ubuntu 1.2K Apr  4 00:40 ca.crt
+# 772997 -rw-rw---- 1 ubuntu ubuntu 1.7K Apr  4 00:40 deadlinedb.service.consul.key
+# 772998 -rw-rw-r-- 1 ubuntu ubuntu 1.1K Apr  4 00:40 deadlinedb.service.consul.crt
+# 772999 -rw-r----- 1 root   root   2.8K Apr  4 00:40 deadlinedb.service.consul.pem
+# 772996 -rw-rw-r-- 1 ubuntu ubuntu    1 Apr  4 00:40 serial
+# 772995 -rw-rw-r-- 1 ubuntu ubuntu  155 Apr  4 00:40 index.txt
+# 773000 -rw-rw---- 1 ubuntu ubuntu 1.7K Apr  4 00:40 Deadline10Client.key
+# 773001 -rw-rw-r-- 1 ubuntu ubuntu 1.1K Apr  4 00:40 Deadline10Client.crt
+# 773002 -r--r----- 1 ubuntu ubuntu 3.2K Apr  4 00:40 Deadline10Client.pfx
+
+# and after RCS:
+# ls -ltriah /opt/Thinkbox/certs/
+# total 20K
+# 521285 -r-------- 1 ubuntu root   1.2K Apr  4 00:41 ca.crt
+# 521291 -r-------- 1 ubuntu root   3.3K Apr  4 00:41 deadlinedb.service.consul.pfx
+# 521294 -r-------- 1 root   root   3.3K Apr  4 00:41 Deadline10RemoteClient.pfx
+
+# dir permissions
+# ls -ltriah /opt/Thinkbox/
+# total 24K
+#   3811 drwxr-xr-x  5 root   root    4.0K Apr  4 00:39 ..
+# 521278 drwxr-xr-x  4 root   root    4.0K Apr  4 00:39 DeadlineDatabase10
+# 768147 drwxrwxr-- 20 ubuntu ubuntu  4.0K Apr  4 00:40 DeadlineRepository10
+# 521280 drwxr-x---  2 ubuntu ubuntu  4.0K Apr  4 00:41 certs
+# 521277 drwxr-x---  6 ubuntu ubuntu  4.0K Apr  4 00:41 .
+# 772643 drwxrwxrwx  5 nobody nogroup 4.0K Apr  4 00:42 Deadline10
+
+#MongoDB config file
+
+# systemLog:
+#   destination: file
+#   # Mongo DB's output will be logged here.
+#   path: /opt/Thinkbox/DeadlineDatabase10/mongo/data/logs/log.txt
+#   # Default to quiet mode to limit log output size. Set to 'false' when debugging.
+#   quiet: true
+#   # Increase verbosity level for more debug messages (max: 5)
+#   verbosity: 0
+
+# net:
+#   # Port MongoDB will listen on for incoming connections
+#   port: 27100
+#   ipv6: true
+#   ssl:
+#     # SSL/TLS options
+#     mode: requireSSL
+#     # If enabling TLS, the below options need to be set:
+#     PEMKeyFile: /opt/Thinkbox/DeadlineDatabase10/certs/deadlinedb.service.consul.pem
+#     CAFile: /opt/Thinkbox/DeadlineDatabase10/certs/ca.crt
+#   # By default mongo will only use localhost, this will allow us to use the IP Address
+#   bindIpAll: true
+
+# storage:
+#   # Database files will be stored here
+#   dbPath: /opt/Thinkbox/DeadlineDatabase10/mongo/data
+#   engine: wiredTiger
+
+# security:
+#   authorization: disabled
+
+sudo chown ubuntu:ubuntu $deadline_certificates_location/*
 
 # finalize permissions post install:
 sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/
@@ -231,7 +308,7 @@ sudo $deadline_installer_dir/$deadline_client_installer_filename \
 --generatedcertdir "${deadline_client_certificates_location}/" \
 --slavestartup false \
 --proxyrootdir $deadline_proxy_root_dir \
---proxycertificate $deadline_client_certificates_location/$deadline_proxy_certificate_basename.pfx
+--proxycertificate $deadline_client_certificates_location/$deadline_proxy_certificate
 
 # Configure /var/lib/Thinkbox/Deadline10/deadline.ini
 replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchPulseAtStartup=" "True"
