@@ -220,6 +220,8 @@ replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  autho
 # 521277 drwxr-x---  6 ubuntu ubuntu  4.0K Apr  4 00:41 .
 # 772643 drwxrwxrwx  5 nobody nogroup 4.0K Apr  4 00:42 Deadline10
 
+# cat /opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf
+
 #MongoDB config file
 
 # systemLog:
@@ -324,59 +326,5 @@ sudo service deadline10launcher restart
 
 echo "Validate that a connection with the database can be established with the config"
 /opt/Thinkbox/DeadlineDatabase10/mongo/application/bin/deadline_mongo --eval 'printjson(db.getCollectionNames())'
-
-
-# For posterity:
-
-# Generate certs with install - deprecated
-
-# sudo $deadline_db_installer_filename \
-# --mode unattended \
-# --debuglevel 2 \
-# --prefix /opt/Thinkbox/DeadlineRepository10 \
-# --setpermissions true \
-# --installmongodb true \
-# --prepackagedDB $mongo_installer_tgz \
-# --dbOverwrite true \
-# --mongodir /opt/Thinkbox/DeadlineDatabase10 \
-# --dbListeningPort $dbport \
-# --certgen_outdir /opt/Thinkbox/DeadlineDatabase10/certs \
-# --certgen_password avaultpassword \
-# --createX509dbuser true \
-# --requireSSL true \
-# --dbhost $host_name \
-# --dbport $dbport \
-# --dbuser $deadlineuser_name \
-# --dbpassword avaultpassword \
-# --dbauth true \
-# --dbcertpass avaultpassword \
-# --dbssl true
-
-# deprecated method to install RCS with certs
-
-# sudo $deadline_installer_dir/$deadline_db_installer_filename \
-# --mode unattended \
-# --launcherdaemon true \
-# --enable-components proxyconfig \
-# --servercert {{ deadline_server_certificates_location }}/{{ deadline_client_certificate }} \
-# --debuglevel 2 \
-# --prefix /opt/Thinkbox/Deadline10 \
-# --connectiontype Repository \
-# --repositorydir /opt/Thinkbox/DeadlineRepository10/ \
-# --dbsslcertificate {{ deadline_server_certificates_location }}/{{ deadline_client_certificate }} \
-# --dbsslpassword avaultpassword \
-# --licensemode UsageBased \
-# --daemonuser {{ user_deadlineuser_name }} \
-# --connserveruser {{ user_deadlineuser_name }} \
-# --httpport 8080 \
-# --tlsport 4433 \
-# --enabletls true \
-# --tlscertificates generate  \
-# --generatedcertdir {{ deadline_certificates_location }}/ \
-# --clientcert_pass avaultpassword \
-# --slavestartup false \
-# --proxycertificatepassword avaultpassword \
-# --proxyrootdir {{ deadline_proxy_root_dir }} \
-# --proxycertificate {{ deadline_certificates_location }}/{{ deadline_proxy_certificate }}
 
 cd $pwd

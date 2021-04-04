@@ -144,13 +144,7 @@ sudo $deadline_installer_dir/$deadline_db_installer_filename \
 
 # stop service before updating config.
 sudo service Deadline10db stop
-# Configure Mongo : /opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf
-# replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"        "    mode:" " requireSSL"
-# replace_line "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "    #CAFile:" "    CAFile: ERROR_DURING_REPLACEMENT" # if you can read this result, something went wrong
-# replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "    CAFile:" " $deadline_client_certificates_location/ca.crt"
-# replace_line "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    #PEMKeyFile:" "    PEMKeyFile: ERROR_DURING_REPLACEMENT" # if you can read this result, something went wrong
-# replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    PEMKeyFile:" " $deadline_client_certificates_location/$server_cert_basename.pem"
-# replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  authorization:" " enabled" # ? not sure what this should be
+
 
 # After DB install, certs exist here
 # ls -ltriah /opt/Thinkbox/DeadlineDatabase10/certs/
@@ -168,9 +162,7 @@ sudo service Deadline10db stop
 # 521289 -r-------- 1 ubuntu root   3.3K Apr  3 23:29 deadlinedb.service.consul.pfx
 # 521292 -r-------- 1 root   root   3.3K Apr  3 23:29 Deadline10RemoteClient.pfx
 
-
 #MongoDB config file
-
 # systemLog:
 #   destination: file
 #   # Mongo DB's output will be logged here.
