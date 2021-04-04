@@ -53,7 +53,7 @@ END
 )
   sudo python3 -c "$PYTHON_CODE"
 }
-function replace_value() {
+function ensure_value() { # If the pattern matches, the value will be replaced, otherwise it willl be appended.
   local -r filepath=$1
   local -r start=$2
   local -r end=$3
@@ -62,10 +62,16 @@ import argparse
 import sys
 import fileinput
 print("open: {} replace after: {} with: {}".format( "$filepath", "$start", "$end" ))
+replaced=False
 for line in fileinput.input(["$filepath"], inplace=True):
     if line.startswith("$start"):
         line = '{}{}\n'.format( "$start", "$end" )
+        replaced=True
     sys.stdout.write(line)
+if replaced==False: # Append if no match
+    with open("$filepath", "a") as file_object:
+        line = '{}{}\n'.format( "$start", "$end" )
+        file_object.write(line)
 END
 )
   sudo python3 -c "$PYTHON_CODE"
@@ -181,12 +187,12 @@ sudo chmod o-rwx "${deadline_certificates_location}/mongo_client.pem"
 # stop service before updating config.
 sudo service Deadline10db stop
 # Configure Mongo : /opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf
-replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"        "    mode:" " requireSSL"
+ensure_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"        "    mode:" " requireSSL"
 replace_line "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "    #CAFile:" "    CAFile: ERROR_DURING_REPLACEMENT" # if you can read this result, something went wrong
-replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "    CAFile:" " $deadline_certificates_location/ca.crt"
+ensure_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "    CAFile:" " $deadline_certificates_location/ca.crt"
 replace_line "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    #PEMKeyFile:" "    PEMKeyFile: ERROR_DURING_REPLACEMENT" # if you can read this result, something went wrong
-replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    PEMKeyFile:" " $deadline_certificates_location/$server_cert_basename.pem"
-replace_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  authorization:" " enabled" # ? not sure what this should be
+ensure_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"  "    PEMKeyFile:" " $deadline_certificates_location/$server_cert_basename.pem"
+ensure_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  authorization:" " enabled" # ? not sure what this should be
 
 # After DB install, certs exist here 
 # ls -ltriah /opt/Thinkbox/DeadlineDatabase10/certs/
@@ -313,14 +319,14 @@ sudo $deadline_installer_dir/$deadline_client_installer_filename \
 --proxycertificate $deadline_client_certificates_location/$deadline_proxy_certificate
 
 # Configure /var/lib/Thinkbox/Deadline10/deadline.ini
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchPulseAtStartup=" "True"
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchRemoteConnectionServerAtStartup=" "True"
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot=" "$deadline_proxy_root_dir"
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyUseSSL=" "True"
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "DbSSLCertificate=" "$deadline_certificates_location/$deadline_client_certificate"
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxySSLCertificate=" "$deadline_client_certificates_location/$deadline_proxy_certificate"
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot0=" "$deadline_proxy_root_dir;$deadline_client_certificates_location/$deadline_proxy_certificate"
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/Thinkbox/DeadlineRepository10/;$deadline_certificates_location/$deadline_client_certificate"
+ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchPulseAtStartup=" "True"
+ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchRemoteConnectionServerAtStartup=" "True"
+ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot=" "$deadline_proxy_root_dir"
+ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyUseSSL=" "True"
+ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "DbSSLCertificate=" "$deadline_certificates_location/$deadline_client_certificate"
+ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxySSLCertificate=" "$deadline_client_certificates_location/$deadline_proxy_certificate"
+ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot0=" "$deadline_proxy_root_dir;$deadline_client_certificates_location/$deadline_proxy_certificate"
+ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/Thinkbox/DeadlineRepository10/;$deadline_certificates_location/$deadline_client_certificate"
 
 # cat /var/lib/Thinkbox/Deadline10/deadline.ini
 # [Deadline]
