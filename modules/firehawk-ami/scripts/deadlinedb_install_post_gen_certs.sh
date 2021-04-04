@@ -174,9 +174,9 @@ sudo mv -v "${ssl_keygen_path}/mongo_client.pem" "$deadline_certificates_locatio
 # Certs Permissions
 sudo chown $deadlineuser_name:$deadlineuser_name $deadline_certificates_location/*
 sudo chmod u=r,g=r,o=r "${deadline_certificates_location}/${deadline_client_certificate}"
-sudo chmod o-rwx ${deadline_certificates_location}/*.pem
-sudo chmod o-rwx ${deadline_certificates_location}/*.key
-sudo chmod o-rwx ${deadline_certificates_location}/*.pfx
+sudo chmod o-rwx ${deadline_certificates_location}/$deadline_client_certificate
+sudo chmod o-rwx "${deadline_certificates_location}/${server_cert_basename}.pem"
+sudo chmod o-rwx "${deadline_certificates_location}/mongo_client.pem"
 
 # stop service before updating config.
 sudo service Deadline10db stop
