@@ -166,7 +166,7 @@ cat "${ssl_keygen_path}/mongo_client.crt" "${ssl_keygen_path}/mongo_client.key" 
 # python ssl_gen.py --client --cert-name "$deadline_proxy_certificate_basename"
 # python ssl_gen.py --pfx --cert-name "$deadline_proxy_certificate_basename"
 # Remote Client Cert ? not sure how this works yet, sinc RCS is supposed to create that.
-python ssl_gen.py --client --cert-name $deadline_client_certificate_basename
+python ssl_gen.py --client --cert-name $deadline_client_certificate_basename --cert-ou "$deadline_client_certificate_basename" # The deadline install by default produces a different ou for the client cert than the ca.  We match that here.
 python ssl_gen.py --pfx --cert-name $deadline_client_certificate_basename
 
 # Relocate certs
