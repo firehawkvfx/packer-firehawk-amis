@@ -388,4 +388,8 @@ sudo service deadline10launcher restart
 echo "Validate that a connection with the database can be established with the config"
 /opt/Thinkbox/DeadlineDatabase10/mongo/application/bin/deadline_mongo --eval 'printjson(db.getCollectionNames())'
 
+# Do we need this?
+# https://docs.thinkboxsoftware.com/products/deadline/10.0/1_User%20Manual/manual/db-authentication.html
+# deadlinecommand UpdateDatabaseSettings /opt/Thinkbox/DeadlineRepository10 MongoDB deadlinedb.service.consul deadline10db 27100 -1 True True ubuntu "" "" False
+
 cd $pwd
