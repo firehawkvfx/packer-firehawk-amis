@@ -15,12 +15,12 @@ deadline_version="10.1.9.2"
 mongo_url="https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-3.6.19.tgz"
 dbport="27100"
 host_name="deadlinedb.service.consul"
-server_cert_basename="Deadline10Server"
 deadline_client_certificate="Deadline10Client.pfx"
 deadline_proxy_certificate="Deadline10RemoteClient.pfx"
-deadline_proxy_root_dir="deadlinedb.service.consul:4433"
 
 # Script vars (implicit)
+server_cert_basename="$host_name"
+deadline_proxy_root_dir="$host_name:4433"
 deadline_client_certificate_basename="${deadline_client_certificate%.*}"
 deadline_proxy_certificate_basename="${deadline_proxy_certificate%.*}"
 deadline_linux_installers_tar="/tmp/Deadline-${deadline_version}-linux-installers.tar" # temp dir since we just keep the extracted contents for repeat installs.
@@ -102,10 +102,17 @@ sudo mkdir -p /opt/Thinkbox
 sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox
 sudo chmod u=rwX,g=rX,o-rwx /opt/Thinkbox
 
-deadline_certificates_location="/opt/Thinkbox/certs"
+# DB certs by default live here
+deadline_certificates_location="/opt/Thinkbox/DeadlineDatabase10/certs"
 sudo mkdir -p "$deadline_certificates_location"
 sudo chown $deadlineuser_name:$deadlineuser_name $deadline_certificates_location
 sudo chmod u=rwX,g=rX,o-rwx "$deadline_certificates_location"
+
+# Client certs live here
+deadline_client_certificates_location="/opt/Thinkbox/certs"
+sudo mkdir -p "$deadline_client_certificates_location"
+sudo chown $deadlineuser_name:$deadlineuser_name $deadline_client_certificates_location
+sudo chmod u=rwX,g=rX,o-rwx "$deadline_client_certificates_location"
 
 sudo mkdir -p $deadline_installer_dir
 
@@ -126,7 +133,7 @@ sudo $deadline_installer_dir/$deadline_db_installer_filename \
 --dbport $dbport \
 --dbuser $deadlineuser_name \
 --dbauth true \
---certgen_outdir /opt/Thinkbox/DeadlineDatabase10/certs \
+--certgen_outdir $deadline_certificates_location \
 --createX509dbuser true \
 --requireSSL false \
 --dbssl false
@@ -144,9 +151,9 @@ python ssl_gen.py --ca --cert-org "$cert_org" --cert-ou "$cert_ou"
 python ssl_gen.py --server --cert-name "$server_cert_basename"
 # Create PEM key - undocumented by Thinkbox
 cat "${ssl_keygen_path}/${server_cert_basename}.crt" "${ssl_keygen_path}/${server_cert_basename}.key" | sudo tee "${ssl_keygen_path}/${server_cert_basename}.pem"
-# RCS proxy cert
-python ssl_gen.py --client --cert-name "$deadline_proxy_certificate_basename"
-python ssl_gen.py --pfx --cert-name "$deadline_proxy_certificate_basename"
+# # RCS proxy cert
+# python ssl_gen.py --client --cert-name "$deadline_proxy_certificate_basename"
+# python ssl_gen.py --pfx --cert-name "$deadline_proxy_certificate_basename"
 # Remote Client Cert ? not sure how this works yet, sinc RCS is supposed to create that.
 python ssl_gen.py --client --cert-name $deadline_client_certificate_basename
 python ssl_gen.py --pfx --cert-name $deadline_client_certificate_basename
@@ -177,6 +184,9 @@ sudo chmod u+rX,g+rX,o-rwx /opt/Thinkbox/
 sudo chown $deadlineuser_name:$deadlineuser_name $deadline_certificates_location
 sudo chmod u+rX,g+rX,o-rwx $deadline_certificates_location
 
+sudo chown $deadlineuser_name:$deadlineuser_name $deadline_client_certificates_location
+sudo chmod u+rX,g+rX,o-rwx $deadline_client_certificates_location
+
 sudo chown -R $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/DeadlineRepository10
 sudo chmod -R u=rX,g=rX,o-rwx /opt/Thinkbox/DeadlineRepository10
 
@@ -205,12 +215,12 @@ sudo $deadline_installer_dir/$deadline_client_installer_filename \
 --mode unattended \
 --launcherdaemon true \
 --enable-components proxyconfig \
---servercert "${deadline_certificates_location}/${deadline_client_certificate}" \
+--servercert "${deadline_client_certificates_location}/${deadline_client_certificate}" \
 --debuglevel 2 \
 --prefix /opt/Thinkbox/Deadline10 \
 --connectiontype Repository \
 --repositorydir /opt/Thinkbox/DeadlineRepository10/ \
---dbsslcertificate "${deadline_certificates_location}/${deadline_client_certificate}" \
+--dbsslcertificate "${deadline_client_certificates_location}/${deadline_client_certificate}" \
 --licensemode UsageBased \
 --daemonuser "$deadlineuser_name" \
 --connserveruser "$deadlineuser_name" \
@@ -218,20 +228,20 @@ sudo $deadline_installer_dir/$deadline_client_installer_filename \
 --tlsport 4433 \
 --enabletls true \
 --tlscertificates generate  \
---generatedcertdir "${deadline_certificates_location}/" \
+--generatedcertdir "${deadline_client_certificates_location}/" \
 --slavestartup false \
 --proxyrootdir $deadline_proxy_root_dir \
---proxycertificate $deadline_certificates_location/$deadline_proxy_certificate_basename.pfx
+--proxycertificate $deadline_client_certificates_location/$deadline_proxy_certificate_basename.pfx
 
 # Configure /var/lib/Thinkbox/Deadline10/deadline.ini
 replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchPulseAtStartup=" "True"
 replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchRemoteConnectionServerAtStartup=" "True"
 replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot=" "$deadline_proxy_root_dir"
 replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyUseSSL=" "True"
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "DbSSLCertificate=" "$deadline_certificates_location/$deadline_client_certificate"
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxySSLCertificate=" "$deadline_certificates_location/$deadline_proxy_certificate"
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot0=" "$deadline_proxy_root_dir;$deadline_certificates_location/$deadline_proxy_certificate"
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/Thinkbox/DeadlineRepository10/;$deadline_certificates_location/$deadline_client_certificate"
+replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "DbSSLCertificate=" "$deadline_client_certificates_location/$deadline_client_certificate"
+replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxySSLCertificate=" "$deadline_client_certificates_location/$deadline_proxy_certificate"
+replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot0=" "$deadline_proxy_root_dir;$deadline_client_certificates_location/$deadline_proxy_certificate"
+replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/Thinkbox/DeadlineRepository10/;$deadline_client_certificates_location/$deadline_client_certificate"
 
 sudo service deadline10launcher restart
 
