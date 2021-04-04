@@ -196,18 +196,12 @@ ensure_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  author
 
 # After DB install, certs exist here 
 # ls -ltriah /opt/Thinkbox/DeadlineDatabase10/certs/
-# total 48K
-# 521278 drwxr-xr-x 4 root   root   4.0K Apr  4 00:39 ..
-# 772994 -rw-rw---- 1 ubuntu ubuntu 1.7K Apr  4 00:40 ca.key
-# 772993 -rw-rw-r-- 1 ubuntu ubuntu 1.2K Apr  4 00:40 ca.crt
-# 772997 -rw-rw---- 1 ubuntu ubuntu 1.7K Apr  4 00:40 deadlinedb.service.consul.key
-# 772998 -rw-rw-r-- 1 ubuntu ubuntu 1.1K Apr  4 00:40 deadlinedb.service.consul.crt
-# 772999 -rw-r----- 1 root   root   2.8K Apr  4 00:40 deadlinedb.service.consul.pem
-# 772996 -rw-rw-r-- 1 ubuntu ubuntu    1 Apr  4 00:40 serial
-# 772995 -rw-rw-r-- 1 ubuntu ubuntu  155 Apr  4 00:40 index.txt
-# 773000 -rw-rw---- 1 ubuntu ubuntu 1.7K Apr  4 00:40 Deadline10Client.key
-# 773001 -rw-rw-r-- 1 ubuntu ubuntu 1.1K Apr  4 00:40 Deadline10Client.crt
-# 773002 -r--r----- 1 ubuntu ubuntu 3.2K Apr  4 00:40 Deadline10Client.pfx
+# total 24K
+# 521278 drwxr-xr-x 4 ubuntu ubuntu 4.0K Apr  4 03:32 ..
+# 772997 -rw-rw-r-- 1 ubuntu ubuntu 1.2K Apr  4 03:33 ca.crt
+# 773003 -rw-r----- 1 ubuntu ubuntu 2.8K Apr  4 03:33 deadlinedb.service.consul.pem
+# 773006 -rw-r----- 1 ubuntu ubuntu 2.8K Apr  4 03:33 mongo_client.pem
+# 773009 -r--r----- 1 ubuntu ubuntu 3.2K Apr  4 03:33 Deadline10Client.pfx
 
 # and after RCS:
 # ls -ltriah /opt/Thinkbox/certs/
@@ -328,6 +322,12 @@ ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxySSLCertificate=" 
 ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot0=" "$deadline_proxy_root_dir;$deadline_client_certificates_location/$deadline_proxy_certificate"
 ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/Thinkbox/DeadlineRepository10/;$deadline_certificates_location/$deadline_client_certificate"
 
+# finalize permissions post install:
+sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/DeadlineDatabase10
+sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/certs/*
+sudo chmod u=wr,g=r,o-rwx /opt/Thinkbox/certs/*
+sudo chmod u=wr,g=r,o=r /opt/Thinkbox/certs/ca.crt
+
 # cat /var/lib/Thinkbox/Deadline10/deadline.ini
 # [Deadline]
 # HttpListenPort=8080
@@ -352,8 +352,13 @@ ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/T
 # IncludeRCSInLauncherMenu=true
 # ConnectionType=Repository
 # NetworkRoot=/opt/Thinkbox/DeadlineRepository10/
-# DbSSLCertificate=/opt/Thinkbox/certs/Deadline10Client.pfx
-# NetworkRoot0=/opt/Thinkbox/DeadlineRepository10/;/opt/Thinkbox/certs/Deadline10Client.pfx
+# DbSSLCertificate=/opt/Thinkbox/DeadlineDatabase10/certs/Deadline10Client.pfx
+# NetworkRoot0=/opt/Thinkbox/DeadlineRepository10/;/opt/Thinkbox/DeadlineDatabase10/certs/Deadline10Client.pfx
+# LaunchPulseAtStartup=True
+# ProxyRoot=deadlinedb.service.consul:4433
+# ProxyUseSSL=True
+# ProxySSLCertificate=/opt/Thinkbox/certs/Deadline10RemoteClient.pfx
+# ProxyRoot0=deadlinedb.service.consul:4433;/opt/Thinkbox/certs/Deadline10RemoteClient.pfx
 
 sudo service deadline10launcher restart
 
