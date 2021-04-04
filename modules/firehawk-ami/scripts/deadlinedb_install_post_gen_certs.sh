@@ -7,8 +7,6 @@ pwd=$(pwd)
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" # The directory of this script
 
 # User vars
-cert_org="Firehawk VFX"
-cert_ou="CG"
 installers_bucket="software.dev.firehawkvfx.com"
 deadlineuser_name="ubuntu"
 deadline_version="10.1.9.2"
@@ -19,6 +17,8 @@ deadline_client_certificate="Deadline10Client.pfx"
 deadline_proxy_certificate="Deadline10RemoteClient.pfx"
 
 # Script vars (implicit)
+cert_org="Deadline10Installer"
+cert_ou="Deadline10MongoDB"
 server_cert_basename="$host_name"
 deadline_proxy_root_dir="$host_name:4433"
 deadline_client_certificate_basename="${deadline_client_certificate%.*}"
@@ -329,6 +329,7 @@ ensure_value "/opt/Thinkbox/DeadlineRepository10/settings/connection.ini" "Enabl
 
 # finalize permissions post install:
 sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/DeadlineDatabase10
+sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/DeadlineRepository10/settings/connection.ini
 sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/certs/*
 sudo chmod u=wr,g=r,o-rwx /opt/Thinkbox/certs/*
 sudo chmod u=wr,g=r,o=r /opt/Thinkbox/certs/ca.crt
@@ -368,10 +369,10 @@ sudo chmod u=wr,g=r,o=r /opt/Thinkbox/certs/ca.crt
 # cat /opt/Thinkbox/DeadlineRepository10/settings/connection.ini 
 # [Connection]
 # AlternatePort=0
-# Authenticate=False
+# Authenticate=True
 # DatabaseName=deadline10db
 # DbType=MongoDB
-# EnableSSL=False
+# EnableSSL=True
 # Hostname=deadlinedb.service.consul
 # PasswordHash=
 # Port=27100

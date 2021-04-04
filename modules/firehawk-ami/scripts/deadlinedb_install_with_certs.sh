@@ -7,8 +7,6 @@ pwd=$(pwd)
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" # The directory of this script
 
 # User vars
-cert_org="Firehawk VFX"
-cert_ou="CG"
 installers_bucket="software.dev.firehawkvfx.com"
 deadlineuser_name="ubuntu"
 deadline_version="10.1.9.2"
