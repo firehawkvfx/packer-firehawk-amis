@@ -186,6 +186,7 @@ sudo chmod o-rwx "${deadline_certificates_location}/mongo_client.pem"
 
 # stop service before updating config.
 sudo service Deadline10db stop
+
 # Configure Mongo : /opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf
 ensure_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"        "    mode:" " requireSSL"
 replace_line "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf"      "    #CAFile:" "    CAFile: ERROR_DURING_REPLACEMENT" # if you can read this result, something went wrong
@@ -252,7 +253,7 @@ ensure_value "/opt/Thinkbox/DeadlineDatabase10/mongo/data/config.conf" "  author
 #   engine: wiredTiger
 
 # security:
-#   authorization: disabled
+#   authorization: enabled
 
 sudo chown ubuntu:ubuntu $deadline_certificates_location/*
 
