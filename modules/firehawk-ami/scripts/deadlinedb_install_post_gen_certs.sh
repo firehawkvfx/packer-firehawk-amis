@@ -294,12 +294,12 @@ sudo $deadline_installer_dir/$deadline_client_installer_filename \
 --mode unattended \
 --launcherdaemon true \
 --enable-components proxyconfig \
---servercert "${deadline_client_certificates_location}/${deadline_client_certificate}" \
+--servercert "${deadline_certificates_location}/${deadline_client_certificate}" \
 --debuglevel 2 \
 --prefix /opt/Thinkbox/Deadline10 \
 --connectiontype Repository \
 --repositorydir /opt/Thinkbox/DeadlineRepository10/ \
---dbsslcertificate "${deadline_client_certificates_location}/${deadline_client_certificate}" \
+--dbsslcertificate "${deadline_certificates_location}/${deadline_client_certificate}" \
 --licensemode UsageBased \
 --daemonuser "$deadlineuser_name" \
 --connserveruser "$deadlineuser_name" \
@@ -317,10 +317,37 @@ replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchPulseAtStartup=
 replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchRemoteConnectionServerAtStartup=" "True"
 replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot=" "$deadline_proxy_root_dir"
 replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyUseSSL=" "True"
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "DbSSLCertificate=" "$deadline_client_certificates_location/$deadline_client_certificate"
+replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "DbSSLCertificate=" "$deadline_certificates_location/$deadline_client_certificate"
 replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxySSLCertificate=" "$deadline_client_certificates_location/$deadline_proxy_certificate"
 replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot0=" "$deadline_proxy_root_dir;$deadline_client_certificates_location/$deadline_proxy_certificate"
-replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/Thinkbox/DeadlineRepository10/;$deadline_client_certificates_location/$deadline_client_certificate"
+replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/Thinkbox/DeadlineRepository10/;$deadline_certificates_location/$deadline_client_certificate"
+
+# cat /var/lib/Thinkbox/Deadline10/deadline.ini
+# [Deadline]
+# HttpListenPort=8080
+# TlsListenPort=4433
+# TlsServerCert=/opt/Thinkbox/certs//deadlinedb.service.consul.pfx
+# TlsCaCert=/opt/Thinkbox/certs//ca.crt
+# TlsAuth=True
+# LaunchRemoteConnectionServerAtStartup=True
+# KeepRemoteConnectionServerRunning=True
+# LicenseMode=Standard
+# LicenseServer=
+# Region=
+# LauncherListeningPort=17000
+# LauncherServiceStartupDelay=60
+# AutoConfigurationPort=17001
+# SlaveStartupPort=17003
+# SlaveDataRoot=
+# RestartStalledSlave=false
+# NoGuiMode=false
+# LaunchSlaveAtStartup=false
+# AutoUpdateOverride=
+# IncludeRCSInLauncherMenu=true
+# ConnectionType=Repository
+# NetworkRoot=/opt/Thinkbox/DeadlineRepository10/
+# DbSSLCertificate=/opt/Thinkbox/certs/Deadline10Client.pfx
+# NetworkRoot0=/opt/Thinkbox/DeadlineRepository10/;/opt/Thinkbox/certs/Deadline10Client.pfx
 
 sudo service deadline10launcher restart
 

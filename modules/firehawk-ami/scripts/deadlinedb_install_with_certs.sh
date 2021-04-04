@@ -261,6 +261,33 @@ replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxySSLCertificate="
 replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot0=" "$deadline_proxy_root_dir;$deadline_client_certificates_location/$deadline_proxy_certificate"
 replace_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/Thinkbox/DeadlineRepository10/;$deadline_client_certificates_location/$deadline_client_certificate"
 
+# cat /var/lib/Thinkbox/Deadline10/deadline.ini
+# [Deadline]
+# HttpListenPort=8080
+# TlsListenPort=4433
+# TlsServerCert=/opt/Thinkbox/certs//deadlinedb.service.consul.pfx
+# TlsCaCert=/opt/Thinkbox/certs//ca.crt
+# TlsAuth=True
+# LaunchRemoteConnectionServerAtStartup=True
+# KeepRemoteConnectionServerRunning=True
+# LicenseMode=Standard
+# LicenseServer=
+# Region=
+# LauncherListeningPort=17000
+# LauncherServiceStartupDelay=60
+# AutoConfigurationPort=17001
+# SlaveStartupPort=17003
+# SlaveDataRoot=
+# RestartStalledSlave=false
+# NoGuiMode=false
+# LaunchSlaveAtStartup=false
+# AutoUpdateOverride=
+# IncludeRCSInLauncherMenu=true
+# ConnectionType=Repository
+# NetworkRoot=/opt/Thinkbox/DeadlineRepository10/
+# DbSSLCertificate=/opt/Thinkbox/certs/Deadline10Client.pfx
+# NetworkRoot0=/opt/Thinkbox/DeadlineRepository10/;/opt/Thinkbox/certs/Deadline10Client.pfx
+
 sudo service deadline10launcher restart
 
 echo "Validate that a connection with the database can be established with the config"
