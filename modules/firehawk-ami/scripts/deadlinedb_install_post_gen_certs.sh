@@ -323,6 +323,10 @@ ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxySSLCertificate=" 
 ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot0=" "$deadline_proxy_root_dir;$deadline_client_certificates_location/$deadline_proxy_certificate"
 ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/Thinkbox/DeadlineRepository10/;$deadline_certificates_location/$deadline_client_certificate"
 
+# configure /opt/Thinkbox/DeadlineRepository10/settings/connection.ini 
+ensure_value "/opt/Thinkbox/DeadlineRepository10/settings/connection.ini" "Authenticate=" "True"
+ensure_value "/opt/Thinkbox/DeadlineRepository10/settings/connection.ini" "EnableSSL=" "True"
+
 # finalize permissions post install:
 sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/DeadlineDatabase10
 sudo chown $deadlineuser_name:$deadlineuser_name /opt/Thinkbox/certs/*
@@ -360,6 +364,23 @@ sudo chmod u=wr,g=r,o=r /opt/Thinkbox/certs/ca.crt
 # ProxyUseSSL=True
 # ProxySSLCertificate=/opt/Thinkbox/certs/Deadline10RemoteClient.pfx
 # ProxyRoot0=deadlinedb.service.consul:4433;/opt/Thinkbox/certs/Deadline10RemoteClient.pfx
+
+# cat /opt/Thinkbox/DeadlineRepository10/settings/connection.ini 
+# [Connection]
+# AlternatePort=0
+# Authenticate=False
+# DatabaseName=deadline10db
+# DbType=MongoDB
+# EnableSSL=False
+# Hostname=deadlinedb.service.consul
+# PasswordHash=
+# Port=27100
+# ReplicaSetName=
+# SplitDB=False
+# Username=
+# Version=10
+# StorageAccess=Database
+# CACertificatePath=
 
 sudo service deadline10launcher restart
 

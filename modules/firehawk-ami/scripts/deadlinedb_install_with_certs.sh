@@ -305,6 +305,23 @@ sudo chmod u=wr,g=r,o=r /opt/Thinkbox/certs/ca.crt
 # ProxySSLCertificate=/opt/Thinkbox/certs/Deadline10RemoteClient.pfx
 # ProxyRoot0=deadlinedb.service.consul:4433;/opt/Thinkbox/certs/Deadline10RemoteClient.pfx
 
+# cat /opt/Thinkbox/DeadlineRepository10/settings/connection.ini 
+# [Connection]
+# AlternatePort=0
+# Authenticate=True
+# DatabaseName=deadline10db
+# DbType=MongoDB
+# EnableSSL=True
+# Hostname=deadlinedb.service.consul
+# PasswordHash=
+# Port=27100
+# ReplicaSetName=
+# SplitDB=False
+# Username=
+# Version=10
+# StorageAccess=Database
+# CACertificatePath=
+
 sudo service deadline10launcher restart
 
 echo "Validate that a connection with the database can be established with the config"
