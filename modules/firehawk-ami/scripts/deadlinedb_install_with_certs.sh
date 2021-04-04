@@ -3,7 +3,7 @@
 # This installs certificates with the DB.
 
 set -e
-pwd=$(pwd)
+# pwd=$(pwd)
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" # The directory of this script
 
 # User vars
@@ -122,7 +122,7 @@ sudo mkdir -p $deadline_installer_dir
 
 # Install Deadline DB
 sudo tar -xvf $deadline_linux_installers_tar -C $deadline_installer_dir
-cd $deadline_installer_dir
+# cd $deadline_installer_dir
 sudo $deadline_installer_dir/$deadline_db_installer_filename \
 --mode unattended \
 --debuglevel 2 \
@@ -326,4 +326,4 @@ echo "Validate that a connection with the database can be established with the c
 /opt/Thinkbox/DeadlineDatabase10/mongo/application/bin/deadline_mongo --eval 'printjson(db.getCollectionNames())'
 # /opt/Thinkbox/DeadlineDatabase10/mongo/application/bin/deadline_mongo --sslPEMKeyPassword "avaultpassword" --eval 'printjson(db.getCollectionNames())'
 
-cd $pwd
+# cd $pwd
