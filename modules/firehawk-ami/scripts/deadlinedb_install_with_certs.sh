@@ -142,10 +142,10 @@ sudo $deadline_installer_dir/$deadline_db_installer_filename \
 --certgen_outdir $deadline_certificates_location \
 --createX509dbuser true \
 --requireSSL true \
---dbssl true \
---dbpassword avaultpassword \
---certgen_password avaultpassword \
---dbcertpass avaultpassword
+--dbssl true
+# --dbpassword avaultpassword \
+# --certgen_password avaultpassword \
+# --dbcertpass avaultpassword
 
 
 # stop service before updating config.
@@ -242,7 +242,6 @@ sudo $deadline_installer_dir/$deadline_client_installer_filename \
 --connectiontype Repository \
 --repositorydir /opt/Thinkbox/DeadlineRepository10/ \
 --dbsslcertificate "${deadline_certificates_location}/${deadline_client_certificate}" \
---dbsslpassword avaultpassword \
 --licensemode UsageBased \
 --daemonuser "$deadlineuser_name" \
 --connserveruser "$deadlineuser_name" \
@@ -251,11 +250,12 @@ sudo $deadline_installer_dir/$deadline_client_installer_filename \
 --enabletls true \
 --tlscertificates generate  \
 --generatedcertdir "${deadline_client_certificates_location}/" \
---clientcert_pass avaultpassword \
 --slavestartup false \
---proxycertificatepassword avaultpassword \
 --proxyrootdir $deadline_proxy_root_dir \
---proxycertificate $deadline_client_certificates_location/$deadline_proxy_certificate
+--proxycertificate $deadline_client_certificates_location/$deadline_proxy_certificate \
+# --dbsslpassword avaultpassword \
+# --clientcert_pass avaultpassword \
+# --proxycertificatepassword avaultpassword
 
 # Configure /var/lib/Thinkbox/Deadline10/deadline.ini
 ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchPulseAtStartup=" "True"
@@ -297,12 +297,18 @@ sudo chmod u=wr,g=r,o=r /opt/Thinkbox/certs/ca.crt
 # IncludeRCSInLauncherMenu=true
 # ConnectionType=Repository
 # NetworkRoot=/opt/Thinkbox/DeadlineRepository10/
-# DbSSLCertificate=/opt/Thinkbox/certs/Deadline10Client.pfx
-# NetworkRoot0=/opt/Thinkbox/DeadlineRepository10/;/opt/Thinkbox/certs/Deadline10Client.pfx
+# DbSSLCertificate=/opt/Thinkbox/DeadlineDatabase10/certs/Deadline10Client.pfx
+# NetworkRoot0=/opt/Thinkbox/DeadlineRepository10/;/opt/Thinkbox/DeadlineDatabase10/certs/Deadline10Client.pfx
+# LaunchPulseAtStartup=True
+# ProxyRoot=deadlinedb.service.consul:4433
+# ProxyUseSSL=True
+# ProxySSLCertificate=/opt/Thinkbox/certs/Deadline10RemoteClient.pfx
+# ProxyRoot0=deadlinedb.service.consul:4433;/opt/Thinkbox/certs/Deadline10RemoteClient.pfx
 
 sudo service deadline10launcher restart
 
 echo "Validate that a connection with the database can be established with the config"
-/opt/Thinkbox/DeadlineDatabase10/mongo/application/bin/deadline_mongo --sslPEMKeyPassword "avaultpassword" --eval 'printjson(db.getCollectionNames())'
+/opt/Thinkbox/DeadlineDatabase10/mongo/application/bin/deadline_mongo --eval 'printjson(db.getCollectionNames())'
+# /opt/Thinkbox/DeadlineDatabase10/mongo/application/bin/deadline_mongo --sslPEMKeyPassword "avaultpassword" --eval 'printjson(db.getCollectionNames())'
 
 cd $pwd
