@@ -3,13 +3,12 @@
 # This installs certificates with the DB.
 
 set -e
-# pwd=$(pwd)
-SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" # The directory of this script
 
 # User vars
 installers_bucket="software.dev.firehawkvfx.com" # TODO these must become vars
 deadlineuser_name="ubuntu" # TODO these must become vars
 deadline_version="10.1.9.2" # TODO these must become vars
+# deadline_version="10.1.14.5"
 dbport="27100"
 db_host_name="deadlinedb.service.consul" # TODO these must become vars
 deadline_proxy_certificate="Deadline10RemoteClient.pfx"
@@ -43,14 +42,15 @@ sudo chown $deadlineuser_name:$deadlineuser_name "/home/$deadlineuser_name/Downl
 if [[ -f "$deadline_linux_installers_tar" ]]; then
     echo "File already exists: $deadline_linux_installers_tar"
 else
-    aws s3api head-object --bucket $installers_bucket --key "Deadline-${deadline_version}-linux-installers.tar"
-    exit_code=$?
-    if [[ $exit_code -eq 0 ]]; then
+    # Prefer installation from Thinkbox S3 Bucket.
+    output=$(aws s3api head-object --bucket thinkbox-installers --key "Deadline/${deadline_version}/Linux/${deadline_linux_installers_filename}") && exit_status=0 || exit_status=$?
+    if [[ $exit_status -eq 0 ]]; then
+        echo "...Downloading Deadline from: thinkbox-installers"
+        aws s3api get-object --bucket thinkbox-installers --key "Deadline/${deadline_version}/Linux/${deadline_linux_installers_filename}" "${deadline_linux_installers_tar}"
+    else
+        printf "\n\nWarning: The installer was not aquired from Thinkbox.  It may have become deprecated.  Other AWS Accounts will not be able to install this version.\n\n"
         echo "...Downloading Deadline from: $installers_bucket"
         aws s3api get-object --bucket $installers_bucket --key "${deadline_linux_installers_filename}" "${deadline_linux_installers_tar}"
-    else
-        echo "...Downloading Deadline from: thinkbox-installers"
-        aws s3api get-object --bucket thinkbox-installers --key "Deadline/${deadline_version}/Linux/${deadline_linux_installers_basename}" "${deadline_linux_installers_tar}"
     fi
 fi
 

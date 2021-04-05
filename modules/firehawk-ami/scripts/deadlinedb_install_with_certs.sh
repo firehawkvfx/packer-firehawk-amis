@@ -96,7 +96,7 @@ else
         aws s3api get-object --bucket $installers_bucket --key "${deadline_linux_installers_filename}" "${deadline_linux_installers_tar}"
     else
         echo "...Downloading Deadline from: thinkbox-installers"
-        aws s3api get-object --bucket thinkbox-installers --key "Deadline/${deadline_version}/Linux/${deadline_linux_installers_basename}" "${deadline_linux_installers_tar}"
+        aws s3api get-object --bucket thinkbox-installers --key "Deadline/${deadline_version}/Linux/${deadline_linux_installers_filename}" "${deadline_linux_installers_tar}"
     fi
 fi
 
