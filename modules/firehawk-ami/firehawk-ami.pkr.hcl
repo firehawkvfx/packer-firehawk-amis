@@ -695,8 +695,31 @@ build {
     inline = [
       "sudo chmod +x /var/tmp/download-deadline.sh",
       "deadline_version=${var.deadline_version} installers_bucket=${var.installers_bucket} /var/tmp/download-deadline.sh",
+      "download_dir=/var/tmp/downloads", # Cleanup unneed files
+      "deadline_linux_installers_tar=\"$download_dir/Deadline-${var.deadline_version}-linux-installers.tar\"",
+      "deadline_linux_installers_filename=\"$(basename $deadline_linux_installers_tar)\"",
+      "deadline_linux_installers_basename=\"${deadline_linux_installers_filename%.*}\"",
+      "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
+      "rm $deadline_installer_dir\AWSPortalLink*"
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.centos7-rendernode-ami"]
+  }
+
+  provisioner "shell" {
+    ### Install Deadline Ubuntu Dependencies
+    inline = [
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xdg-utils lsb",
+      "sudo mkdir -p /usr/share/desktop-directories"
+    ]
+    only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
+
+  provisioner "shell" {
+    ### Install Deadline Centos Dependencies
+    inline = [
+      "sudo yum install -y redhat-lsb samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap"
+    ]
+    only = ["amazon-ebs.centos7-rendernode-ami"]
   }
 
   # provisioner "ansible" { # Temp disable dealine and rcs install until immutability is achieved.
