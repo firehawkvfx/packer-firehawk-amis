@@ -14,16 +14,16 @@ deadline_linux_installers_tar="$download_dir/Deadline-${deadline_version}-linux-
 deadline_linux_installers_filename="$(basename $deadline_linux_installers_tar)"
 deadline_linux_installers_basename="${deadline_linux_installers_filename%.*}"
 deadline_installer_dir="$download_dir/$deadline_linux_installers_basename"
-mongo_installer_tgz="$download_dir/$(basename $mongo_url)"
 deadline_db_installer_filename="DeadlineRepository-${deadline_version}-linux-x64-installer.run"
 deadline_client_installer_filename="DeadlineClient-${deadline_version}-linux-x64-installer.run"
 
 echo "Ensure dir exists: $download_dir"
 mkdir -p $download_dir
 
-# Download mongo
+# Download mongo if url provided
 if [[ ! -z "$mongo_url" ]]; then
     echo "...Provided mongo_url=$mongo_url"
+    mongo_installer_tgz="$download_dir/$(basename $mongo_url)"
     if [[ -f "$mongo_installer_tgz" ]]; then
         echo "File already exists: $mongo_installer_tgz"
     else
