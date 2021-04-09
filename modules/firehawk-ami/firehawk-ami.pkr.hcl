@@ -164,10 +164,10 @@ EOF
 
 }
 
-source "amazon-ebs" "amazon-linux-2-ami" {
+source "amazon-ebs" "amazolinux2-ami" {
   tags            = merge({ "ami_role" : "firehawk_amazonlinux2_ami" }, local.common_ami_tags)
   ami_description = "An Amazon Linux 2 AMI that will accept connections from hosts with TLS Certs."
-  ami_name        = "firehawk-bastion-amazon-linux-2-${local.timestamp}-{{uuid}}"
+  ami_name        = "firehawk-bastion-amazolinux2-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = "${var.aws_region}"
   # source_ami      = "${var.amazon_linux_2_ami}"
@@ -346,7 +346,7 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
 
 build {
   sources = [
-    "source.amazon-ebs.amazon-linux-2-ami",
+    "source.amazon-ebs.amazolinux2-ami",
     "source.amazon-ebs.centos7-ami",
     "source.amazon-ebs.centos7-rendernode-ami",
     "source.amazon-ebs.ubuntu18-ami",
@@ -444,7 +444,7 @@ build {
     ]
     inline_shebang = "/bin/bash -e"
     only           = [
-      "amazon-ebs.amazon-linux-2-ami",
+      "amazon-ebs.amazolinux2-ami",
       "amazon-ebs.centos7-ami",
       "amazon-ebs.centos7-rendernode-ami",
       "amazon-ebs.ubuntu18-ami",
@@ -833,7 +833,7 @@ build {
       "/tmp/terraform-aws-consul/modules/install-dnsmasq/install-dnsmasq"
       # "sudo systemctl restart dnsmasq", # if this fixes vault server, but breaks other clients, inspect further.
     ]
-    only = ["amazon-ebs.ubuntu16-ami", "amazon-ebs.amazon-linux-2-ami", "amazon-ebs.centos7-ami", "amazon-ebs.centos7-rendernode-ami"]
+    only = ["amazon-ebs.ubuntu16-ami", "amazon-ebs.amazolinux2-ami", "amazon-ebs.centos7-ami", "amazon-ebs.centos7-rendernode-ami"]
   }
   provisioner "shell" {
     inline = ["/tmp/terraform-aws-consul/modules/setup-systemd-resolved/setup-systemd-resolved"]
