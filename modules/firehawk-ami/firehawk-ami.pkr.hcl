@@ -686,6 +686,19 @@ build {
     only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
+  provisioner "file" { # fix apt upgrades to not hold up boot
+    destination = "/var/tmp/download-deadline.sh"
+    source      = "${local.template_dir}/scripts/download-deadline.sh"
+  }
+  provisioner "shell" {
+    ### Download deadline installer for DB, RCS and rendernode
+    inline = [
+      "sudo chmod +x /var/tmp/download-deadline.sh"
+      "deadline_version=${var.deadline_version} installers_bucket=${var.installers_bucket} /var/tmp/download-deadline.sh",
+    ]
+    only = ["amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.centos7-rendernode-ami"]
+  }
+
   # provisioner "ansible" { # Temp disable dealine and rcs install until immutability is achieved.
   #   playbook_file = "./ansible/deadline-db-install.yaml"
   #   extra_arguments = [
