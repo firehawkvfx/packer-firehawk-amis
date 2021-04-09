@@ -706,12 +706,13 @@ build {
   provisioner "file" { # fix apt upgrades to not hold up boot
     destination = "/var/tmp/download-deadline.sh"
     source      = "${local.template_dir}/scripts/download-deadline.sh"
+    only = ["amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.centos7-rendernode-ami"]
   }
   provisioner "shell" {
-    ### Download deadline installer for DB, RCS and rendernode
+    ### Download Deadline Installer for DB, RCS Client
     inline = [
       "sudo chmod +x /var/tmp/download-deadline.sh",
-      "deadline_version=${var.deadline_version} installers_bucket=${var.installers_bucket} /var/tmp/download-deadline.sh",
+      "deadline_version=${var.deadline_version} installers_bucket=${var.installers_bucket} mongo_url=\"https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-3.6.19.tgz\" /var/tmp/download-deadline.sh",
       "download_dir=/var/tmp/downloads", # Cleanup unneeded AWSPortalLink
       "deadline_linux_installers_tar=\"$download_dir/Deadline-${var.deadline_version}-linux-installers.tar\"",
       "deadline_linux_installers_filename=\"$(basename $deadline_linux_installers_tar)\"",
@@ -719,17 +720,20 @@ build {
       "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
       "sudo rm $deadline_installer_dir/AWSPortalLink*"
     ]
-    only = ["amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.centos7-rendernode-ami"]
+    only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
   provisioner "shell" {
-    ###Cleanup unneeded DeadlineRepository for render node
+    ### Download Deadline Installer for Client
     inline = [
+      "sudo chmod +x /var/tmp/download-deadline.sh",
+      "deadline_version=${var.deadline_version} installers_bucket=${var.installers_bucket} /var/tmp/download-deadline.sh",
       "download_dir=/var/tmp/downloads", 
       "deadline_linux_installers_tar=\"$download_dir/Deadline-${var.deadline_version}-linux-installers.tar\"",
       "deadline_linux_installers_filename=\"$(basename $deadline_linux_installers_tar)\"",
       "deadline_linux_installers_basename=\"$${deadline_linux_installers_filename%.*}\"",
       "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
+      "sudo rm $deadline_installer_dir/AWSPortalLink*"
       "sudo rm $deadline_installer_dir/DeadlineRepository*"
     ]
     only = ["amazon-ebs.centos7-rendernode-ami"]
