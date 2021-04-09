@@ -671,6 +671,23 @@ build {
 
   ### Install Mongo / Deadline DB
 
+  provisioner "shell" {
+    ### Install Deadline DB Ubuntu Dependencies
+    inline = [
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xdg-utils lsb",
+      "sudo mkdir -p /usr/share/desktop-directories"
+    ]
+    only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
+
+  provisioner "shell" {
+    ### Install Deadline Worker Centos Dependencies
+    inline = [
+      "sudo yum install -y redhat-lsb samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap wget"
+    ]
+    only = ["amazon-ebs.centos7-rendernode-ami"]
+  }
+
   provisioner "ansible" {
     playbook_file = "./ansible/transparent-hugepages-disable.yml"
     extra_arguments = [
@@ -714,23 +731,6 @@ build {
       "deadline_linux_installers_basename=\"$${deadline_linux_installers_filename%.*}\"",
       "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
       "sudo rm $deadline_installer_dir/DeadlineRepository*"
-    ]
-    only = ["amazon-ebs.centos7-rendernode-ami"]
-  }
-
-  provisioner "shell" {
-    ### Install Deadline Ubuntu Dependencies
-    inline = [
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xdg-utils lsb",
-      "sudo mkdir -p /usr/share/desktop-directories"
-    ]
-    only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
-  }
-
-  provisioner "shell" {
-    ### Install Deadline Centos Dependencies
-    inline = [
-      "sudo yum install -y redhat-lsb samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap"
     ]
     only = ["amazon-ebs.centos7-rendernode-ami"]
   }
