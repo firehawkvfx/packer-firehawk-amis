@@ -21,7 +21,7 @@ deadline_db_installer_filename="DeadlineRepository-${deadline_version}-linux-x64
 deadline_client_installer_filename="DeadlineClient-${deadline_version}-linux-x64-installer.run"
 
 echo "Ensure dir exists: $download_dir"
-mkdir -p
+mkdir -p $download_dir
 
 # Download mongo
 if [[ -f "$mongo_installer_tgz" ]]; then
