@@ -700,7 +700,7 @@ build {
       "deadline_linux_installers_filename=\"$(basename $deadline_linux_installers_tar)\"",
       "deadline_linux_installers_basename=\"$${deadline_linux_installers_filename%.*}\"",
       "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
-      "rm $deadline_installer_dir/AWSPortalLink*"
+      "sudo rm $deadline_installer_dir/AWSPortalLink*"
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.centos7-rendernode-ami"]
   }
@@ -713,7 +713,7 @@ build {
       "deadline_linux_installers_filename=\"$(basename $deadline_linux_installers_tar)\"",
       "deadline_linux_installers_basename=\"$${deadline_linux_installers_filename%.*}\"",
       "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
-      "rm $deadline_installer_dir/DeadlineRepository*"
+      "sudo rm $deadline_installer_dir/DeadlineRepository*"
     ]
     only = ["amazon-ebs.centos7-rendernode-ami"]
   }
