@@ -695,14 +695,27 @@ build {
     inline = [
       "sudo chmod +x /var/tmp/download-deadline.sh",
       "deadline_version=${var.deadline_version} installers_bucket=${var.installers_bucket} /var/tmp/download-deadline.sh",
-      "download_dir=/var/tmp/downloads", # Cleanup unneed files
+      "download_dir=/var/tmp/downloads", # Cleanup unneeded AWSPortalLink
       "deadline_linux_installers_tar=\"$download_dir/Deadline-${var.deadline_version}-linux-installers.tar\"",
       "deadline_linux_installers_filename=\"$(basename $deadline_linux_installers_tar)\"",
-      "deadline_linux_installers_basename=\"${deadline_linux_installers_filename%.*}\"",
+      "deadline_linux_installers_basename=\"$${deadline_linux_installers_filename%.*}\"",
       "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
-      "rm $deadline_installer_dir\AWSPortalLink*"
+      "rm $deadline_installer_dir/AWSPortalLink*"
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.centos7-rendernode-ami"]
+  }
+
+  provisioner "shell" {
+    ###Cleanup unneeded DeadlineRepository for render node
+    inline = [
+      "download_dir=/var/tmp/downloads", 
+      "deadline_linux_installers_tar=\"$download_dir/Deadline-${var.deadline_version}-linux-installers.tar\"",
+      "deadline_linux_installers_filename=\"$(basename $deadline_linux_installers_tar)\"",
+      "deadline_linux_installers_basename=\"$${deadline_linux_installers_filename%.*}\"",
+      "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
+      "rm $deadline_installer_dir/DeadlineRepository*"
+    ]
+    only = ["amazon-ebs.centos7-rendernode-ami"]
   }
 
   provisioner "shell" {
