@@ -91,7 +91,7 @@ variable "test_consul" { # If a consul cluster is running, attempt to join the c
 variable "deadline_version" {
   description = "The version of the deadline installer to aquire"
   type        = string
-  default     = "10.1.9.2"
+  default     = "10.1.14.5"
 }
 variable "installers_bucket" {
   description = "The installer bucket to persist installations to"
