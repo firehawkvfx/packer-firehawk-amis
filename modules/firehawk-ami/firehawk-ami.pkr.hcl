@@ -183,8 +183,30 @@ source "amazon-ebs" "amazonlinux2-ami" {
     owners      = [var.account_id]
   }
   ssh_username = "ec2-user"
-
 }
+
+source "amazon-ebs" "amazonlinux2-nicedcv-ami" {
+  tags            = merge({ "ami_role" : "amazonlinux2_nicedcv_ami" }, local.common_ami_tags)
+  ami_description = "A Graphical Amazon Linux 2 NICE DCV AMI that will accept connections from hosts with TLS Certs."
+  ami_name        = "firehawk-workstation-amazonlinux2-nicedcv-${local.timestamp}-{{uuid}}"
+  instance_type   = "t2.micro"
+  region          = "${var.aws_region}"
+  # source_ami      = "${var.amazon_linux_2_ami}"
+  source_ami_filter {
+    filters = {
+      "tag:ami_role" : "amazonlinux2_nicedcv_base_ami",
+      "tag:packer_template" : "firehawk-base-ami",
+      "tag:commit_hash" : var.ingress_commit_hash,
+      "tag:commit_hash_short" : var.ingress_commit_hash_short,
+      "tag:resourcetier" : var.resourcetier,
+    }
+    most_recent = true
+    owners      = [var.account_id]
+  }
+  ssh_username = "ec2-user"
+}
+
+
 
 #could not parse template for following block: "template: generated:4: function \"clean_resource_name\" not defined"
 
@@ -347,6 +369,7 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
 build {
   sources = [
     "source.amazon-ebs.amazonlinux2-ami",
+    "source.amazon-ebs.amazonlinux2-nicedcv-ami",
     "source.amazon-ebs.centos7-ami",
     "source.amazon-ebs.centos7-rendernode-ami",
     "source.amazon-ebs.ubuntu18-ami",
@@ -445,6 +468,7 @@ build {
     inline_shebang = "/bin/bash -e"
     only           = [
       "amazon-ebs.amazonlinux2-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-ami",
       "amazon-ebs.centos7-ami",
       "amazon-ebs.centos7-rendernode-ami",
       "amazon-ebs.ubuntu18-ami",
@@ -541,7 +565,10 @@ build {
     roles_path = "./ansible/roles"
     ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
     galaxy_file = "./requirements.yml"
-    only = ["amazon-ebs.centos7-rendernode-ami"]
+    only = [
+      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-ami"
+      ]
   }
 
   provisioner "ansible" {
@@ -555,7 +582,10 @@ build {
     roles_path = "./ansible/roles"
     ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
     galaxy_file = "./requirements.yml"
-    only = ["amazon-ebs.centos7-rendernode-ami"]
+    only = [
+      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-ami"
+      ]
   }
 
   ### Open VPN / Deadline DB / Centos install CLI.  This should be relocated to the base ami, and done purely with bash now instead.
@@ -622,21 +652,16 @@ build {
   # }
 
   provisioner "shell" {
-    ### Centos 7 - jq required and the dig command is also required
+    ### AWS CLI
     inline = [
-      # "sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
       "python3 -m pip install --user --upgrade awscli",
     ]
-    only = ["amazon-ebs.openvpn-server-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
-  }
-
-  provisioner "shell" {
-    ### Centos 7 - jq required and the dig command is also required
-    inline = [
-      # "sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
-      "python3 -m pip install --user --upgrade awscli",
-    ]
-    only = ["amazon-ebs.centos7-rendernode-ami"]
+    only = [
+      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-ami",
+      "amazon-ebs.openvpn-server-ami",
+      "amazon-ebs.deadline-db-ubuntu18-ami"
+      ]
   }
 
   ### Install Houdini ### Requires you create a SESI API Key on the Side FX website to auto download.
@@ -653,7 +678,10 @@ build {
     roles_path = "./ansible/roles"
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key}" ]
     galaxy_file = "./requirements.yml"
-    only = ["amazon-ebs.centos7-rendernode-ami"]
+    only = [
+      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-ami"
+      ]
   }
 
   # ### Ensure aws works for root user.  This should be relocated to the base ami.
@@ -685,7 +713,10 @@ build {
     inline = [
       "sudo yum install -y redhat-lsb samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap wget"
     ]
-    only = ["amazon-ebs.centos7-rendernode-ami"]
+    only = [
+      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-ami"
+      ]
   }
 
   provisioner "ansible" {
@@ -706,7 +737,11 @@ build {
   provisioner "file" { # fix apt upgrades to not hold up boot
     destination = "/var/tmp/download-deadline.sh"
     source      = "${local.template_dir}/scripts/download-deadline.sh"
-    only = ["amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.centos7-rendernode-ami"]
+    only = [
+      "amazon-ebs.deadline-db-ubuntu18-ami",
+      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-ami"
+    ]
   }
   provisioner "shell" {
     ### Download Deadline Installer for DB, RCS Client
@@ -738,10 +773,13 @@ build {
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
       "sudo rm -fv $deadline_installer_dir/DeadlineRepository*"
     ]
-    only = ["amazon-ebs.centos7-rendernode-ami"]
+    only = [
+      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-ami"
+    ]
   }
 
-  # provisioner "ansible" { # Temp disable dealine and rcs install until immutability is achieved.
+  # provisioner "ansible" { # Temp disable dealine and rcs install until immutability with post cert install is achieved.
   #   playbook_file = "./ansible/deadline-db-install.yaml"
   #   extra_arguments = [
   #     "-v",
@@ -796,7 +834,11 @@ build {
       # "sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
       "sudo yum -y install bind-utils jq"
     ]
-    only = ["amazon-ebs.centos7-ami", "amazon-ebs.centos7-rendernode-ami"]
+    only = [
+      "amazon-ebs.centos7-ami", 
+      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-ami"
+    ]
   }
 
   ### Install Consul
@@ -833,7 +875,13 @@ build {
       "/tmp/terraform-aws-consul/modules/install-dnsmasq/install-dnsmasq"
       # "sudo systemctl restart dnsmasq", # if this fixes vault server, but breaks other clients, inspect further.
     ]
-    only = ["amazon-ebs.ubuntu16-ami", "amazon-ebs.amazonlinux2-ami", "amazon-ebs.centos7-ami", "amazon-ebs.centos7-rendernode-ami"]
+    only = [
+      "amazon-ebs.ubuntu16-ami",
+      "amazon-ebs.amazonlinux2-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-ami",
+      "amazon-ebs.centos7-ami",
+      "amazon-ebs.centos7-rendernode-ami"
+    ]
   }
   provisioner "shell" {
     inline = ["/tmp/terraform-aws-consul/modules/setup-systemd-resolved/setup-systemd-resolved"]
