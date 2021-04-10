@@ -49,7 +49,7 @@ else
             echo "The bucket $installers_bucket already contains: $deadline_linux_installers_filename"
         fi
     else
-        printf "\n\nWarning: The installer was not aquired from Thinkbox.  It may have become deprecated.  Other AWS Accounts will not be able to install this version.\n\n"
+        printf "\n\nWarning: The installer was not aquired from Thinkbox.  It may have become deprecated, or you are not using an IAM Profile with correct permissions.  Other AWS Accounts may not be able to install this version from a bucket.\n\n"
         echo "...Downloading from: $installers_bucket"
         aws s3api get-object --bucket $installers_bucket --key "$deadline_linux_installers_filename" "${deadline_linux_installers_tar}"
     fi
