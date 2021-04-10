@@ -203,12 +203,12 @@ source "amazon-ebs" "amazonlinux2-nicedcv-nvidia-ami" {
     most_recent = true
     owners      = [var.account_id]
   }
-  launch_block_device_mappings {
-    device_name           = "/dev/xvda1"
-    volume_size           = 20
-    volume_type           = "gp2"
-    delete_on_termination = true
-  }
+  # launch_block_device_mappings {
+  #   device_name           = "/dev/xvda1"
+  #   volume_size           = 20
+  #   volume_type           = "gp2"
+  #   delete_on_termination = true
+  # }
   # ami_block_device_mappings {
   #   device_name  = "/dev/sdb"
   #   virtual_name = "ephemeral0"
@@ -694,7 +694,7 @@ build {
     galaxy_file = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+      # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
       ]
   }
 
