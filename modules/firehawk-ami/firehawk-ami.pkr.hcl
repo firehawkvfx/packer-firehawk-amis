@@ -2,7 +2,7 @@
 # The firehawk-base-ami is used to build this ami.
 
 variable "aws_region" {
-  type    = string
+  type = string
 }
 variable "account_id" {
   type = string
@@ -68,7 +68,7 @@ variable "vault_version" {
   default = "1.5.5"
 }
 variable "vault_module_version" { # The hashicorp github module version to clone.
-  default = "pull-request-235" # from "v0.13.11", this resolves consul dns issues on start.  This is likely resolved by Hashicorp now.
+  default = "pull-request-235"    # from "v0.13.11", this resolves consul dns issues on start.  This is likely resolved by Hashicorp now.
 }
 
 ### Only required if testing consul during build
@@ -100,19 +100,19 @@ variable "installers_bucket" {
 # Required for render node AMI
 variable "sesi_client_id" {
   description = "The client ID generated from your Side FX Account to automatically download Houdini."
-  type = string
+  type        = string
 }
 variable "sesi_client_secret_key" {
   description = "The secret key generated from your Side FX Account to automatically download Houdini."
-  type = string
+  type        = string
 }
 variable "houdini_license_server_address" {
   description = "The IP or host name of your Houdini license server (IP Address is recommended to simplify usage across sites with DNS)."
-  type = string
+  type        = string
 }
 variable "SSL_expiry" {
   description = "The Expiry resulting from the TTL on the SSL Certificates"
-  type = string
+  type        = string
 }
 
 locals {
@@ -125,14 +125,14 @@ locals {
     "commit_hash" : var.commit_hash,
     "commit_hash_short" : var.commit_hash_short,
     "resourcetier" : var.resourcetier,
-    "sslexpiry": var.SSL_expiry
+    "sslexpiry" : var.SSL_expiry
   }
-  syscontrol_gid = "9003"
-  deployuser_uid = "9004"
-  deadlineuser_uid = "9001"
-  houdini_build = "daily"
-  sesi_client_id = var.sesi_client_id
-  sesi_client_secret_key = var.sesi_client_secret_key
+  syscontrol_gid                 = "9003"
+  deployuser_uid                 = "9004"
+  deadlineuser_uid               = "9001"
+  houdini_build                  = "daily"
+  sesi_client_id                 = var.sesi_client_id
+  sesi_client_secret_key         = var.sesi_client_secret_key
   houdini_license_server_address = var.houdini_license_server_address
 }
 
@@ -141,7 +141,7 @@ source "amazon-ebs" "openvpn-server-ami" {
   ami_description = "An Open VPN Access Server AMI configured for Firehawk"
   ami_name        = "firehawk-openvpn-server-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
-  region          = "${var.aws_region}"
+  region          = var.aws_region
   # source_ami      = "${var.openvpn_server_base_ami}"
   source_ami_filter {
     filters = {
@@ -169,7 +169,7 @@ source "amazon-ebs" "amazonlinux2-ami" {
   ami_description = "An Amazon Linux 2 AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-bastion-amazonlinux2-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
-  region          = "${var.aws_region}"
+  region          = var.aws_region
   # source_ami      = "${var.amazon_linux_2_ami}"
   source_ami_filter {
     filters = {
@@ -190,7 +190,7 @@ source "amazon-ebs" "amazonlinux2-nicedcv-nvidia-ami" {
   ami_description = "A Graphical Amazon Linux 2 NICE DCV AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-workstation-amazonlinux2-nicedcv-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
-  region          = "${var.aws_region}"
+  region          = var.aws_region
   # source_ami      = "${var.amazon_linux_2_ami}"
   source_ami_filter {
     filters = {
@@ -217,7 +217,9 @@ source "amazon-ebs" "amazonlinux2-nicedcv-nvidia-ami" {
   #   device_name  = "/dev/sdc"
   #   virtual_name = "ephemeral1"
   # }
-  ssh_username = "ec2-user"
+  ssh_username         = "ec2-user"
+  iam_instance_profile = var.provisioner_iam_profile_name # provide read and write s3 access for updating and retrieving installers
+
 }
 
 
@@ -229,7 +231,7 @@ source "amazon-ebs" "centos7-ami" {
   ami_description = "A Cent OS 7 AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-bastion-centos7-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
-  region          = "${var.aws_region}"
+  region          = var.aws_region
   # source_ami      = "${var.centos7_ami}"
   source_ami_filter {
     filters = {
@@ -251,7 +253,7 @@ source "amazon-ebs" "centos7-rendernode-ami" {
   ami_description = "A Cent OS 7 AMI rendernode."
   ami_name        = "firehawk-bastion-centos7-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
-  region          = "${var.aws_region}"
+  region          = var.aws_region
   # source_ami      = "${var.centos7_ami}"
   source_ami_filter {
     filters = {
@@ -289,7 +291,7 @@ source "amazon-ebs" "ubuntu18-ami" {
   ami_description = "An Ubuntu 18.04 AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-bastion-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
-  region          = "${var.aws_region}"
+  region          = var.aws_region
   # source_ami      = "${var.ubuntu18_ami}"
   source_ami_filter {
     filters = {
@@ -310,7 +312,7 @@ source "amazon-ebs" "ubuntu18-vault-consul-server-ami" {
   ami_description = "An Ubuntu 18.04 AMI Vault and Consul Server."
   ami_name        = "firehawk-vault-consul-server-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
-  region          = "${var.aws_region}"
+  region          = var.aws_region
   # source_ami      = "${var.ubuntu18_ami}"
   source_ami_filter { # Uses firehawk base ami
     filters = {
@@ -342,7 +344,7 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
   ami_description = "An Ubuntu 18.04 AMI with Deadline DB ${var.deadline_version} server."
   ami_name        = "firehawk-deadlinedb-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
-  region          = "${var.aws_region}"
+  region          = var.aws_region
   # source_ami      = "${var.ubuntu18_ami}"
   source_ami_filter {
     filters = {
@@ -444,7 +446,7 @@ build {
 
   provisioner "shell" { # Vault client probably wont be installed on bastions in future, but most hosts that will authenticate will require it.
     inline = [
-      "git config --global advice.detachedHead false", # disable warning about detached head because we dont care, it is a software installation
+      "git config --global advice.detachedHead false",                                                                              # disable warning about detached head because we dont care, it is a software installation
       "git clone --branch ${var.vault_module_version} https://github.com/queglay/terraform-aws-vault.git /tmp/terraform-aws-vault", # This can be replaced with a local copy if required.
       "if test -n '${var.vault_download_url}'; then",
       " /tmp/terraform-aws-vault/modules/install-vault/install-vault --download-url ${var.vault_download_url} --skip-package-update;",
@@ -462,7 +464,7 @@ build {
   }
   provisioner "file" {
     destination = "/tmp/ca.crt.pem"
-    source      = "${var.ca_public_key_path}"
+    source      = var.ca_public_key_path
   }
   ### Clients only require the CA cert.
   provisioner "shell" {
@@ -480,7 +482,7 @@ build {
       "sudo /tmp/terraform-aws-vault/modules/update-certificate-store/update-certificate-store --cert-file-path /opt/vault/tls/ca.crt.pem"
     ]
     inline_shebang = "/bin/bash -e"
-    only           = [
+    only = [
       "amazon-ebs.amazonlinux2-ami",
       "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
       "amazon-ebs.centos7-ami",
@@ -493,17 +495,17 @@ build {
   # ### Only Vault and Consul servers should have the private keys.
   provisioner "file" {
     destination = "/tmp/vault.crt.pem"
-    source      = "${var.tls_public_key_path}"
-    only           = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
+    source      = var.tls_public_key_path
+    only        = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
   }
   provisioner "file" {
     destination = "/tmp/vault.key.pem"
-    source      = "${var.tls_private_key_path}"
-    only           = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
+    source      = var.tls_private_key_path
+    only        = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
   }
 
   provisioner "shell" {
-    inline         = [
+    inline = [
       "if [[ '${var.install_auth_signing_script}' == 'true' ]]; then",
       "sudo mv /tmp/sign-request.py /opt/vault/scripts/",
       "else",
@@ -515,17 +517,17 @@ build {
       "sudo chown -R vault:vault /opt/vault/tls/",
       "sudo chmod -R 600 /opt/vault/tls",
       "sudo chmod 700 /opt/vault/tls",
-      "sudo /tmp/terraform-aws-vault/modules/update-certificate-store/update-certificate-store --cert-file-path /opt/vault/tls/ca.crt.pem"]
+    "sudo /tmp/terraform-aws-vault/modules/update-certificate-store/update-certificate-store --cert-file-path /opt/vault/tls/ca.crt.pem"]
     inline_shebang = "/bin/bash -e"
     only           = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
   }
 
   provisioner "shell" {
-    inline         = ["sudo apt-get install -y git",
+    inline = ["sudo apt-get install -y git",
       "if [[ '${var.install_auth_signing_script}' == 'true' ]]; then",
       "sudo apt-get install -y python-pip",
       "LC_ALL=C && sudo pip install boto3",
-      "fi"]
+    "fi"]
     inline_shebang = "/bin/bash -e"
     only           = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
   }
@@ -539,7 +541,7 @@ build {
   ### requirements for deadline SSL
 
   provisioner "shell" {
-    inline         = [
+    inline = [
       "apt-get install python-openssl",
       "cd /home/ubuntu/Downloads",
       "git clone https://github.com/ThinkboxSoftware/SSLGeneration.git" # https://docs.thinkboxsoftware.com/products/deadline/10.1/1_User%20Manual/manual/proxy-sslgen.html?highlight=ssl%20certificate%20generation
@@ -576,13 +578,13 @@ build {
       "user_deadlineuser_name=deadlineuser variable_host=default variable_connect_as_user=centos variable_user=deployuser sudo=true add_to_group_syscontrol=true create_ssh_key=false variable_uid=${local.deployuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
     ]
     collections_path = "./ansible/collections"
-    roles_path = "./ansible/roles"
-    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
-    galaxy_file = "./requirements.yml"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
       "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
-      ]
+    ]
   }
 
   provisioner "ansible" {
@@ -593,13 +595,13 @@ build {
       "user_deadlineuser_name=deadlineuser variable_host=default variable_connect_as_user=centos variable_user=deadlineuser sudo=false add_to_group_syscontrol=false create_ssh_key=false variable_uid=${local.deadlineuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
     ]
     collections_path = "./ansible/collections"
-    roles_path = "./ansible/roles"
-    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
-    galaxy_file = "./requirements.yml"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
       "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
-      ]
+    ]
   }
 
   ### Open VPN / Deadline DB / Centos install CLI.  This should be relocated to the base ami, and done purely with bash now instead.
@@ -675,7 +677,7 @@ build {
       "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
       "amazon-ebs.openvpn-server-ami",
       "amazon-ebs.deadline-db-ubuntu18-ami"
-      ]
+    ]
   }
 
   ### Install Houdini ### Requires you create a SESI API Key on the Side FX website to auto download.
@@ -689,13 +691,13 @@ build {
       "install_houdini"
     ]
     collections_path = "./ansible/collections"
-    roles_path = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key}" ]
-    galaxy_file = "./requirements.yml"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key}"]
+    galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
       # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
-      ]
+    ]
   }
 
   # ### Ensure aws works for root user.  This should be relocated to the base ami.
@@ -730,7 +732,7 @@ build {
     only = [
       "amazon-ebs.centos7-rendernode-ami",
       "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
-      ]
+    ]
   }
 
   provisioner "ansible" {
@@ -778,7 +780,7 @@ build {
     inline = [
       "sudo chmod +x /var/tmp/download-deadline.sh",
       "deadline_version=${var.deadline_version} installers_bucket=${var.installers_bucket} /var/tmp/download-deadline.sh",
-      "download_dir=/var/tmp/downloads", 
+      "download_dir=/var/tmp/downloads",
       "deadline_linux_installers_tar=\"$download_dir/Deadline-${var.deadline_version}-linux-installers.tar\"",
       "deadline_linux_installers_filename=\"$(basename $deadline_linux_installers_tar)\"",
       "deadline_linux_installers_basename=\"$${deadline_linux_installers_filename%.*}\"",
@@ -834,10 +836,10 @@ build {
       "install_houdini"
     ]
     collections_path = "./ansible/collections"
-    roles_path = "./ansible/roles"
-    ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
-    galaxy_file = "./requirements.yml"
-    only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
   ### This block will install Consul Agent for DNS
@@ -849,7 +851,7 @@ build {
       "sudo yum -y install bind-utils jq"
     ]
     only = [
-      "amazon-ebs.centos7-ami", 
+      "amazon-ebs.centos7-ami",
       "amazon-ebs.centos7-rendernode-ami",
       "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
     ]
@@ -865,7 +867,7 @@ build {
       " /tmp/terraform-aws-consul/modules/install-consul/install-consul --download-url ${var.consul_download_url};",
       "else",
       " /tmp/terraform-aws-consul/modules/install-consul/install-consul --version ${var.consul_version};",
-      "fi"]
+    "fi"]
   }
 
   ### Consul DNS config.
@@ -953,7 +955,7 @@ build {
     only             = ["amazon-ebs.openvpn-server-ami"]
   }
 
-### Configure Centos user and render user
+  ### Configure Centos user and render user
 
   # provisioner "ansible" {
   #   playbook_file = "./ansible/newuser_deadlineuser.yaml"
