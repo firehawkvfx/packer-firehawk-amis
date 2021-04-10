@@ -6,7 +6,7 @@ enforce_henv: false
 ansible_become_pass: "{{ user_deadlineuser_pw }}"
 houdini_major_version: 18.0
 download_to_dir: /tmp/firehawk
-variable_user: centos
+variable_user: "{{ ansible_user }}"
 bastionip: "{{ groups['bastionip'][0] }}"
 skip_packages: false
 houdini_install_type: 'node'

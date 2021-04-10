@@ -9,7 +9,7 @@
     # the become sudo pass is only relevent for local installation if required on the host specified.
     ansible_become_pass: "{{ user_deadlineuser_pw }}"
     
-    variable_user: centos
+    variable_user: "{{ ansible_user }}"
     bastionip: "{{ groups['bastionip'][0] }}"
     
     # whether to execute the unit test.  False will just copy the file.
