@@ -185,7 +185,7 @@ source "amazon-ebs" "amazonlinux2-ami" {
   ssh_username = "ec2-user"
 }
 
-source "amazon-ebs" "amazonlinux2-nicedcv-ami" {
+source "amazon-ebs" "amazonlinux2-nicedcv-nvidia-ami" {
   tags            = merge({ "ami_role" : "amazonlinux2_nicedcv_ami" }, local.common_ami_tags)
   ami_description = "A Graphical Amazon Linux 2 NICE DCV AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-workstation-amazonlinux2-nicedcv-${local.timestamp}-{{uuid}}"
@@ -369,7 +369,7 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
 build {
   sources = [
     "source.amazon-ebs.amazonlinux2-ami",
-    "source.amazon-ebs.amazonlinux2-nicedcv-ami",
+    "source.amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
     "source.amazon-ebs.centos7-ami",
     "source.amazon-ebs.centos7-rendernode-ami",
     "source.amazon-ebs.ubuntu18-ami",
@@ -468,7 +468,7 @@ build {
     inline_shebang = "/bin/bash -e"
     only           = [
       "amazon-ebs.amazonlinux2-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
       "amazon-ebs.centos7-ami",
       "amazon-ebs.centos7-rendernode-ami",
       "amazon-ebs.ubuntu18-ami",
@@ -567,7 +567,7 @@ build {
     galaxy_file = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-ami"
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
       ]
   }
 
@@ -584,7 +584,7 @@ build {
     galaxy_file = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-ami"
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
       ]
   }
 
@@ -658,7 +658,7 @@ build {
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
       "amazon-ebs.openvpn-server-ami",
       "amazon-ebs.deadline-db-ubuntu18-ami"
       ]
@@ -680,7 +680,7 @@ build {
     galaxy_file = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-ami"
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
       ]
   }
 
@@ -715,7 +715,7 @@ build {
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-ami"
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
       ]
   }
 
@@ -740,7 +740,7 @@ build {
     only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-ami"
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
     ]
   }
   provisioner "shell" {
@@ -775,7 +775,7 @@ build {
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-ami"
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
     ]
   }
 
@@ -837,7 +837,7 @@ build {
     only = [
       "amazon-ebs.centos7-ami", 
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-ami"
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
     ]
   }
 
@@ -878,7 +878,7 @@ build {
     only = [
       "amazon-ebs.ubuntu16-ami",
       "amazon-ebs.amazonlinux2-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
       "amazon-ebs.centos7-ami",
       "amazon-ebs.centos7-rendernode-ami"
     ]
