@@ -186,7 +186,7 @@ source "amazon-ebs" "amazonlinux2-ami" {
 }
 
 source "amazon-ebs" "amazonlinux2-nicedcv-nvidia-ami" {
-  tags            = merge({ "ami_role" : "amazonlinux2_nicedcv_ami" }, local.common_ami_tags)
+  tags            = merge({ "ami_role" : "firehawk_amazonlinux2_nicedcv_ami" }, local.common_ami_tags)
   ami_description = "A Graphical Amazon Linux 2 NICE DCV AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-workstation-amazonlinux2-nicedcv-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -984,6 +984,33 @@ build {
   #   galaxy_file = "./requirements.yml"
   #   only = ["amazon-ebs.centos7-rendernode-ami"]
   # }
+
+
+  ### Configure NICEDCV workstation - Always create session.  Install browser
+  provisioner "shell" { # Install Firefox
+    inline = [
+      "wget -O ~/FirefoxSetup.tar.bz2 \"https://download.mozilla.org/?product=firefox-latest&os=linux64\"",
+      "sudo tar xvjf ~/FirefoxSetup.tar.bz2 -C /opt/",
+      "sudo ln -s /opt/firefox/firefox /usr/bin/firefox"
+      # "sudo ln -s /opt/firefox/firefox /home/ec2-user/Desktop"
+    ]
+    only = ["amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"]
+  }
+
+  provisioner "file" { # Start a virtual session on each boot.  Do not combine this with the console session above.  Pick one.
+    destination = "/tmp/dcv_session.sh"
+    source      = "${local.template_dir}/scripts/dcv_session.sh"
+    only = ["amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"]
+  }
+
+  provisioner "shell" { 
+    inline = [
+      "sudo mv /tmp/dcv_session.sh /var/lib/cloud/scripts/per-boot/",
+      "sudo /var/lib/cloud/scripts/per-boot/dcv_session.sh", # This just tests the script.
+      "dcv list-sessions" # A session should be listed here.
+    ]
+    only = ["amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"]
+  }
 
   post-processor "manifest" {
     output     = "${local.template_dir}/manifest.json"
