@@ -734,6 +734,17 @@ build {
       "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
     ]
   }
+  provisioner "shell" {
+    ### Install Deadline Worker Amazon Linux 2 Dependencies - https://docs.thinkboxsoftware.com/products/deadline/10.1/1_User%20Manual/manual/install-client.html
+    inline = [
+      "sudo yum install -y lsb"
+    ]
+    only = [
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+    ]
+  }
+
+  
 
   provisioner "ansible" {
     playbook_file = "./ansible/transparent-hugepages-disable.yml"
