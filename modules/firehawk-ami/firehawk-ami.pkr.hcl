@@ -444,6 +444,15 @@ build {
   # }
 
   ### This block will install Vault and Consul Agent for DNS
+ 
+  # Ensure no more updates are running
+  provisioner "shell" {
+    inline = [
+      "sudo systemd-run --property='After=apt-daily.service apt-daily-upgrade.service' --wait /bin/true; echo \"exit $?\""
+    ]
+    inline_shebang = "/bin/bash -e"
+    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+  }
 
   provisioner "shell" { # Vault client probably wont be installed on bastions in future, but most hosts that will authenticate will require it.
     inline = [
@@ -524,9 +533,10 @@ build {
   }
 
   provisioner "shell" {
-    inline = ["sudo apt-get install -y git",
+    inline = [
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y git",
       "if [[ '${var.install_auth_signing_script}' == 'true' ]]; then",
-      "sudo apt-get install -y python-pip",
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y python-pip",
       "LC_ALL=C && sudo pip install boto3",
     "fi"]
     inline_shebang = "/bin/bash -e"
