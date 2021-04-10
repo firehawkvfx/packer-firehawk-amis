@@ -203,6 +203,12 @@ source "amazon-ebs" "amazonlinux2-nicedcv-nvidia-ami" {
     most_recent = true
     owners      = [var.account_id]
   }
+  launch_block_device_mappings {
+    device_name           = "/dev/sda1"
+    volume_size           = 20
+    volume_type           = "gp2"
+    delete_on_termination = true
+  }
   ssh_username = "ec2-user"
 }
 
