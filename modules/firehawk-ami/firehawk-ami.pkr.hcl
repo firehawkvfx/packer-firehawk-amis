@@ -91,7 +91,7 @@ variable "test_consul" { # If a consul cluster is running, attempt to join the c
 variable "deadline_version" {
   description = "The version of the deadline installer to aquire"
   type        = string
-  default     = "10.1.14.5"
+  # default     = "10.1.14.5" # this should be added as a tag for the ami.
 }
 variable "installers_bucket" {
   description = "The installer bucket to persist installations to"
@@ -125,7 +125,8 @@ locals {
     "commit_hash" : var.commit_hash,
     "commit_hash_short" : var.commit_hash_short,
     "resourcetier" : var.resourcetier,
-    "sslexpiry" : var.SSL_expiry
+    "sslexpiry" : var.SSL_expiry,
+    "deadline_version" : var.deadline_version
   }
   syscontrol_gid                 = "9003"
   deployuser_uid                 = "9004"
@@ -744,7 +745,7 @@ build {
     ]
   }
 
-  
+
 
   provisioner "ansible" {
     playbook_file = "./ansible/transparent-hugepages-disable.yml"
@@ -1011,14 +1012,14 @@ build {
   provisioner "file" { # Start a virtual session on each boot.  Do not combine this with the console session above.  Pick one.
     destination = "/tmp/dcv_session.sh"
     source      = "${local.template_dir}/scripts/dcv_session.sh"
-    only = ["amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"]
+    only        = ["amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"]
   }
 
-  provisioner "shell" { 
+  provisioner "shell" {
     inline = [
       "sudo mv /tmp/dcv_session.sh /var/lib/cloud/scripts/per-boot/",
       "sudo /var/lib/cloud/scripts/per-boot/dcv_session.sh", # This just tests the script.
-      "dcv list-sessions" # A session should be listed here.
+      "dcv list-sessions"                                    # A session should be listed here.
     ]
     only = ["amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"]
   }

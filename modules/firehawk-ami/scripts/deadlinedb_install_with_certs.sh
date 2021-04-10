@@ -9,7 +9,6 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" # 
 # User vars
 installers_bucket="software.dev.firehawkvfx.com"
 deadlineuser_name="ubuntu"
-deadline_version="10.1.9.2"
 mongo_url="https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-3.6.19.tgz"
 dbport="27100"
 host_name="deadlinedb.service.consul"

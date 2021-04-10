@@ -7,8 +7,6 @@ set -e
 # User vars
 installers_bucket="software.dev.firehawkvfx.com" # TODO these must become vars
 deadlineuser_name="ubuntu" # TODO these must become vars
-deadline_version="10.1.9.2" # TODO these must become vars
-# deadline_version="10.1.14.5"
 dbport="27100"
 db_host_name="deadlinedb.service.consul" # TODO these must become vars
 deadline_proxy_certificate="Deadline10RemoteClient.pfx"
