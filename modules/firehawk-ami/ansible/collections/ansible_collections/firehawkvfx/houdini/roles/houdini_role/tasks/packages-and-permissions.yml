@@ -82,7 +82,7 @@
   vars:
     ansible_python_interpreter: "{{ package_python_interpreter }}"
 
-- name: dir permissions on /opt/houdini_install_script
+- name: "dir permissions on /opt/houdini_install_script for variable_user {{ variable_user }}"
   file:
     path: /opt/houdini_install_script
     state: directory
