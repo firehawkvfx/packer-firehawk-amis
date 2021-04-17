@@ -729,7 +729,7 @@ build {
   provisioner "shell" {
     ### Install Deadline DB Ubuntu Dependencies
     inline = [
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xdg-utils lsb",
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xdg-utils lsb python-openssl",
       "sudo mkdir -p /usr/share/desktop-directories"
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
@@ -809,7 +809,8 @@ build {
       "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
       "sudo rm -fv $deadline_linux_installers_tar",
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
-      "sudo rm -fv $deadline_installer_dir/DeadlineRepository*"
+      "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
+      "sudo rm -fv /opt/Thinkbox/DeadlineDatabase10/mongo/data/logs/*" # cleanup logs
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
