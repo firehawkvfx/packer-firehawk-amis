@@ -93,6 +93,12 @@ variable "deadline_version" {
   type        = string
   # default     = "10.1.14.5" # this should be added as a tag for the ami.
 }
+
+variable "db_host_name" {
+  description = "The hostname for deadline DB"
+  type = string
+  default = "deadlinedb.service.consul"
+}
 variable "installers_bucket" {
   description = "The installer bucket to persist installations to"
   type        = string
@@ -615,6 +621,43 @@ build {
     ]
   }
 
+  provisioner "shell" { # Begin migrating to bash for user creation.
+    inline         = [
+      ### Create deadlineuser
+      "user_name=${var.deadlineuser_name}",
+"function has_yum {"
+"  [[ -n \"$(command -v yum)\" ]]"
+"}"
+"function has_apt_get {"
+"  [[ -n \"$(command -v apt-get)\" ]]"
+"}"
+      "function add_sudo_user() {",
+      "  local -r user_name=\"$1\"",
+      "  if $(has_apt_get); then",
+      "    sudo_group=sudo",
+      "  elif $(has_yum); then",
+      "    sudo_group=wheel",
+      "  else",
+      "    echo \"ERROR: Could not find apt-get or yum.\"",
+      "    exit 1",
+      "  fi",
+      "  echo \"Adding user: $user_name with groups: $sudo_group $user_name\"",
+      "  sudo useradd -m -d /home/$user_name/ -s /bin/bash -G $sudo_group $user_name",
+      "  echo \"Adding user as passwordless sudoer.\"",
+      "  touch \"/etc/sudoers.d/98_$user_name\"; grep -qxF \"$user_name ALL=(ALL) NOPASSWD:ALL\" /etc/sudoers.d/98_$user_name || echo \"$user_name ALL=(ALL) NOPASSWD:ALL\" >> \"/etc/sudoers.d/98_$user_name\"",
+      "  sudo -i -u $user_name mkdir -p /home/$user_name/.ssh",
+        # Generate a public and private key - some tools can fail without one.
+      "  sudo -i -u $user_name bash -c \"ssh-keygen -q -b 2048 -t rsa -f /home/$user_name/.ssh/id_rsa -C \"\" -N \"\"\"",
+      "}",
+      "add_sudo_user $deadlineuser_name"
+    ]
+    inline_shebang = "/bin/bash -e"
+    only           = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
+
+
+
+
   ### Open VPN / Deadline DB / Centos install CLI.  This should be relocated to the base ami, and done purely with bash now instead.
   # provisioner "ansible" {
   #   extra_arguments = [
@@ -772,9 +815,18 @@ build {
     only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
+  # provisioner "file" { # fix apt upgrades to not hold up boot
+  #   destination = "/var/tmp/download-deadline.sh"
+  #   source      = "${local.template_dir}/scripts/download-deadline.sh"
+  #   only = [
+  #     "amazon-ebs.deadline-db-ubuntu18-ami",
+  #     "amazon-ebs.centos7-rendernode-ami",
+  #     "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+  #   ]
+  # }
   provisioner "file" { # fix apt upgrades to not hold up boot
-    destination = "/var/tmp/download-deadline.sh"
-    source      = "${local.template_dir}/scripts/download-deadline.sh"
+    destination = "/var/tmp/install-deadlinedb.sh"
+    source      = "${local.template_dir}/scripts/install-deadlinedb.sh"
     only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
       "amazon-ebs.centos7-rendernode-ami",
@@ -784,15 +836,16 @@ build {
   provisioner "shell" {
     ### Download Deadline Installer for DB, RCS Client
     inline = [
-      "sudo chmod +x /var/tmp/download-deadline.sh",
-      "deadline_version=${var.deadline_version} installers_bucket=${var.installers_bucket} mongo_url=\"https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-3.6.19.tgz\" /var/tmp/download-deadline.sh",
-      "download_dir=/var/tmp/downloads", # Cleanup unneeded AWSPortalLink
-      "deadline_linux_installers_tar=\"$download_dir/Deadline-${var.deadline_version}-linux-installers.tar\"",
-      "deadline_linux_installers_filename=\"$(basename $deadline_linux_installers_tar)\"",
-      "deadline_linux_installers_basename=\"$${deadline_linux_installers_filename%.*}\"",
-      "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
-      "sudo rm -fv $deadline_linux_installers_tar",
-      "sudo rm -fv $deadline_installer_dir/AWSPortalLink*"
+      # "sudo chmod +x /var/tmp/download-deadline.sh",
+      # "deadline_version=${var.deadline_version} installers_bucket=${var.installers_bucket} mongo_url=\"https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-3.6.19.tgz\" /var/tmp/download-deadline.sh",
+      # "download_dir=/var/tmp/downloads", # Cleanup unneeded AWSPortalLink
+      # "deadline_linux_installers_tar=\"$download_dir/Deadline-${var.deadline_version}-linux-installers.tar\"",
+      # "deadline_linux_installers_filename=\"$(basename $deadline_linux_installers_tar)\"",
+      # "deadline_linux_installers_basename=\"$${deadline_linux_installers_filename%.*}\"",
+      # "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
+      # "sudo rm -fv $deadline_linux_installers_tar",
+      # "sudo rm -fv $deadline_installer_dir/AWSPortalLink*"
+      "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadlinedb.sh --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install"
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
