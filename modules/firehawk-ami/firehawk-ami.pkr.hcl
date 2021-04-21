@@ -848,7 +848,7 @@ build {
       # "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
       # "sudo rm -fv $deadline_linux_installers_tar",
       # "sudo rm -fv $deadline_installer_dir/AWSPortalLink*"
-      "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadlinedb --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip_install_validation"
+      "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadlinedb --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation"
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
