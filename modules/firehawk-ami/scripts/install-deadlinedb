@@ -148,7 +148,7 @@ function download_mongo {
   local -r mongo_url="$2"
 
   echo "...Check for mongo installer" # Download mongo
-  if [[ test -f "$(dirname $mongo_installer_tgz)" && test -f "$mongo_installer_tgz" ]]; then
+  if [[ -d "$(dirname $mongo_installer_tgz)" && -f "$mongo_installer_tgz" ]]; then
       echo "File already exists: $mongo_installer_tgz"
   else
       wget $mongo_url -O $mongo_installer_tgz
