@@ -648,7 +648,7 @@ build {
       "  echo \"Adding user: $user_name with groups: $sudo_group $user_name\"",
       "  sudo useradd -m -d /home/$user_name/ -s /bin/bash -G $sudo_group $user_name",
       "  echo \"Adding user as passwordless sudoer.\"",
-      "  touch \"/etc/sudoers.d/98_$user_name\"; grep -qxF \"$user_name ALL=(ALL) NOPASSWD:ALL\" /etc/sudoers.d/98_$user_name || echo \"$user_name ALL=(ALL) NOPASSWD:ALL\" >> \"/etc/sudoers.d/98_$user_name\"",
+      "  sudo touch \"/etc/sudoers.d/98_$user_name\"; grep -qxF \"$user_name ALL=(ALL) NOPASSWD:ALL\" /etc/sudoers.d/98_$user_name || echo \"$user_name ALL=(ALL) NOPASSWD:ALL\" >> \"/etc/sudoers.d/98_$user_name\"",
       "  sudo -i -u $user_name mkdir -p /home/$user_name/.ssh",
         # Generate a public and private key - some tools can fail without one.
       "  sudo -i -u $user_name bash -c \"ssh-keygen -q -b 2048 -t rsa -f /home/$user_name/.ssh/id_rsa -C \"\" -N \"\"\"",
