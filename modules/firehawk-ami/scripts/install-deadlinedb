@@ -146,14 +146,17 @@ END
 function download_mongo {
   local -r mongo_installer_tgz="$1"
   local -r mongo_url="$2"
+  if [[ ! -d "$(dirname $mongo_installer_tgz)" ]]; then
+    echo "Ensuring dir exists for installers."
+    mkdir -p  "$(dirname $mongo_installer_tgz)"
+  fi
 
   echo "...Check for mongo installer" # Download mongo
-  if [[ -d "$(dirname $mongo_installer_tgz)" && -f "$mongo_installer_tgz" ]]; then
+  if [[ -f "$mongo_installer_tgz" ]]; then
       echo "File already exists: $mongo_installer_tgz"
   else
       wget $mongo_url -O $mongo_installer_tgz
   fi
-
 }
 
 function download_deadline {
