@@ -625,12 +625,12 @@ build {
     inline         = [
       ### Create deadlineuser
       "user_name=${var.deadlineuser_name}",
-"function has_yum {"
-"  [[ -n \"$(command -v yum)\" ]]"
-"}"
-"function has_apt_get {"
-"  [[ -n \"$(command -v apt-get)\" ]]"
-"}"
+      "function has_yum {",
+      "  [[ -n \"$(command -v yum)\" ]]",
+      "}",
+      "function has_apt_get {",
+      "  [[ -n \"$(command -v apt-get)\" ]]",
+      "}",
       "function add_sudo_user() {",
       "  local -r user_name=\"$1\"",
       "  if $(has_apt_get); then",
