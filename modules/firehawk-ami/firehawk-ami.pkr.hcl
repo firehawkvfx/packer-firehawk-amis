@@ -93,6 +93,11 @@ variable "deadline_version" {
   type        = string
   # default     = "10.1.14.5" # this should be added as a tag for the ami.
 }
+variable "deadlineuser_name" {
+  description = "The deadline user name for render nodes and deadline DB"
+  type = string
+  default = "deadlineuser"
+}
 
 variable "db_host_name" {
   description = "The hostname for deadline DB"
@@ -832,8 +837,7 @@ build {
       "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
     ]
   }
-  provisioner "shell" {
-    ### Download Deadline Installer for DB, RCS Client
+  provisioner "shell" { ### Download Deadline Installer for DB, RCS Client
     inline = [
       # "sudo chmod +x /var/tmp/download-deadline.sh",
       # "deadline_version=${var.deadline_version} installers_bucket=${var.installers_bucket} mongo_url=\"https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-3.6.19.tgz\" /var/tmp/download-deadline.sh",
