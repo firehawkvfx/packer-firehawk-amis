@@ -35,6 +35,8 @@ function print_usage {
   echo -e "  --post-certgen-rcs\t\tPost configure remote client and RCS certificates.  Used when deploying a prebuilt image. Optional."
   echo -e "  --skip-download-installers\t\tSkip downloading installers. Used when deploying a prebuilt image. Optional"
   echo -e "  --skip-install-packages\t\tSkip installing required packages. Used when deploying a prebuilt image. Optional"
+  echo -e "  --skip-install-validation\t\tSkip testing the service after install. Used when installing on for an image. Optional"
+  
   echo
   echo "Example:"
   echo
