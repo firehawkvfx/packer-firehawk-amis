@@ -829,8 +829,8 @@ build {
   #   ]
   # }
   provisioner "file" { # fix apt upgrades to not hold up boot
-    destination = "/var/tmp/install-deadlinedb.sh"
-    source      = "${local.template_dir}/scripts/install-deadlinedb.sh"
+    destination = "/var/tmp/install-deadlinedb"
+    source      = "${local.template_dir}/scripts/install-deadlinedb"
     only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
       "amazon-ebs.centos7-rendernode-ami",
@@ -848,7 +848,7 @@ build {
       # "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
       # "sudo rm -fv $deadline_linux_installers_tar",
       # "sudo rm -fv $deadline_installer_dir/AWSPortalLink*"
-      "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadlinedb.sh --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install"
+      "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadlinedb --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install"
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
