@@ -624,7 +624,6 @@ build {
   provisioner "shell" { # Begin migrating to bash for user creation.
     inline         = [
       ### Create deadlineuser
-      "user_name=${var.deadlineuser_name}",
       "function has_yum {",
       "  [[ -n \"$(command -v yum)\" ]]",
       "}",
@@ -649,7 +648,7 @@ build {
         # Generate a public and private key - some tools can fail without one.
       "  sudo -i -u $user_name bash -c \"ssh-keygen -q -b 2048 -t rsa -f /home/$user_name/.ssh/id_rsa -C \"\" -N \"\"\"",
       "}",
-      "add_sudo_user $deadlineuser_name"
+      "add_sudo_user ${var.deadlineuser_name}"
     ]
     inline_shebang = "/bin/bash -e"
     only           = ["amazon-ebs.deadline-db-ubuntu18-ami"]
