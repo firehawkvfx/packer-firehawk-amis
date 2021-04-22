@@ -837,16 +837,9 @@ build {
       "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
     ]
   }
-  provisioner "shell" { ### Download Deadline Installer for DB, RCS Client
+
+  provisioner "shell" { ### Download and Install Deadline for DB, RCS Client
     inline = [
-      # "sudo chmod +x /var/tmp/download-deadline.sh",
-      # "deadline_version=${var.deadline_version} installers_bucket=${var.installers_bucket} mongo_url=\"https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-3.6.19.tgz\" /var/tmp/download-deadline.sh",
-      # "download_dir=/var/tmp/downloads", # Cleanup unneeded AWSPortalLink
-      # "deadline_linux_installers_tar=\"$download_dir/Deadline-${var.deadline_version}-linux-installers.tar\"",
-      # "deadline_linux_installers_filename=\"$(basename $deadline_linux_installers_tar)\"",
-      # "deadline_linux_installers_basename=\"$${deadline_linux_installers_filename%.*}\"",
-      # "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
-      # "sudo rm -fv $deadline_linux_installers_tar",
       "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadlinedb --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation",
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "rm -fv /var/tmp/downloads/AWSPortalLink*",
@@ -855,26 +848,40 @@ build {
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
-  provisioner "shell" {
-    ### Download Deadline Installer for Client
+  provisioner "shell" { ### Download and Install Deadline for Client Worker
     inline = [
-      "sudo chmod +x /var/tmp/download-deadline.sh",
-      "deadline_version=${var.deadline_version} installers_bucket=${var.installers_bucket} /var/tmp/download-deadline.sh",
-      "download_dir=/var/tmp/downloads",
-      "deadline_linux_installers_tar=\"$download_dir/Deadline-${var.deadline_version}-linux-installers.tar\"",
-      "deadline_linux_installers_filename=\"$(basename $deadline_linux_installers_tar)\"",
-      "deadline_linux_installers_basename=\"$${deadline_linux_installers_filename%.*}\"",
-      "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
-      "sudo rm -fv $deadline_linux_installers_tar",
+      "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadlinedb --deadline-version ${var.deadline_version} --install-worker --skip-install-validation",
+      "rm /tmp/Deadline-${var.deadline_version}-linux-installers.tar",
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
       "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
-      "sudo rm -fv /opt/Thinkbox/DeadlineDatabase10/mongo/data/logs/*" # cleanup logs
+      "sudo rm -frv /var/log/Thinkbox/Deadline10/*" # cleanup logs
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
       "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
     ]
   }
+
+  # provisioner "shell" {
+  #   ### Download Deadline Installer for Client
+  #   inline = [
+  #     "sudo chmod +x /var/tmp/download-deadline.sh",
+  #     "deadline_version=${var.deadline_version} installers_bucket=${var.installers_bucket} /var/tmp/download-deadline.sh",
+  #     "download_dir=/var/tmp/downloads",
+  #     "deadline_linux_installers_tar=\"$download_dir/Deadline-${var.deadline_version}-linux-installers.tar\"",
+  #     "deadline_linux_installers_filename=\"$(basename $deadline_linux_installers_tar)\"",
+  #     "deadline_linux_installers_basename=\"$${deadline_linux_installers_filename%.*}\"",
+  #     "deadline_installer_dir=\"$download_dir/$deadline_linux_installers_basename\"",
+  #     "sudo rm -fv $deadline_linux_installers_tar",
+  #     "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
+  #     "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
+  #     "sudo rm -fv /opt/Thinkbox/DeadlineDatabase10/mongo/data/logs/*" # cleanup logs
+  #   ]
+  #   only = [
+  #     "amazon-ebs.centos7-rendernode-ami",
+  #     "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+  #   ]
+  # }
 
   # provisioner "ansible" { # Temp disable dealine and rcs install until immutability with post cert install is achieved.
   #   playbook_file = "./ansible/deadline-db-install.yaml"
@@ -906,7 +913,7 @@ build {
   #   only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   # }
 
-  ### Install Houdini Plugin for deadline DB ###
+  ### Install Houdini Plugin for Deadline DB ###
   provisioner "ansible" {
     playbook_file = "./ansible/collections/ansible_collections/firehawkvfx/houdini/deadline_db_houdini_plugin.yml"
     extra_arguments = [
