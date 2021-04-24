@@ -872,8 +872,8 @@ build {
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*" # cleanup logs
     ]
     only = [
-      "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+      "amazon-ebs.centos7-rendernode-ami"
+      # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
     ]
   }
 

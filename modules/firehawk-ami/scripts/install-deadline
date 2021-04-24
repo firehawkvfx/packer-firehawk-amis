@@ -260,6 +260,7 @@ function install_db_with_certs {
   local -r deadline_certificates_location="$7"
 
   # Install Deadline DB
+  set -x
   sudo $deadline_installer_dir/$deadline_db_installer_filename \
   --mode unattended \
   --debuglevel 2 \
@@ -277,6 +278,7 @@ function install_db_with_certs {
   --createX509dbuser true \
   --requireSSL true \
   --dbssl true
+  set +x
   # --dbauth true \
   # --dbpassword avaultpassword \
   # --certgen_password avaultpassword \
@@ -295,6 +297,7 @@ function install_db_without_certs {
   local -r deadline_certificates_location="$7"
 
   # Install Deadline DB
+  set -x
   sudo $deadline_installer_dir/$deadline_db_installer_filename \
   --mode unattended \
   --debuglevel 2 \
@@ -312,6 +315,7 @@ function install_db_without_certs {
   --createX509dbuser true \
   --requireSSL false \
   --dbssl false
+  set +x
   # --dbauth true \
   echo "Completed DB install."
 }
@@ -640,6 +644,7 @@ function install_rcs_no_generate_certs {
   echo "...Installing Deadline Client: RCS with disabled cert generation"
   # Install Client:
   # Deadline RCS
+  set -x
   sudo $deadline_installer_dir/$deadline_client_installer_filename \
   --mode unattended \
   --launcherdaemon true \
@@ -661,7 +666,7 @@ function install_rcs_no_generate_certs {
   --slavestartup false \
   --proxyrootdir $deadline_proxy_root_dir \
   --proxycertificate $deadline_client_certificates_location/$deadline_proxy_certificate
-
+  set +x
   # --generatedcertdir "${deadline_client_certificates_location}/" \
   # --dbsslpassword avaultpassword \
   # --clientcert_pass avaultpassword \
@@ -691,6 +696,7 @@ function install_rcs_generate_certs {
   echo "...Installing Deadline Client: RCS with certs"
   # Install Client:
   # Deadline RCS # TODO: consider removing servercert since it is probably incorrect and being regenerated anyway.
+  set -x
   sudo $deadline_installer_dir/$deadline_client_installer_filename \
   --mode unattended \
   --launcherdaemon true \
@@ -712,7 +718,7 @@ function install_rcs_generate_certs {
   --slavestartup false \
   --proxyrootdir $deadline_proxy_root_dir \
   --proxycertificate "$deadline_client_certificates_location/$deadline_proxy_certificate"
-
+  set +x
   # --dbsslpassword avaultpassword \
   # --clientcert_pass avaultpassword \
   # --proxycertificatepassword avaultpassword
