@@ -592,12 +592,31 @@ build {
   #   only             = ["amazon-ebs.centos7-rendernode-ami"]
   # }
 
-  provisioner "ansible" {
+  provisioner "ansible" { # Disable SELINUX for rendernodes until tested and working when enabled.
+    playbook_file = "./ansible/selinux.yaml"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "variable_host=default variable_connect_as_user=centos set_selinux=disabled"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only = [
+      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+    ]
+  }
+
+  provisioner "ansible" { # Add user deployuser
     playbook_file = "./ansible/newuser_deadlineuser.yaml"
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "user_deadlineuser_name=deadlineuser variable_host=default variable_connect_as_user=centos variable_user=deployuser sudo=true add_to_group_syscontrol=true create_ssh_key=false variable_uid=${local.deployuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
+      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=centos",
+      "variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid}",
+      "variable_host=default delegate_host=localhost"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
@@ -614,7 +633,8 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "user_deadlineuser_name=deadlineuser variable_host=default variable_connect_as_user=centos variable_user=deadlineuser sudo=false add_to_group_syscontrol=false create_ssh_key=false variable_uid=${local.deadlineuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
+      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=centos",  "variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid}",
+      "variable_host=default delegate_host=localhost"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
@@ -622,42 +642,47 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
+      "amazon-ebs.deadline-db-ubuntu18-ami"
     ]
   }
 
-  provisioner "shell" { # Begin migrating to bash for user creation.
-    inline         = [
-      ### Create deadlineuser
-      "function has_yum {",
-      "  [[ -n \"$(command -v yum)\" ]]",
-      "}",
-      "function has_apt_get {",
-      "  [[ -n \"$(command -v apt-get)\" ]]",
-      "}",
-      "function add_sudo_user() {",
-      "  local -r user_name=\"$1\"",
-      "  if $(has_apt_get); then",
-      "    sudo_group=sudo",
-      "  elif $(has_yum); then",
-      "    sudo_group=wheel",
-      "  else",
-      "    echo \"ERROR: Could not find apt-get or yum.\"",
-      "    exit 1",
-      "  fi",
-      "  echo \"Adding user: $user_name with groups: $sudo_group $user_name\"",
-      "  sudo useradd -m -d /home/$user_name/ -s /bin/bash -G $sudo_group $user_name",
-      "  echo \"Adding user as passwordless sudoer.\"",
-      "  sudo touch \"/etc/sudoers.d/98_$user_name\"; sudo grep -qxF \"$user_name ALL=(ALL) NOPASSWD:ALL\" /etc/sudoers.d/98_$user_name || echo \"$user_name ALL=(ALL) NOPASSWD:ALL\" | sudo tee -a \"/etc/sudoers.d/98_$user_name\"",
-      "  sudo -i -u $user_name mkdir -p /home/$user_name/.ssh",
-        # Generate a public and private key - some tools can fail without one.
-      "  sudo -i -u $user_name bash -c \"ssh-keygen -q -b 2048 -t rsa -f /home/$user_name/.ssh/id_rsa -C \"\" -N \"\"\"",
-      "}",
-      "add_sudo_user ${var.deadlineuser_name}"
-    ]
-    inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.deadline-db-ubuntu18-ami"]
-  }
+  # provisioner "shell" { # Begin migrating to bash for user creation, more portable with user data usage if required.
+  #   inline         = [
+  #     ### Create deadlineuser
+  #     "function has_yum {",
+  #     "  [[ -n \"$(command -v yum)\" ]]",
+  #     "}",
+  #     "function has_apt_get {",
+  #     "  [[ -n \"$(command -v apt-get)\" ]]",
+  #     "}",
+  #     "function add_sudo_user() {",
+  #     "  local -r user_name=\"$1\"",
+  #     "  if $(has_apt_get); then",
+  #     "    sudo_group=sudo",
+  #     "  elif $(has_yum); then",
+  #     "    sudo_group=wheel",
+  #     "  else",
+  #     "    echo \"ERROR: Could not find apt-get or yum.\"",
+  #     "    exit 1",
+  #     "  fi",
+  #     "  echo \"Adding user: $user_name with groups: $sudo_group $user_name\"",
+  #     "  sudo useradd -m -d /home/$user_name/ -s /bin/bash -G $sudo_group $user_name",
+  #     "  echo \"Adding user as passwordless sudoer.\"",
+  #     "  sudo touch \"/etc/sudoers.d/98_$user_name\"; sudo grep -qxF \"$user_name ALL=(ALL) NOPASSWD:ALL\" /etc/sudoers.d/98_$user_name || echo \"$user_name ALL=(ALL) NOPASSWD:ALL\" | sudo tee -a \"/etc/sudoers.d/98_$user_name\"",
+  #     "  sudo -i -u $user_name mkdir -p /home/$user_name/.ssh",
+  #       # Generate a public and private key - some tools can fail without one.
+  #     "  sudo -i -u $user_name bash -c \"ssh-keygen -q -b 2048 -t rsa -f /home/$user_name/.ssh/id_rsa -C \"\" -N \"\"\"",
+  #     "}",
+  #     "add_sudo_user ${var.deadlineuser_name}"
+  #   ]
+  #   inline_shebang = "/bin/bash -e"
+  #   only           = [
+  #     "amazon-ebs.deadline-db-ubuntu18-ami",
+  #     "amazon-ebs.centos7-rendernode-ami",
+  #     "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+  #     ]
+  # }
 
 
 

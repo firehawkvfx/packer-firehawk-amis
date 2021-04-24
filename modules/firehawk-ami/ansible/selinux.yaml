@@ -1,0 +1,17 @@
+---
+
+- hosts: "{{ variable_host | default('ansible_control') }}"
+  remote_user: "{{ variable_connect_as_user | default('deployuser') }}"
+  gather_facts: "{{ variable_gather_facts | default('false') }}"
+  become: true
+  
+  vars:
+    set_selinux: unchanged
+
+  tasks:
+  - name: Disable SELinux # Disable SELINUX for some hosts not exposed to public internet - it can often cause issues with various systems like PDGMQ, licensing, and PCOIP.  May try permissive mode in future.
+    selinux:
+      state: "{{ set_selinux }}"
+    when: set_selinux != "unchanged"
+    vars:
+      ansible_python_interpreter: "{{ package_python_interpreter }}"
