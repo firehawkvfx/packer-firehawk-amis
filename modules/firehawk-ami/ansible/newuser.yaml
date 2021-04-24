@@ -27,7 +27,8 @@
     tags:
     - always
 
-  - fail: msg="Bailing out: this play requires 'variable_user'"
+  - fail:
+      msg: "Bailing out: this play requires 'variable_user'"
     when: variable_user is not defined
 
   roles:
@@ -53,7 +54,8 @@
     sudo: true
 
   pre_tasks:
-  - fail: msg="Bailing out: this play requires 'variable_user'"
+  - fail:
+      msg: "Bailing out: this play requires 'variable_user'"
     when: variable_user is not defined
 
   - name: Wait 10 seconds - Test connection for user - no sudo
@@ -63,7 +65,7 @@
     failed_when: result['failed']
     become_user: "{{ variable_user }}"
 
-- hosts: "{{ variable_host | default('ansible_control') }}" # check login is possible as user
+- hosts: "{{ variable_host | default('ansible_control') }}" # check login is possible as user with sudo if enabled
   remote_user: "{{ variable_connect_as_user | default('deployuser') }}"
   gather_facts: true
   become: true
@@ -76,7 +78,8 @@
     sudo: true
 
   pre_tasks:
-  - fail: msg="Bailing out: this play requires 'variable_user'"
+  - fail:
+      msg: "Bailing out: this play requires 'variable_user'"
     when: variable_user is not defined
     
   - name: Wait 10 seconds - Test connection for user - with sudo
