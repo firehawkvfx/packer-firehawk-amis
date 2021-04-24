@@ -58,4 +58,4 @@
     regexp: "^%{{ variable_user }}"
     line: "%{{ variable_user }} ALL=(ALL) NOPASSWD: ALL"
     validate: 'visudo -cf %s'
-  when: ( ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' ) and ( sudo | bool ) and ( passwordless_sudo | bool )
+  when: ( sudo | bool ) and ( passwordless_sudo | bool )
