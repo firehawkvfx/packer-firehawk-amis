@@ -898,7 +898,7 @@ function options { # Not all defaults are available as args, however the script 
   done
 
   assert_not_empty "--deadline-version" "$deadline_version"
-  assert_either_or "--db-host-name" "$db_host_name" "--install-worker" "$install_worker" # db host name not required when installing worker
+  assert_not_empty "--db-host-name" "$db_host_name" # db host name required when installing worker as well for proxyroot dir
 
   if [[ "$install_worker" == "true" ]]; then # if installing the worker, disable db and rcs options
     skip_install_db="true"
