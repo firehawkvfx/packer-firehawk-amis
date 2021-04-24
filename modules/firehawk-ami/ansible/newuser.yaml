@@ -89,4 +89,4 @@
     failed_when: result['failed']
     become_user: "{{ variable_user }}"
     become: true
-    when: ( sudo | bool ) and ( my_password | length > 0 )
+    when: ( sudo | bool ) and ( my_password is defined ) and ( my_password | length > 0 )
