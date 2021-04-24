@@ -641,7 +641,23 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+    ]
+  }
+
+  provisioner "ansible" {
+    playbook_file = "./ansible/newuser.yaml"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=ubuntu variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+      #  package_python_interpreter=/usr/bin/python2.7"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only = [
       "amazon-ebs.deadline-db-ubuntu18-ami"
     ]
   }
@@ -825,8 +841,6 @@ build {
       "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
     ]
   }
-
-
 
   provisioner "ansible" {
     playbook_file = "./ansible/transparent-hugepages-disable.yml"
