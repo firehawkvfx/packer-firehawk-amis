@@ -18,7 +18,7 @@ readonly DEFAULT_DOWNLOAD_INSTALLERS="true"
 # Functions
 function print_usage {
   echo
-  echo "Usage: install-deadlinedb [OPTIONS]"
+  echo "Usage: install-deadline [OPTIONS]"
   echo
   echo "This script can be used to download and install Deadline DB and RCS.  It optionally configures certificates post install for immutable infrastructure usage. This script has been tested with Ubuntu 18.04."
   echo
@@ -40,7 +40,7 @@ function print_usage {
   echo
   echo "Example:"
   echo
-  echo "  install-deadlinedb --deadline-version 10.1.14.5"
+  echo "  install-deadline --deadline-version 10.1.14.5"
 }
 
 function log {
@@ -87,6 +87,14 @@ function assert_either_or {
     print_usage
     exit 1
   fi
+}
+
+function has_yum {
+  [[ -n "$(command -v yum)" ]]
+}
+
+function has_apt_get {
+  [[ -n "$(command -v apt-get)" ]]
 }
 
 # A retry function that attempts to run a command a number of times and returns the output
@@ -600,6 +608,14 @@ function post_db_install_permissions {
   sudo service Deadline10db start
 }
 
+function install_packages {
+  if $(has_apt_get); then
+    sudo apt-get install -y xdg-utils lsb
+  elif $(has_yum); then
+    sudo yum install -y redhat-lsb samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap wget
+  fi
+}
+
 function install_rcs_no_generate_certs {
   local -r deadline_installer_dir="$1"
   local -r deadline_client_installer_filename="$2"
@@ -617,8 +633,7 @@ function install_rcs_no_generate_certs {
   # Directories and Permissions
   if [[ "$skip_install_packages" == "false" ]]; then
     echo "...Install packages for Deadline RCS"
-    sudo apt-get install -y xdg-utils
-    sudo apt-get install -y lsb # required for render nodes as well
+    install_packages
   fi
   sudo mkdir -p /usr/share/desktop-directories
 
@@ -668,8 +683,7 @@ function install_rcs_generate_certs {
   # Directories and Permissions
   if [[ "$skip_install_packages" == "false" ]]; then
     echo "...Install packages for Deadline RCS"
-    sudo apt-get install -y xdg-utils
-    sudo apt-get install -y lsb # required for render nodes as well
+    install_packages
   fi
   sudo mkdir -p /usr/share/desktop-directories
 
@@ -719,8 +733,7 @@ function install_worker {
   # Directories and Permissions
   if [[ "$skip_install_packages" == "false" ]]; then
     echo "...Install packages for Deadline RCS"
-    sudo apt-get install -y xdg-utils
-    sudo apt-get install -y lsb # required for render nodes as well
+    install_packages
   fi
   sudo mkdir -p /usr/share/desktop-directories
 
