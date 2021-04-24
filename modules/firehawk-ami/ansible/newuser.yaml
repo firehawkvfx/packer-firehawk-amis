@@ -71,10 +71,10 @@
   become: true
 
   vars:
+    my_password: # If no password is defined it will not be set.
     ansible_become_pass: "{{ my_password }}"
     ansible_password: "{{ my_password }}"
     variable_user:
-    my_password: # If no password is defined it will not be set.
     sudo: true
 
   pre_tasks:
@@ -89,4 +89,4 @@
     failed_when: result['failed']
     become_user: "{{ variable_user }}"
     become: true
-    when: ( sudo | bool ) and ( my_password ) and ( my_password | length > 0 )
+    when: sudo | bool 
