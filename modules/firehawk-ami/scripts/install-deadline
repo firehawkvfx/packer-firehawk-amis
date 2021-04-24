@@ -718,7 +718,7 @@ function install_rcs_generate_certs {
   # --proxycertificatepassword avaultpassword
 }
 
-function install_worker {
+function install_client_worker {
   local -r deadline_installer_dir="$1"
   local -r deadline_client_installer_filename="$2"
   # local -r deadline_certificates_location="$3"
@@ -910,6 +910,8 @@ function options { # Not all defaults are available as args, however the script 
   cert_ou="Deadline10MongoDB"
   rcs_cert_ou="Deadline10ConnServer"
 
+  server_cert_basename="$db_host_name"
+  deadline_proxy_root_dir="$db_host_name:$proxyport"
   deadline_client_certificate_basename="${deadline_client_certificate%.*}"
   deadline_linux_installers_tar="/tmp/Deadline-${deadline_version}-linux-installers.tar"
   deadline_linux_installers_filename="$(basename $deadline_linux_installers_tar)"
@@ -922,13 +924,9 @@ function options { # Not all defaults are available as args, however the script 
   deadline_certificates_location="/opt/Thinkbox/DeadlineDatabase10/certs"
   deadline_client_certificates_location="/opt/Thinkbox/certs"
 
-  if [[ ! -z "$db_host_name" ]]; then
+  if [[ "$skip_install_db" == "false" ]]; then
     set_hostname $db_host_name # The db requires a host name for other clients to know how to find the service.
-
-    server_cert_basename="$db_host_name"
-    deadline_proxy_root_dir="$db_host_name:$proxyport"
   fi
-
 
   # Downloads
   if [[ "$skip_download_installers" == "false" ]]; then
@@ -967,7 +965,18 @@ function options { # Not all defaults are available as args, however the script 
 
   # Install Worker
   if [[ "$install_worker" == "true" ]]; then
-    install_worker "$deadline_installer_dir" "$deadline_client_installer_filename" "$deadline_certificates_location" "$deadline_client_certificates_location" "$deadline_client_certificate" "$deadline_proxy_certificate" "$deadlineuser_name" "$httpport" "$proxyport" "$deadline_proxy_root_dir" "$skip_install_packages"
+    install_client_worker \
+      "$deadline_installer_dir" \
+      "$deadline_client_installer_filename" \
+      "$deadline_certificates_location" \
+      "$deadline_client_certificates_location" \
+      "$deadline_client_certificate" \
+      "$deadline_proxy_certificate" \
+      "$deadlineuser_name" \
+      "$httpport" \
+      "$proxyport" \
+      "$deadline_proxy_root_dir" \
+      "$skip_install_packages"
   fi
 
   # Generate certs seperately
