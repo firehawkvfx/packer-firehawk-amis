@@ -364,6 +364,7 @@ function get_ssl_gen_repo {
     sudo apt-get install -y python-openssl
   fi
   sudo rm -frv "$ssl_keygen_base_path" # if this is a repeated install, clear the keys
+  mkdir -p "$(dirname $ssl_keygen_base_path)"
   git clone https://github.com/ThinkboxSoftware/SSLGeneration.git "$ssl_keygen_base_path"
 }
 
@@ -941,14 +942,12 @@ function options { # Not all defaults are available as args, however the script 
     fi
     download_deadline "$deadline_linux_installers_tar" "$deadline_version" "$deadline_linux_installers_filename" "$installers_bucket" "$deadline_installer_dir"
   fi
-  if [[ "$skip_install_packages" == "false" ]]; then
-    get_ssl_gen_repo "$deadlineuser_name" "$skip_install_packages" # this repo contains the deadline script to generate certificates
-  fi
   
   # Install DB
   if [[ "$skip_install_db" == "false" ]]; then
     setup_directories_and_permissions "$deadlineuser_name" "$deadline_certificates_location" "$deadline_client_certificates_location"
-    
+    get_ssl_gen_repo "$deadlineuser_name" "$skip_install_packages" # this repo contains the deadline script to generate certificates
+
     if [[ "$skip_certgen_during_install" == "true" ]]; then
       install_db_without_certs "$deadline_installer_dir" "$deadline_db_installer_filename" "$mongo_installer_tgz" "$dbport" "$db_host_name" "$deadlineuser_name" "$deadline_certificates_location"
     else
