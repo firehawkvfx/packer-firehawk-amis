@@ -28,7 +28,7 @@
   user:
     name: "{{ variable_user }}"
     password: "{{ my_password }}"
-  when: ( my_password | length > 0 )
+  when: my_password | length > 0
   become: true
 
 - name: Ensure primary group for user exists
