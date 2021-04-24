@@ -661,6 +661,7 @@ function install_rcs_no_generate_certs {
   --slavestartup false \
   --proxyrootdir $deadline_proxy_root_dir \
   --proxycertificate $deadline_client_certificates_location/$deadline_proxy_certificate
+
   # --generatedcertdir "${deadline_client_certificates_location}/" \
   # --dbsslpassword avaultpassword \
   # --clientcert_pass avaultpassword \
@@ -710,7 +711,8 @@ function install_rcs_generate_certs {
   --generatedcertdir "${deadline_client_certificates_location}/" \
   --slavestartup false \
   --proxyrootdir $deadline_proxy_root_dir \
-  --proxycertificate $deadline_client_certificates_location/$deadline_proxy_certificate
+  --proxycertificate "$deadline_client_certificates_location/$deadline_proxy_certificate"
+
   # --dbsslpassword avaultpassword \
   # --clientcert_pass avaultpassword \
   # --proxycertificatepassword avaultpassword
@@ -740,6 +742,7 @@ function install_worker {
   echo "...Installing Deadline Client: Worker"
   # Install Client:
   # Deadline Worker
+  set -x
   sudo $deadline_installer_dir/$deadline_client_installer_filename \
   --mode unattended \
   --launcherdaemon true \
@@ -754,7 +757,8 @@ function install_worker {
   --enabletls true \
   --slavestartup true \
   --proxyrootdir $deadline_proxy_root_dir \
-  --proxycertificate $deadline_client_certificates_location/$deadline_proxy_certificate
+  --proxycertificate "$deadline_client_certificates_location/$deadline_proxy_certificate"
+  set -x
 }
 
 function configure_deadline {

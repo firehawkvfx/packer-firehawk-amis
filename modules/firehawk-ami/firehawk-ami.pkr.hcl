@@ -865,7 +865,7 @@ build {
 
   provisioner "shell" { ### Download and Install Deadline for Client Worker
     inline = [
-      "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadline --deadline-version ${var.deadline_version} --install-worker --skip-install-validation --skip-install-packages",
+      "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadline --deadline-version ${var.deadline_version} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages",
       "rm /tmp/Deadline-${var.deadline_version}-linux-installers.tar",
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
       "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
