@@ -584,7 +584,7 @@ build {
   #     "--skip-tags",
   #     "user_access"
   #   ]
-  #   playbook_file    = "./ansible/newuser_deadlineuser.yaml"
+  #   playbook_file    = "./ansible/newuser.yaml"
   #   collections_path = "./ansible/collections"
   #   roles_path       = "./ansible/roles"
   #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
@@ -610,7 +610,7 @@ build {
   }
 
   provisioner "ansible" { # Add user deployuser
-    playbook_file = "./ansible/newuser_deadlineuser.yaml"
+    playbook_file = "./ansible/newuser.yaml"
     extra_arguments = [
       "-v",
       "--extra-vars",
@@ -628,7 +628,7 @@ build {
   }
 
   provisioner "ansible" {
-    playbook_file = "./ansible/newuser_deadlineuser.yaml"
+    playbook_file = "./ansible/newuser.yaml"
     extra_arguments = [
       "-v",
       "--extra-vars",
@@ -1070,7 +1070,7 @@ build {
   ### Configure Centos user and render user
 
   # provisioner "ansible" {
-  #   playbook_file = "./ansible/newuser_deadlineuser.yaml"
+  #   playbook_file = "./ansible/newuser.yaml"
   #   extra_arguments = [
   #     "-v",
   #     "--extra-vars",
@@ -1084,7 +1084,7 @@ build {
   # }
 
   # provisioner "ansible" {
-  #   playbook_file = "./ansible/newuser_deadlineuser.yaml"
+  #   playbook_file = "./ansible/newuser.yaml"
   #   extra_arguments = [
   #     "-v",
   #     "--extra-vars",

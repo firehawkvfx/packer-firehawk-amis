@@ -6,7 +6,7 @@
   become: true
 
   vars:
-    variable_user: deadlineuser
+    variable_user: # The username to ensure exist
     variable_uid: 9001
     variable_user_gid: "{{ variable_uid }}"
     variable_gid: "{{ syscontrol_gid }}"
@@ -27,6 +27,9 @@
     tags:
     - always
 
+  - fail: msg="Bailing out: this play requires 'variable_user'"
+    when: variable_user is not defined
+
   roles:
   - role: 'newuser'
   - role: 'add-user-to-group'
@@ -46,10 +49,13 @@
   become: false
 
   vars:
-    variable_user: deadlineuser
+    variable_user:
     sudo: true
 
   pre_tasks:
+  - fail: msg="Bailing out: this play requires 'variable_user'"
+    when: variable_user is not defined
+
   - name: Wait 10 seconds - Test connection for user - no sudo
     wait_for_connection:
       timeout: 10
@@ -65,10 +71,14 @@
   vars:
     ansible_become_pass: "{{ my_password }}"
     ansible_password: "{{ my_password }}"
-    variable_user: deadlineuser
+    variable_user:
+    my_password: # If no password is defined it will not be set.
     sudo: true
 
   pre_tasks:
+  - fail: msg="Bailing out: this play requires 'variable_user'"
+    when: variable_user is not defined
+    
   - name: Wait 10 seconds - Test connection for user - with sudo
     wait_for_connection:
       timeout: 10
