@@ -819,6 +819,7 @@ function options { # Not all defaults are available as args, however the script 
   local deadline_client_certificate="$DEFAULT_DEADLINE_CLIENT_CERTIFICATE"
   local mongo_url="$DEFAULT_MONGO_URL"
   local skip_download_installers="false"
+  local skip_download_mongo="false"
   local skip_install_packages="false"
   local skip_install_db="false"
   local skip_install_rcs="false"
@@ -868,6 +869,9 @@ function options { # Not all defaults are available as args, however the script 
         ;;
       --skip-download-installers)
         skip_download_installers="true"
+        ;;
+      --skip-download-mongo)
+        skip_download_mongo="true"
         ;;
       --skip-install-packages)
         skip_install_packages="true"
@@ -924,7 +928,9 @@ function options { # Not all defaults are available as args, however the script 
 
   # Downloads
   if [[ "$skip_download_installers" == "false" ]]; then
-    download_mongo "$mongo_installer_tgz" "$mongo_url"
+    if [[ "$skip_download_mongo" == "false" ]]; then
+      download_mongo "$mongo_installer_tgz" "$mongo_url"
+    fi
     download_deadline "$deadline_linux_installers_tar" "$deadline_version" "$deadline_linux_installers_filename" "$installers_bucket" "$deadline_installer_dir"
   fi
   if [[ "$skip_install_packages" == "false" ]]; then

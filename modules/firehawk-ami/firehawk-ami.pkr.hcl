@@ -855,7 +855,7 @@ build {
 
   provisioner "shell" { ### Download and Install Deadline for DB, RCS Client
     inline = [
-      "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation",
+      "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages",
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "rm -fv /var/tmp/downloads/AWSPortalLink*",
       "rm /tmp/Deadline-${var.deadline_version}-linux-installers.tar"
@@ -865,7 +865,7 @@ build {
 
   provisioner "shell" { ### Download and Install Deadline for Client Worker
     inline = [
-      "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadline --deadline-version ${var.deadline_version} --install-worker --skip-install-validation",
+      "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadline --deadline-version ${var.deadline_version} --install-worker --skip-install-validation --skip-install-packages",
       "rm /tmp/Deadline-${var.deadline_version}-linux-installers.tar",
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
       "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
