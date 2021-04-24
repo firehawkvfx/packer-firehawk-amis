@@ -357,7 +357,7 @@ function start_launcher {
 function get_ssl_gen_repo {
   local -r deadlineuser_name="$1"
   local -r skip_install_packages="$2"
-  local -r ssl_keygen_base_path="${HOME}Downloads/SSLGeneration"
+  local -r ssl_keygen_base_path="${HOME}/Downloads/SSLGeneration"
 
   # Generate Certs - see https://docs.thinkboxsoftware.com/products/deadline/10.0/1_User%20Manual/manual/proxy-sslgen.html
   if [[ "$skip_install_packages" == "false" ]]; then
@@ -381,7 +381,7 @@ function generate_certs_for_db_and_rcs {
   local -r deadline_proxy_certificate="${10}"
   local -r dbport="${11}"
   local -r deadline_major_version="$(echo $deadline_version | awk -F '.' '{print $1}')"
-  local -r ssl_keygen_base_path="${HOME}Downloads/SSLGeneration"
+  local -r ssl_keygen_base_path="${HOME}/Downloads/SSLGeneration"
   local -r ssl_keygen_path="$ssl_keygen_base_path/keys"
   local -r deadline_proxy_certificate_basename="${deadline_proxy_certificate%.*}"
 
@@ -470,11 +470,11 @@ function generate_certs_for_clients {
   local -r deadline_proxy_certificate="${10}"
   local -r dbport="${11}"
   local -r deadline_major_version="$(echo $deadline_version | awk -F '.' '{print $1}')"
-  local -r ssl_keygen_base_path="${HOME}Downloads/SSLGeneration"
+  local -r ssl_keygen_base_path="${HOME}/Downloads/SSLGeneration"
   local -r ssl_keygen_path="$ssl_keygen_base_path/keys"
   local -r deadline_proxy_certificate_basename="${deadline_proxy_certificate%.*}"
   
-  cd /home/$deadlineuser_name/Downloads/SSLGeneration
+  cd $ssl_keygen_base_path
 
   echo "...Clear any previous keys"
   rm -frv ${ssl_keygen_path}/*
