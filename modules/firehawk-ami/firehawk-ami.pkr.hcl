@@ -614,9 +614,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=centos",
-      "variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid}",
-      "variable_host=default delegate_host=localhost"
+      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=centos variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
       #  package_python_interpreter=/usr/bin/python2.7"
     ]
     collections_path = "./ansible/collections"
@@ -634,9 +632,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=centos",
-      "variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid}",
-      "variable_host=default delegate_host=localhost"
+      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=centos variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
       #  package_python_interpreter=/usr/bin/python2.7"
     ]
     collections_path = "./ansible/collections"

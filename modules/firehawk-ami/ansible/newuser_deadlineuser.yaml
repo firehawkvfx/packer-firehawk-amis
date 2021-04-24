@@ -12,6 +12,7 @@
     variable_gid: "{{ syscontrol_gid }}"
     my_password: # If no password is defined it will not be set.
     sudo: true
+    passwordless_sudo: false
   
   pre_tasks:
   - name: "Test connection as {{ ansible_user }}"
