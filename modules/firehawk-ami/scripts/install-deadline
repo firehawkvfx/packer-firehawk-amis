@@ -725,7 +725,7 @@ function install_rcs_generate_certs {
   # --proxycertificatepassword avaultpassword
 }
 
-function install_client_worker {
+function install_client_worker { # see here for example on how to configure instead on instance launch https://docs.thinkboxsoftware.com/products/deadline/10.1/1_User%20Manual/manual/event-spot-deadline-connect.html#event-spot-deadline-connect-ref-label
   local -r deadline_installer_dir="$1"
   local -r deadline_client_installer_filename="$2"
   # local -r deadline_certificates_location="$3"
