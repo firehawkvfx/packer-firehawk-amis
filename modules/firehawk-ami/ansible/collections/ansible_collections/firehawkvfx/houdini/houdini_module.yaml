@@ -7,9 +7,9 @@
 # If the file doesn't exist in the s3 bucket, it will be downloaded from side fx, and then pushed to the bucket after install.
 
 # Example install on an aws instance
-# ansible-playbook -i ansible/inventory ansible/ansible_collections/firehawkvfx/houdini/houdini_module.yaml -v --extra-vars "variable_host=role_workstation_centos hostname=cloud_workstation1.firehawkvfx.com"
+# ansible-playbook -i ansible/inventory ansible/collections/ansible_collections/firehawkvfx/houdini/houdini_module.yaml -v --extra-vars "variable_host=role_workstation_centos hostname=cloud_workstation1.firehawkvfx.com"
 # Example local install on a RHEL 7.6 / CENTOS workstation / render node.
-# ansible-playbook -i ansible/inventory ansible/ansible_collections/firehawkvfx/houdini/houdini_module.yaml -v --extra-vars "variable_host=workstation1 variable_user=deadlineuser hostname=workstation1 ansible_become_pass=sompass"
+# ansible-playbook -i ansible/inventory ansible/collections/ansible_collections/firehawkvfx/houdini/houdini_module.yaml -v --extra-vars "variable_host=workstation1 variable_user=deadlineuser hostname=workstation1 ansible_become_pass=sompass"
 
 - hosts: "{{ variable_host | default('role_node_centos') }}"
   remote_user: "{{ variable_connect_as_user | default(ansible_user) }}"
@@ -19,7 +19,7 @@
   vars:
     ansible_become_pass: "{{ user_deadlineuser_pw }}"
     secrets_path: "{{ playbook_dir }}" # if not defined, retarget to this path.  This allows local installs (not cloud) to inherit user prefs.
-    vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
+    vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/collections/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
 # consider abs path with:
 # {{role_path}}
 
@@ -51,7 +51,7 @@
 #   become: true
   
 #   vars:
-#     vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
+#     vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/collections/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
 
 #   # vars_files:
 #   #   - /deployuser/ansible/group_vars/all/vars
@@ -145,7 +145,7 @@
   
   vars:
     secrets_path: "{{ playbook_dir }}"
-    vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
+    vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/collections/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
     variable_user: "{{ ansible_user }}"
   # vars_files:
   #   - /deployuser/ansible/group_vars/all/vars
@@ -193,7 +193,7 @@
 #     no_extension: "{{ deadline_linux_installers_tar | splitext | first }}"
 #     basename: "{{ no_extension.split('/')[-1] }}"
 #     houdini_install_type: 'node'
-#     vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
+#     vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/collections/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
 
 #   # vars_files:
 #   #   - /deployuser/ansible/group_vars/all/vars

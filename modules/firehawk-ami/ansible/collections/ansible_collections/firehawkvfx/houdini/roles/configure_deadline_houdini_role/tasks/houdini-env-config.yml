@@ -5,7 +5,7 @@
     houdini_template: "{{ lookup('first_found', findme) }}"
   vars:
     findme:
-      - "/secrets/overrides/ansible/ansible_collections/firehawkvfx/houdini/roles/install_deadline_role/files/houdini_template.env"
+      - "/secrets/overrides/ansible/collections/ansible_collections/firehawkvfx/houdini/roles/install_deadline_role/files/houdini_template.env"
       - "houdini_template.env"
 
 - debug:
