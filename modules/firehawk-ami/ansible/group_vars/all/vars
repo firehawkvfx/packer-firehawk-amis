@@ -139,8 +139,8 @@ workstation_address: "{{ lookup('env', 'TF_VAR_workstation_address') }}"
 gateway_hostname: "{{ lookup('env', 'TF_VAR_gateway_hostname') }}"
 control_hostname: "{{ lookup('env', 'TF_VAR_control_hostname') }}"
 
-usage_based_url: "{{ lookup('env', 'TF_VAR_usage_based_url') }}"
-usage_based_activation_code: "{{ lookup('env', 'TF_VAR_usage_based_activation_code') }}"
+ubl_url: "{{ lookup('env', 'TF_VAR_ubl_url') }}"
+ubl_activation_code: "{{ lookup('env', 'TF_VAR_ubl_activation_code') }}"
 
 houdini_license_server_address: "{{ lookup('env','TF_VAR_houdini_license_server_address') }}"
 
