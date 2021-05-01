@@ -263,7 +263,7 @@ source "amazon-ebs" "centos7-ami" {
 source "amazon-ebs" "centos7-rendernode-ami" {
   tags            = merge({ "ami_role" : "firehawk_centos7_rendernode_ami" }, local.common_ami_tags)
   ami_description = "A Cent OS 7 AMI rendernode."
-  ami_name        = "firehawk-bastion-centos7-${local.timestamp}-{{uuid}}"
+  ami_name        = "firehawk-rendernode-centos7-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = var.aws_region
   # source_ami      = "${var.centos7_ami}"
