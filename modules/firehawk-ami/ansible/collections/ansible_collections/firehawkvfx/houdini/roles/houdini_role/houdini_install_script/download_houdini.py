@@ -14,18 +14,23 @@ import shutil
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-b", "--buildversion", type=str, help="Use latest daily build (d/daily, p/production)")
+parser.add_argument("-b", "--buildtype", type=str, help="Use latest daily build (d/daily, p/production)")
+parser.add_argument("-v", "--majorversion", type=str, help="Major version (18.0, 18.5, etc)")
 
 _args, other_args = parser.parse_known_args()
 
-buildversion = "production"
-if _args.buildversion:
-    if _args.buildversion in ['d', 'daily']:
+only_production = True
+if _args.buildtype:
+    if _args.buildtype in ['d', 'daily']:
         print("get daily build")
         only_production = False
-    elif _args.buildversion in ['p', 'production']:
+    elif _args.buildtype in ['p', 'production']:
         print("get production build")
         only_production = True
+
+majorversion = "18.5"
+if _args.majorversion:
+    majorversion = str(float(_args.majorversion))
 
 # Code that provides convenient Python wrappers to call into the API:
 
@@ -178,12 +183,12 @@ if __name__ == '__main__':
     # Retrieve the daily builds list, if you want the latest production
     # you can skip this step
     releases_list = service.download.get_daily_builds_list(
-        product='houdini', version='18.0', platform='linux', only_production=only_production)
+        product='houdini', version=majorversion, platform='linux', only_production=only_production)
 
     latest_build=releases_list[0]['build']
 
     latest_release = service.download.get_daily_build_download(
-        product='houdini', version='18.0', build=latest_build, platform='linux')
+        product='houdini', version=majorversion, build=latest_build, platform='linux')
     
     query = ( latest_release['filename'], latest_release['download_url'] )
     

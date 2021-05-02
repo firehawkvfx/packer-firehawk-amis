@@ -22,7 +22,7 @@ parser.add_argument("-t", "--temp_download_dir", type=str, help="Temp Download d
 parser.add_argument("-u", "--username", type=str, help="SideFx account username")
 parser.add_argument("-p", "--password", type=str, help="SideFx account password")
 parser.add_argument("-s", "--server", type=str, help="Install License server (y/yes, n/no, a/auto, default auto)")
-parser.add_argument("-b", "--buildversion", type=str, help="Use latest daily build (d/daily, p/production)")
+parser.add_argument("-b", "--buildtype", type=str, help="Use latest daily build (d/daily, p/production)")
 parser.add_argument("-f", "--filename", type=str, help="Use a specific file to install houdini (houdini-17.5.326-linux_x86_64_gcc6.3.tar.gz)")
 parser.add_argument("-d", "--downloadonly", type=str, help="Download latest installer only without install (true)")
 parser.add_argument("-q", "--queryonly", type=str, help="query the filename only for the latest daily or produciton build (true)")
@@ -65,7 +65,7 @@ if _args.server:
     elif _args.server in ['n', 'no']:
         lic_server = False
 
-buildversion = "production"
+buildtype = "production"
 downloadonly = False
 
 if _args.downloadonly:
@@ -79,13 +79,13 @@ if _args.queryonly:
         print "will query latest filename without download or install"
         queryonly = True
 
-if _args.buildversion:
-    if _args.buildversion in ['d', 'daily']:
+if _args.buildtype:
+    if _args.buildtype in ['d', 'daily']:
         print "get daily build"
-        buildversion = "daily"
-    elif _args.buildversion in ['p', 'production']:
+        buildtype = "daily"
+    elif _args.buildtype in ['p', 'production']:
         print "get production build"
-        buildversion = "production"
+        buildtype = "production"
 
 existing_filename = None
 if _args.filename and _args.filename != 'auto':
@@ -147,7 +147,7 @@ login_data = dict(username=username, password=password, csrfmiddlewaretoken=csrf
 # login
 r = client.post(URL, data=login_data, headers=dict(Referer=URL))
 
-if ('daily' in buildversion):
+if ('daily' in buildtype):
     print 'Get last daily build version...'
     pageurl = "https://www.sidefx.com/download/daily-builds/#category-devel"
     page = client.get(pageurl)
