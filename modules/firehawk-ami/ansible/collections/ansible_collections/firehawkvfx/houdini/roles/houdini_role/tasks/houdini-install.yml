@@ -51,7 +51,7 @@
   shell: |
     cd /opt/houdini_install_script/
     . /opt/houdini_install_script/exit_test.sh
-    python /opt/houdini_install_script/download_houdini.py -buildtype {{ houdini_version_item.houdini_build }} --majorversion {{ houdini_version_item.houdini_major_version }} ; exit_test
+    python /opt/houdini_install_script/download_houdini.py --buildtype {{ houdini_version_item.houdini_build }} --majorversion {{ houdini_version_item.houdini_major_version }} ; exit_test
   register: houdini_query_out
   become: true
   when: houdini_version_item.houdini_auto_version
