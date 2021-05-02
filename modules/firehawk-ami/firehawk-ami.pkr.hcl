@@ -597,7 +597,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_host=default set_selinux=disabled"
+      "variable_host=default set_selinux=disabled package_python_interpreter=/usr/bin/python3"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
