@@ -597,15 +597,14 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_host=default set_selinux=disabled package_python_interpreter=/usr/bin/python3"
+      "variable_host=default set_selinux=disabled"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
     galaxy_file      = "./requirements.yml"
     only = [
-      "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+      "amazon-ebs.centos7-rendernode-ami"
     ]
   }
 
