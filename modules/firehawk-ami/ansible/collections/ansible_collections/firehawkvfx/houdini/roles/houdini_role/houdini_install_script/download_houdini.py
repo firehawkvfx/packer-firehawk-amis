@@ -21,10 +21,10 @@ _args, other_args = parser.parse_known_args()
 buildversion = "production"
 if _args.buildversion:
     if _args.buildversion in ['d', 'daily']:
-        print "get daily build"
+        print("get daily build")
         only_production = False
     elif _args.buildversion in ['p', 'production']:
-        print "get production build"
+        print("get production build")
         only_production = True
 
 # Code that provides convenient Python wrappers to call into the API:
