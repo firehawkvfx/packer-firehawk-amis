@@ -869,6 +869,7 @@ build {
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "echo 'Retrieve Submission/Cliient plugin from bucket'",
       "sudo -i -u ${var.deadlineuser_name} aws s3api wait object-exists --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip", # wait till object exists - repository build will upload
+      # "aws s3api head-object --bucket software.dev.firehawkvfx.com --key Deadline-10.1.14.5/Thinkbox/DeadlineRepository10/submission/Houdini.zip",
       "sudo -i -u ${var.deadlineuser_name} aws s3 sync \"s3://${local.installers_bucket}/Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip\" /var/tmp",
       "sudo -i -u ${var.deadlineuser_name} unzip /var/tmp/Houdini.zip -d /var/tmp",
       "sudo ls -ltriah /var/tmp/Houdini/Client"

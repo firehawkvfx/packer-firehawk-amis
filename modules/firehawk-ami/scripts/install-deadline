@@ -765,7 +765,7 @@ function install_client_worker { # see here for example on how to configure inst
   --slavestartup true \
   --proxyrootdir $deadline_proxy_root_dir \
   --proxycertificate "$deadline_client_certificates_location/$deadline_proxy_certificate"
-  set -x
+  set +x
 }
 
 function configure_deadline {
