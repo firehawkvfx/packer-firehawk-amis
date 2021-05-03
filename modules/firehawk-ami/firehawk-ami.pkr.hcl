@@ -867,7 +867,8 @@ build {
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
       "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
-      "sudo -i -u ${var.deadlineuser_name} aws s3api wait object-exists --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip", # wait till object exists - repository build will upload
+      "echo 'Retrieve Submission/Cliient plugin from bucket'",
+      "sudo -i -u ${var.deadlineuser_name} aws s3api wait object-exists --bucket s3://${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip", # wait till object exists - repository build will upload
       "sudo -i -u ${var.deadlineuser_name} aws s3 sync \"s3://${local.installers_bucket}/Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip\" /var/tmp",
       "sudo -i -u ${var.deadlineuser_name} unzip /var/tmp/Houdini.zip -d /var/tmp",
       "sudo ls -ltriah /var/tmp/Houdini/Client"
