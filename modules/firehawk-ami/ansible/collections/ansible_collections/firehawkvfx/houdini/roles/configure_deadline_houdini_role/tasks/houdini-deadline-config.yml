@@ -31,7 +31,7 @@
 
 - name: Prepare permissions
   file:
-    path: "/deployuser/tmp/HoudiniSubmitter/"
+    path: "/var/tmp/Houdini/Client/"
     owner: deployuser
     group: deployuser
     mode: u=rwX,g=rwX,o=rX
@@ -41,7 +41,7 @@
 
 - name: Ansible copy directory to the remote server.  if failure - ensure you exit the shell and vagrant ssh in before trying again.  vagerant user and deadlineuser were added to a group and this will not refresh until exiting ssh.
   copy:
-    src: "/deployuser/tmp/HoudiniSubmitter/{{ item }}"
+    src: "/var/tmp/Houdini/Client/{{ item }}"
     dest: "/home/deadlineuser/Thinkbox/Deadline10/submitters/HoudiniSubmitter/"
     owner: deadlineuser
     group: syscontrol
@@ -86,7 +86,7 @@
 
 - name: Ansible copy CallDeadlineCommand.py to the remote server /opt/Thinkbox/DeadlineRepository10/submission/Houdini/Client/CallDeadlineCommand.py
   copy:
-    src: "/deployuser/tmp/HoudiniSubmitter/CallDeadlineCommand.py"
+    src: "/var/tmp/Houdini/Client/CallDeadlineCommand.py"
     dest: "/home/deadlineuser/houdini{{ item.houdini_major_version }}/python2.7libs/"
   become_user: deadlineuser
   become: yes
@@ -128,7 +128,7 @@
 
 - name: Ansible copy submission to the remote server /opt/Thinkbox/DeadlineRepository10/submission/
   copy:
-    src: "/deployuser/tmp/submission/{{ item }}"
+    src: "/tmp/submission/{{ item }}"
     dest: "/opt/Thinkbox/DeadlineRepository10/submission/"
   # become_user: deadlineuser
   become: yes

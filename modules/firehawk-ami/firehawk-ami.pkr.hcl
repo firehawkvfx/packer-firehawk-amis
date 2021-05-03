@@ -777,26 +777,6 @@ build {
     ]
   }
 
-  ### Install Houdini ### Requires you create a SESI API Key on the Side FX website to auto download.
-  provisioner "ansible" {
-    playbook_file = "./ansible/collections/ansible_collections/firehawkvfx/houdini/houdini_module.yaml"
-    extra_arguments = [
-      # "-vvv",
-      "--extra-vars",
-      "variable_user=centos resourcetier=${var.resourcetier} installers_bucket=${local.installers_bucket} variable_host=default houdini_build=${local.houdini_build} sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key} houdini_license_server_address=${var.houdini_license_server_address} user_deadlineuser_pw='' package_python_interpreter=/usr/bin/python2.7",
-      "--tags",
-      "install_houdini"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key}"]
-    galaxy_file      = "./requirements.yml"
-    only = [
-      "amazon-ebs.centos7-rendernode-ami",
-      # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
-    ]
-  }
-
   # ### Ensure aws works for root user.  This should be relocated to the base ami.
 
   # provisioner "shell" {
@@ -871,7 +851,11 @@ build {
       "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages",
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "sudo rm -fv /var/tmp/downloads/AWSPortalLink*",
-      "sudo rm /tmp/Deadline-${var.deadline_version}-linux-installers.tar"
+      "sudo rm /tmp/Deadline-${var.deadline_version}-linux-installers.tar",
+      "apt-get install -y zip unzip",
+      "cd /opt/Thinkbox/DeadlineRepository10/submission",
+      "find . -type d -maxdepth 1 -mindepth 1 -exec zip -r -D '{}.zip' '{}' \;",
+      "aws s3 sync /opt/Thinkbox/DeadlineRepository10/submission \"s3://${local.installers_bucket}/Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission\""
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
@@ -882,7 +866,11 @@ build {
       "sudo rm -fv /tmp/Deadline-${var.deadline_version}-linux-installers.tar",
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
       "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
-      "sudo rm -frv /var/log/Thinkbox/Deadline10/*" # cleanup logs
+      "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
+      "aws s3api wait object-exists --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip" # wait till object exists - repository build will upload
+      "aws s3 sync \"s3://${local.installers_bucket}/Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip\" /var/tmp",
+      "sudo unzip /var/tmp/Houdini.zip -d /var/tmp",
+      "ls -ltriah /var/tmp/Houdini/Client"
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami"
@@ -905,6 +893,27 @@ build {
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
     galaxy_file      = "./requirements.yml"
     only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
+
+  ### Install Houdini ### Requires you create a SESI API Key on the Side FX website to auto download.
+
+  provisioner "ansible" {
+    playbook_file = "./ansible/collections/ansible_collections/firehawkvfx/houdini/houdini_module.yaml"
+    extra_arguments = [
+      # "-vvv",
+      "--extra-vars",
+      "variable_user=deadlineuser resourcetier=${var.resourcetier} installers_bucket=${local.installers_bucket} variable_host=default houdini_build=${local.houdini_build} sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key} houdini_license_server_address=${var.houdini_license_server_address} user_deadlineuser_pw='' package_python_interpreter=/usr/bin/python2.7",
+      "--tags",
+      "install_houdini"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key}"]
+    galaxy_file      = "./requirements.yml"
+    only = [
+      "amazon-ebs.centos7-rendernode-ami",
+      # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+    ]
   }
 
   ### This block will install Consul Agent for DNS

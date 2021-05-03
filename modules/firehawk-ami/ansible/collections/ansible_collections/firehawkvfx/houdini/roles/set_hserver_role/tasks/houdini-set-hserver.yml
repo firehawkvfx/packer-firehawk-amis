@@ -9,3 +9,5 @@
   register: houdini_hserver_deadlineuser_out
   become_user: deadlineuser
   when: houdini_install_type != "server"
+
+  # read more about hserver here https://www.sidefx.com/forum/topic/28264/?page=1#post-129940
