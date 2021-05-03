@@ -853,8 +853,8 @@ build {
       "sudo rm -fv /var/tmp/downloads/AWSPortalLink*",
       "sudo rm /tmp/Deadline-${var.deadline_version}-linux-installers.tar",
       "sudo apt-get install -y zip unzip",
-      "cd /opt/Thinkbox/DeadlineRepository10/submission",
-      "find . -type d -maxdepth 1 -mindepth 1 -exec zip -r -D '{}.zip' '{}' \\; ",
+      "sudo find /opt/Thinkbox/DeadlineRepository10/submission/. -type d -maxdepth 1 -mindepth 1 -exec zip -r -D '{}.zip' '{}' \\; ",
+      "sudo ls -ltriah",
       "sudo -i -u ${var.deadlineuser_name} aws s3 sync /opt/Thinkbox/DeadlineRepository10/submission \"s3://${local.installers_bucket}/Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission\""
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
