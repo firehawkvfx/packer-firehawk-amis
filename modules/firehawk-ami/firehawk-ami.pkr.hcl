@@ -852,10 +852,10 @@ build {
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "sudo rm -fv /var/tmp/downloads/AWSPortalLink*",
       "sudo rm /tmp/Deadline-${var.deadline_version}-linux-installers.tar",
-      "apt-get install -y zip unzip",
+      "sudo apt-get install -y zip unzip",
       "cd /opt/Thinkbox/DeadlineRepository10/submission",
       "find . -type d -maxdepth 1 -mindepth 1 -exec zip -r -D '{}.zip' '{}' \\; ",
-      "aws s3 sync /opt/Thinkbox/DeadlineRepository10/submission \"s3://${local.installers_bucket}/Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission\""
+      "sudo -i -u ${var.deadlineuser_name} aws s3 sync /opt/Thinkbox/DeadlineRepository10/submission \"s3://${local.installers_bucket}/Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission\""
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
@@ -867,10 +867,10 @@ build {
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
       "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
-      "aws s3api wait object-exists --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip", # wait till object exists - repository build will upload
-      "aws s3 sync \"s3://${local.installers_bucket}/Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip\" /var/tmp",
-      "sudo unzip /var/tmp/Houdini.zip -d /var/tmp",
-      "ls -ltriah /var/tmp/Houdini/Client"
+      "sudo -i -u ${var.deadlineuser_name} aws s3api wait object-exists --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip", # wait till object exists - repository build will upload
+      "sudo -i -u ${var.deadlineuser_name} aws s3 sync \"s3://${local.installers_bucket}/Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip\" /var/tmp",
+      "sudo -i -u ${var.deadlineuser_name} unzip /var/tmp/Houdini.zip -d /var/tmp",
+      "sudo ls -ltriah /var/tmp/Houdini/Client"
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami"
