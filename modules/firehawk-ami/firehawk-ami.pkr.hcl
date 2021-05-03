@@ -860,6 +860,13 @@ build {
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
+  provisioner "file" { # fix apt upgrades to not hold up boot
+    destination = "/tmp/retry"
+    source      = "${local.template_dir}/scripts/retry"
+    only = [
+      "amazon-ebs.centos7-rendernode-ami"
+    ]
+  }
   provisioner "shell" { ### Download and Install Deadline for Client Worker
     inline = [
       "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages",
@@ -867,12 +874,13 @@ build {
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
       "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
-      "echo 'Retrieve Submission/Cliient plugin from bucket'",
-      "sudo -i -u ${var.deadlineuser_name} aws s3api wait object-exists --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip", # wait till object exists - repository build will upload
-      # "aws s3api head-object --bucket software.dev.firehawkvfx.com --key Deadline-10.1.14.5/Thinkbox/DeadlineRepository10/submission/Houdini.zip",
-      "sudo -i -u ${var.deadlineuser_name} aws s3 sync \"s3://${local.installers_bucket}/Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip\" /var/tmp",
-      "sudo -i -u ${var.deadlineuser_name} unzip /var/tmp/Houdini.zip -d /var/tmp",
-      "sudo ls -ltriah /var/tmp/Houdini/Client"
+      "echo '...Wait for Submission/Client plugin from bucket'",
+      # "sudo -i -u ${var.deadlineuser_name} aws s3api wait object-exists --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip", # wait till object exists - repository build will upload
+      "sudo -i -u ${var.deadlineuser_name} /tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip' 'Wait for file to arrive in bucket...'",
+      "echo '...Retrieve file...'",
+      "sudo -i -u ${var.deadlineuser_name} aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip /tmp/Houdini.zip",
+      "sudo -i -u ${var.deadlineuser_name} unzip /tmp/Houdini.zip -d /var/tmp",
+      "sudo ls -ltriah /tmp/Houdini/Client"
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami"
