@@ -37,7 +37,7 @@
     mode: u=rwX,g=rwX,o=rX
     recurse: true
   become: yes
-  delegate_to: ansible_control
+  # delegate_to: ansible_control
 
 - name: Ansible copy directory to the remote server.  if failure - ensure you exit the shell and vagrant ssh in before trying again.  vagerant user and deadlineuser were added to a group and this will not refresh until exiting ssh.
   copy:
