@@ -122,7 +122,7 @@
 
 - name: 's3-sync pull houdini installer {{ installers_bucket }}'
   import_role:
-    name: s3_sync
+    name: s3_sync # for some reason (looks like a bug with ansible in packer, the role isn't found in core, so we copy it under houdini roles)
   vars:
     mode: "pull"
     bucket: "{{ installers_bucket }}"
