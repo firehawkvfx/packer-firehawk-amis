@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# This takes one arg as a root folder to zip each folder in as an individual file.  This helps efficiently handle many folders in S3 for download via the AWS Management Console UI, since at this time it is not trivial to download a whole folder.
+
+set -e
+
+pwd=$(pwd)
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" # The directory of this script
+
+cd $1
+find . -type d -maxdepth 1 -mindepth 1 -exec zip -r -D '{}.zip' '{}' \;
+cd $pwd
+

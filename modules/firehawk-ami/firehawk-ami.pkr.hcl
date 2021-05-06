@@ -846,6 +846,13 @@ build {
     ]
   }
 
+  provisioner "file" { # fix apt upgrades to not hold up boot
+    destination = "/tmp/zip-each-folder"
+    source      = "${local.template_dir}/scripts/zip-each-folder"
+    only = [
+      "amazon-ebs.centos7-rendernode-ami"
+    ]
+  }
   provisioner "shell" { ### Download and Install Deadline for DB, RCS Client
     inline = [
       "sudo -i -u ${var.deadlineuser_name} /var/tmp/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages",
@@ -853,9 +860,10 @@ build {
       "sudo rm -fv /var/tmp/downloads/AWSPortalLink*",
       "sudo rm /tmp/Deadline-${var.deadline_version}-linux-installers.tar",
       "sudo apt-get install -y zip unzip",
-      "cd /opt/Thinkbox/DeadlineRepository10/submission",
-      "sudo find . -type d -maxdepth 1 -mindepth 1 -exec zip -r -D '{}.zip' '{}' \\; ",
-      "sudo ls -ltriah",
+      "sudo -i -u ${var.deadlineuser_name} /tmp/zip-each-folder /opt/Thinkbox/DeadlineRepository10/submission",
+      # "cd /opt/Thinkbox/DeadlineRepository10/submission",
+      # "sudo find . -type d -maxdepth 1 -mindepth 1 -exec zip -r -D '{}.zip' '{}' \\; ",
+      # "sudo ls -ltriah",
       "sudo -i -u ${var.deadlineuser_name} aws s3 sync /opt/Thinkbox/DeadlineRepository10/submission \"s3://${local.installers_bucket}/Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission\""
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
