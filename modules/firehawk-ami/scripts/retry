@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Log the given message. All logs are written to stderr with a timestamp.
 function log {
  local -r message="$1"
@@ -33,5 +35,5 @@ function retry {
   log "$description failed after 30 attempts."
   exit $exit_status
 }
-
+set -x
 retry $1 $2
