@@ -850,7 +850,7 @@ build {
     destination = "/tmp/zip-each-folder"
     source      = "${local.template_dir}/scripts/zip-each-folder"
     only = [
-      "amazon-ebs.centos7-rendernode-ami"
+      "amazon-ebs.deadline-db-ubuntu18-ami"
     ]
   }
   provisioner "shell" { ### Download and Install Deadline for DB, RCS Client
