@@ -67,7 +67,7 @@
 #   # store deadline components required for submitter.
 #   - name: Ensure tmp dir exist - HoudiniSubmitter
 #     file:
-#       path: /var/tmp/Houdini/Client/{{ item }}
+#       path: /var/tmp/submission/Houdini/Client/{{ item }}
 #       state: directory
 #       mode: u+rwX,g+rwX,o-rwx
 #       owner: deployuser
@@ -82,7 +82,7 @@
 #   - name: Fetch from the remote recursively and save to local
 #     synchronize:
 #       src: /opt/Thinkbox/DeadlineRepository10/submission/Houdini/Client/{{ item }}
-#       dest: /var/tmp/Houdini/Client/
+#       dest: /var/tmp/submission/Houdini/Client/
 #       mode: pull
 #       recursive: true
 #     become: yes

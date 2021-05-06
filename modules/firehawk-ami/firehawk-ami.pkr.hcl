@@ -882,12 +882,16 @@ build {
       "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "echo '...Wait for Submission/Client plugin from bucket'",
-      # "sudo -i -u ${var.deadlineuser_name} aws s3api wait object-exists --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip", # wait till object exists - repository build will upload
       "sudo -i -u ${var.deadlineuser_name} /tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip' 'Wait for file to arrive in bucket...'",
       "echo '...Retrieve file...'",
       "sudo -i -u ${var.deadlineuser_name} aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip /tmp/Houdini.zip",
-      "sudo -i -u ${var.deadlineuser_name} unzip /tmp/Houdini.zip -d /var/tmp",
-      "sudo ls -ltriah /var/tmp/Houdini/Client"
+      "sudo -i -u ${var.deadlineuser_name} /tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip' 'Wait for file to arrive in bucket...'",
+      "echo '...Retrieve file...'",
+      "sudo -i -u ${var.deadlineuser_name} aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip /tmp/HServer.zip",
+      "sudo mkdir -p /var/tmp/submission",
+      "sudo -i -u ${var.deadlineuser_name} unzip /tmp/Houdini.zip -d /var/tmp/submission",
+      "sudo -i -u ${var.deadlineuser_name} unzip /tmp/HServer.zip -d /var/tmp/submission",
+      "sudo ls -ltriah /var/tmp/submission/Houdini/Client"
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami"
