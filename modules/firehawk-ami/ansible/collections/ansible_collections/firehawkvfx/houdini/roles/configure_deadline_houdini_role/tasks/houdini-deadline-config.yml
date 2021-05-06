@@ -41,7 +41,8 @@
 
 - name: Ansible copy directory from tmp on remote server.
   copy:
-    remote_src: "/var/tmp/submission/Houdini/Client/{{ item }}"
+    src: "/var/tmp/submission/Houdini/Client/{{ item }}"
+    remote_src: true
     dest: "/home/deadlineuser/Thinkbox/Deadline10/submitters/HoudiniSubmitter/"
     owner: deadlineuser
     group: syscontrol
@@ -86,7 +87,8 @@
 
 - name: Ansible copy CallDeadlineCommand.py to the remote server /opt/Thinkbox/DeadlineRepository10/submission/Houdini/Client/CallDeadlineCommand.py
   copy:
-    remote_src: "/var/tmp/submission/Houdini/Client/CallDeadlineCommand.py"
+    src: "/var/tmp/submission/Houdini/Client/CallDeadlineCommand.py"
+    remote_src: true
     dest: "/home/deadlineuser/houdini{{ item.houdini_major_version }}/python2.7libs/"
   become_user: deadlineuser
   become: yes
@@ -128,6 +130,7 @@
 - name: Ansible copy submission to the remote server /opt/Thinkbox/DeadlineRepository10/submission/
   copy:
     src: "/tmp/submission/{{ item }}"
+    remote_src: true
     dest: "/opt/Thinkbox/DeadlineRepository10/submission/"
   # become_user: deadlineuser
   become: yes
