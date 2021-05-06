@@ -119,6 +119,7 @@
   file:
     path: "{{ download_to_dir }}"
     state: directory
+    mode: u=rwX,g=rwX,o=rwX
 
 - name: 's3-sync pull houdini installer {{ installers_bucket }}'
   import_role:
