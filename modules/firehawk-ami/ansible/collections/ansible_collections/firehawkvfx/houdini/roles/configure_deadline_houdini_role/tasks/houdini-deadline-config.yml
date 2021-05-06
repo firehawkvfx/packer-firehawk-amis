@@ -32,8 +32,8 @@
 - name: Prepare permissions
   file:
     path: "/var/tmp/Houdini/Client/"
-    owner: deployuser
-    group: deployuser
+    owner: deadlineuser
+    group: syscontrol
     mode: u=rwX,g=rwX,o=rX
     recurse: true
   become: yes
