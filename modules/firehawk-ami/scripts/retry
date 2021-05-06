@@ -28,11 +28,11 @@ function retry {
       echo "$output"
       return
     fi
-    log "$description failed. Will sleep for 10 seconds and try again."
-    sleep 10
+    log "$description failed. Will sleep for 30 seconds and try again."
+    sleep 30
   done;
 
-  log "$description failed after 30 attempts."
+  log "$description failed after 30 attempts (15 mins). Check that deadline DB suceeded, and verify the s3 bucket contents.  It is possible the number of attempts should be extended."
   exit $exit_status
 }
 retry "$1" "$2"
