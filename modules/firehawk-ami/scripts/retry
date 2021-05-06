@@ -35,5 +35,4 @@ function retry {
   log "$description failed after 30 attempts."
   exit $exit_status
 }
-set -x
 retry "$1" "$2"
