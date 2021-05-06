@@ -95,7 +95,6 @@
   - cloud-install
   - onsite-install
 
-
 - name: set dir permisisons /opt/Thinkbox/DeadlineRepository10/submission
   file:
     path: "/opt/Thinkbox/DeadlineRepository10/submission/"
