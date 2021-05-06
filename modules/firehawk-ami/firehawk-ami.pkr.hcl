@@ -888,7 +888,8 @@ build {
       "sudo -i -u ${var.deadlineuser_name} /tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip' 'Wait for file to arrive in bucket...'",
       "echo '...Retrieve file...'",
       "sudo -i -u ${var.deadlineuser_name} aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip /tmp/HServer.zip",
-      "sudo mkdir -p /var/tmp/submission",
+      "echo '...Create /var/tmp/submission'",
+      "sudo -i -u ${var.deadlineuser_name} mkdir -p /var/tmp/submission",
       "sudo -i -u ${var.deadlineuser_name} unzip /tmp/Houdini.zip -d /var/tmp/submission",
       "sudo -i -u ${var.deadlineuser_name} unzip /tmp/HServer.zip -d /var/tmp/submission",
       "sudo ls -ltriah /var/tmp/submission/Houdini/Client"
