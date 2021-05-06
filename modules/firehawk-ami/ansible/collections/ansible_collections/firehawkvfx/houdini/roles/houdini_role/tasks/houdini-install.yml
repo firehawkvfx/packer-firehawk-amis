@@ -115,6 +115,11 @@
     msg: 'no valid houdini_linux_tar_filename was defined / found'
   when: '".tar" not in houdini_linux_tar_filename'
 
+- name: "ensure {{ download_to_dir }} exists"
+  file:
+    path: "{{ download_to_dir }}"
+    state: directory
+
 - name: 's3-sync pull houdini installer {{ installers_bucket }}'
   import_role:
     name: s3_sync
