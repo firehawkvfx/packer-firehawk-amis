@@ -36,4 +36,4 @@ function retry {
   exit $exit_status
 }
 set -x
-retry $1 $2
+retry "$1" "$2"
