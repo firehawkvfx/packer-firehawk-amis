@@ -12,7 +12,7 @@
 # ansible-playbook -i ansible/inventory ansible/collections/ansible_collections/firehawkvfx/houdini/houdini_module.yaml -v --extra-vars "variable_host=workstation1 variable_user=deadlineuser hostname=workstation1 ansible_become_pass=sompass"
 
 - hosts: "{{ variable_host | default('role_node_centos') }}"
-  remote_user: "{{ variable_connect_as_user | default(ansible_user) }}"
+  remote_user: "{{ variable_connect_as_user | default('deadlineuser') }}"
   gather_facts: "{{ variable_gather_facts | default('false') }}"
   # become: true
 
@@ -139,14 +139,14 @@
 ### Houdini Install
 
 - hosts: "{{ variable_host | default('role_node_centos') }}"
-  remote_user: "{{ variable_connect_as_user | default(ansible_user) }}"
+  remote_user: "{{ variable_connect_as_user | default('deadlineuser') }}"
   gather_facts: "{{ variable_gather_facts | default('false') }}"
   # become: true
   
   vars:
     secrets_path: "{{ playbook_dir }}"
     vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/collections/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
-    variable_user: "{{ ansible_user }}"
+    variable_user: "deadlineuser"
     houdini_install_type: 'node' # type can be node or server
   # vars_files:
   #   - /deployuser/ansible/group_vars/all/vars
