@@ -882,6 +882,7 @@ build {
       "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "echo '...Wait for Submission/Client plugin from bucket'",
+      # The need to wait for this dependency is unfortunate... the deadline repository /submission scripts for the render node are not available until the repostory is installed.  Rather than break the parallel build workflow, we test for existance of the required file in the s3 bucket for a duration limit (15 mins) before failing the render node build.  The deadline DB places those files in the bucket when installing, so if this fails, it should be because the Deadline repository build failed.
       "sudo -i -u ${var.deadlineuser_name} /tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip' 'Wait for file to arrive in bucket...'",
       "echo '...Retrieve file...'",
       "sudo -i -u ${var.deadlineuser_name} aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip /tmp/Houdini.zip",
