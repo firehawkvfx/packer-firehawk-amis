@@ -574,24 +574,6 @@ build {
 
   ### End public cert block to verify other consul agents ###
 
-  ### Configure deadlineuser for render service ###
-  # provisioner "ansible" {
-  #   extra_arguments = [
-  #     "-v",
-  #     "--extra-vars",
-  #     "set_selinux=disabled", # TODO Enable this and test once all services function.
-  #     "variable_host=default variable_connect_as_user=centos variable_user=deadlineuser variable_become_user=centos",
-  #     "--skip-tags",
-  #     "user_access"
-  #   ]
-  #   playbook_file    = "./ansible/newuser.yaml"
-  #   collections_path = "./ansible/collections"
-  #   roles_path       = "./ansible/roles"
-  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-  #   galaxy_file      = "./requirements.yml"
-  #   only             = ["amazon-ebs.centos7-rendernode-ami"]
-  # }
-
   provisioner "ansible" { # Disable SELINUX for rendernodes until tested and working when enabled.
     playbook_file = "./ansible/selinux.yaml"
     extra_arguments = [
@@ -661,109 +643,6 @@ build {
     ]
   }
 
-  # provisioner "shell" { # Begin migrating to bash for user creation, more portable with user data usage if required.
-  #   inline         = [
-  #     ### Create deadlineuser
-  #     "function has_yum {",
-  #     "  [[ -n \"$(command -v yum)\" ]]",
-  #     "}",
-  #     "function has_apt_get {",
-  #     "  [[ -n \"$(command -v apt-get)\" ]]",
-  #     "}",
-  #     "function add_sudo_user() {",
-  #     "  local -r user_name=\"$1\"",
-  #     "  if $(has_apt_get); then",
-  #     "    sudo_group=sudo",
-  #     "  elif $(has_yum); then",
-  #     "    sudo_group=wheel",
-  #     "  else",
-  #     "    echo \"ERROR: Could not find apt-get or yum.\"",
-  #     "    exit 1",
-  #     "  fi",
-  #     "  echo \"Adding user: $user_name with groups: $sudo_group $user_name\"",
-  #     "  sudo useradd -m -d /home/$user_name/ -s /bin/bash -G $sudo_group $user_name",
-  #     "  echo \"Adding user as passwordless sudoer.\"",
-  #     "  sudo touch \"/etc/sudoers.d/98_$user_name\"; sudo grep -qxF \"$user_name ALL=(ALL) NOPASSWD:ALL\" /etc/sudoers.d/98_$user_name || echo \"$user_name ALL=(ALL) NOPASSWD:ALL\" | sudo tee -a \"/etc/sudoers.d/98_$user_name\"",
-  #     "  sudo -i -u $user_name mkdir -p /home/$user_name/.ssh",
-  #       # Generate a public and private key - some tools can fail without one.
-  #     "  sudo -i -u $user_name bash -c \"ssh-keygen -q -b 2048 -t rsa -f /home/$user_name/.ssh/id_rsa -C \"\" -N \"\"\"",
-  #     "}",
-  #     "add_sudo_user ${var.deadlineuser_name}"
-  #   ]
-  #   inline_shebang = "/bin/bash -e"
-  #   only           = [
-  #     "amazon-ebs.deadline-db-ubuntu18-ami",
-  #     "amazon-ebs.centos7-rendernode-ami",
-  #     "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
-  #     ]
-  # }
-
-
-
-
-  ### Open VPN / Deadline DB / Centos install CLI.  This should be relocated to the base ami, and done purely with bash now instead.
-  # provisioner "ansible" {
-  #   extra_arguments = [
-  #     "-v",
-  #     "--extra-vars",
-  #     "variable_host=default variable_connect_as_user=openvpnas variable_user=openvpnas variable_become_user=openvpnas delegate_host=localhost",
-  #     "--skip-tags",
-  #     "user_access"
-  #   ]
-  #   playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
-  #   collections_path = "./ansible/collections"
-  #   roles_path       = "./ansible/roles"
-  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-  #   galaxy_file      = "./requirements.yml"
-  #   only             = ["amazon-ebs.openvpn-server-ami"]
-  # }
-  # provisioner "ansible" {
-  #   extra_arguments = [
-  #     "-v",
-  #     "--extra-vars",
-  #     "variable_host=default variable_connect_as_user=ubuntu variable_user=ubuntu variable_become_user=ubuntu delegate_host=localhost",
-  #     "--skip-tags",
-  #     "user_access"
-  #   ]
-  #   playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
-  #   collections_path = "./ansible/collections"
-  #   roles_path       = "./ansible/roles"
-  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-  #   galaxy_file      = "./requirements.yml"
-  #   only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
-  # }
-  # provisioner "ansible" {
-  #   extra_arguments = [
-  #     "-v",
-  #     "--extra-vars",
-  #     "variable_host=default variable_connect_as_user=centos variable_user=centos variable_become_user=centos delegate_host=localhost",
-  #     "--skip-tags",
-  #     "user_access"
-  #   ]
-  #   playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
-  #   collections_path = "./ansible/collections"
-  #   roles_path       = "./ansible/roles"
-  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-  #   galaxy_file      = "./requirements.yml"
-  #   only             = ["amazon-ebs.centos7-rendernode-ami"]
-  # }
-  # # Install for deadline user and sudo user.
-  # provisioner "ansible" {
-  #   extra_arguments = [
-  #     "-v",
-  #     "--extra-vars",
-  #     "variable_host=default variable_connect_as_user=centos variable_user=centos variable_become_user=deadlineuser delegate_host=localhost package_python_interpreter=/usr/bin/python2.7", # Centos7 requires Py2.7 for Ansible packages.
-  #     "--skip-tags",
-  #     "user_access"
-  #   ]
-  #   playbook_file    = "./ansible/aws_cli_ec2_install.yaml"
-  #   collections_path = "./ansible/collections"
-  #   roles_path       = "./ansible/roles"
-  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-  #   galaxy_file      = "./requirements.yml"
-  #   only             = ["amazon-ebs.centos7-rendernode-ami"]
-  # }
-
   provisioner "shell" {
     ### AWS CLI
     inline = [
@@ -777,25 +656,12 @@ build {
     ]
   }
 
-  # ### Ensure aws works for root user.  This should be relocated to the base ami.
-
-  # provisioner "shell" {
-  #   inline = [
-  #     "echo '...Correct links for AWS CLI'",
-  #     "set -x; which aws",
-  #     "sudo ln -s $(which aws) /usr/local/sbin/aws",
-  #     "sudo ls -ltriah /usr/local/sbin/aws"
-  #   ]
-  #   inline_shebang = "/bin/bash -e"
-  #   only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
-  # }
-
   ### Install Mongo / Deadline DB
 
   provisioner "shell" {
     ### Install Deadline DB Ubuntu Dependencies
     inline = [
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xdg-utils lsb python-openssl",
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xdg-utils lsb python-openssl nc",
       "sudo mkdir -p /usr/share/desktop-directories"
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
@@ -804,7 +670,7 @@ build {
   provisioner "shell" {
     ### Install Deadline Worker Centos Dependencies
     inline = [
-      "sudo yum install -y redhat-lsb samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap wget"
+      "sudo yum install -y redhat-lsb samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap wget nc"
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
