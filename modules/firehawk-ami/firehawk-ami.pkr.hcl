@@ -661,7 +661,7 @@ build {
   provisioner "shell" {
     ### Install Deadline DB Ubuntu Dependencies
     inline = [
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xdg-utils lsb python-openssl nc",
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xdg-utils lsb python-openssl netcat",
       "sudo mkdir -p /usr/share/desktop-directories"
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
