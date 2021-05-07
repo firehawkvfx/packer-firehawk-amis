@@ -668,7 +668,7 @@ build {
   }
 
   provisioner "shell" {
-    ### Install Deadline Worker Centos Dependencies
+    ### Install Deadline Worker Centos Dependencies. nc is also used to ensure a connection can be established with a port.
     inline = [
       "sudo yum install -y redhat-lsb samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap wget nc"
     ]
