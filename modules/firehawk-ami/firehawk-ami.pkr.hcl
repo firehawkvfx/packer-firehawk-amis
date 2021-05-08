@@ -39,14 +39,6 @@ variable "consul_download_url" {
   type    = string
   default = ""
 }
-variable "consul_module_version" {
-  type    = string
-  default = "v0.8.0"
-}
-variable "consul_version" {
-  type    = string
-  default = "1.9.2"
-}
 variable "install_auth_signing_script" {
   type    = string
   default = "true"
@@ -63,12 +55,20 @@ variable "vault_download_url" {
   type    = string
   default = ""
 }
+variable "consul_module_version" {
+  type    = string
+  default = "v0.8.0"
+}
+variable "consul_version" {
+  type    = string
+  default = "1.9.2"
+}
 variable "vault_version" {
   type    = string
   default = "1.6.1"
 }
 variable "vault_module_version" { # The hashicorp github module version to clone.
-  default = "v0.15.1"    # from "v0.13.11", this resolves consul dns issues on start.  This is likely resolved by Hashicorp now.
+  default = "v0.15.1"    # from "v0.15.1", this resolves consul dns issues on start.  This is likely resolved by Hashicorp now.
 }
 
 ### Only required if testing consul during build
