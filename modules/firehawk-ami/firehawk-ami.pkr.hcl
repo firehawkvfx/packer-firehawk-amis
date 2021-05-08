@@ -55,6 +55,14 @@ variable "vault_download_url" {
   type    = string
   default = ""
 }
+
+variable "vault_version" {
+  type    = string
+  default = "1.6.1"
+}
+variable "vault_module_version" { # The hashicorp github module version to clone.
+  default = "v0.15.1"    # from "v0.15.1", this resolves consul dns issues on start.  This is likely resolved by Hashicorp now.
+}
 variable "consul_module_version" {
   type    = string
   default = "v0.8.0"
@@ -62,13 +70,6 @@ variable "consul_module_version" {
 variable "consul_version" {
   type    = string
   default = "1.9.2"
-}
-variable "vault_version" {
-  type    = string
-  default = "1.6.1"
-}
-variable "vault_module_version" { # The hashicorp github module version to clone.
-  default = "v0.15.1"    # from "v0.15.1", this resolves consul dns issues on start.  This is likely resolved by Hashicorp now.
 }
 
 ### Only required if testing consul during build
@@ -468,7 +469,7 @@ build {
   provisioner "shell" { # Vault client probably wont be installed on bastions in future, but most hosts that will authenticate will require it.
     inline = [
       "git config --global advice.detachedHead false",                                                                              # disable warning about detached head because we dont care, it is a software installation
-      "git clone --branch ${var.vault_module_version} https://github.com/hashicorp/terraform-aws-vault /tmp/terraform-aws-vault", # This can be replaced with a local copy if required.
+      "git clone --branch ${var.vault_module_version} https://github.com/hashicorp/terraform-aws-vault.git /tmp/terraform-aws-vault", # This can be replaced with a local copy if required.
       "if test -n '${var.vault_download_url}'; then",
       " /tmp/terraform-aws-vault/modules/install-vault/install-vault --download-url ${var.vault_download_url} --skip-package-update;",
       "else",
