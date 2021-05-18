@@ -6,3 +6,5 @@
 **/tfplan
 modules/firehawk-ami/tmp/
 tmp/
+**/ansible.log
+**/.terragrunt-cache/
