@@ -8,3 +8,4 @@ modules/firehawk-ami/tmp/
 tmp/
 **/ansible.log
 **/.terragrunt-cache/
+**/s3-backend.tf
