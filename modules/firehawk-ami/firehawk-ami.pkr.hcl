@@ -710,7 +710,7 @@ build {
   }
   provisioner "shell" { ### Download and Install Deadline for DB, RCS Client
     inline = [
-      "cd /var/tmp; git clone --branch v0.0.1 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
+      "cd /var/tmp; git clone --branch v0.0.2 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
       "sudo chown -R ${var.deadlineuser_name}:${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline",
       "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages",
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
