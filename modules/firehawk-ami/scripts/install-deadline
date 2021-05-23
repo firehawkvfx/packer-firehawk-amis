@@ -775,6 +775,8 @@ function configure_deadline {
   local -r deadline_client_certificate="$3"
   local -r deadline_client_certificates_location="$4"
   local -r deadline_proxy_certificate="$5"
+  local -r enable_license_forwarder="$6"
+  local -r license_forwarder="$7"
 
   # Configure /var/lib/Thinkbox/Deadline10/deadline.ini
   
@@ -792,7 +794,10 @@ function configure_deadline {
   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxySSLCertificate=" "$deadline_client_certificates_location/$deadline_proxy_certificate"
   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot0=" "$deadline_proxy_root_dir;$deadline_client_certificates_location/$deadline_proxy_certificate"
   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/Thinkbox/DeadlineRepository10/;$deadline_certificates_location/$deadline_client_certificate"
-
+  if [[ "$enable_license_forwarder" == "true" ]]; then
+    ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchLicenseForwarderAtStartup=" "1"
+    ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LicenseForwarderSSLPath=" "$license_forwarder"
+  fi
 }
 
 function configure_auth {
@@ -816,6 +821,8 @@ function set_hostname {
 function options { # Not all defaults are available as args, however the script has been built to easily alter this.
   local installers_bucket=""
   local db_host_name=""
+  local enable_license_forwarder="false"
+  local license_forwarder="none"
   local deadlineuser_name="$DEFAULT_DEADLINEUSER_NAME"
   local skip_certgen_during_install="false"
   local skip_certgen_during_rcs_install="false"
@@ -855,6 +862,11 @@ function options { # Not all defaults are available as args, however the script 
         ;;
       --db-host-name)
         db_host_name="$2"
+        shift
+        ;;
+      --license-forwarder)
+        enable_license_forwarder="true"
+        license_forwarder="$2"
         shift
         ;;
       --skip-certgen-during-db-install)
@@ -965,7 +977,7 @@ function options { # Not all defaults are available as args, however the script 
     else
       install_rcs_no_generate_certs "$deadline_installer_dir" "$deadline_client_installer_filename" "$deadline_certificates_location" "$deadline_client_certificates_location" "$deadline_client_certificate" "$deadline_proxy_certificate" "$deadlineuser_name" "$httpport" "$proxyport" "$deadline_proxy_root_dir" "$skip_install_packages" "$server_cert_basename"
     fi
-    configure_deadline "$deadline_proxy_root_dir" "$deadline_certificates_location" "$deadline_client_certificate" "$deadline_client_certificates_location" "$deadline_proxy_certificate"
+    configure_deadline "$deadline_proxy_root_dir" "$deadline_certificates_location" "$deadline_client_certificate" "$deadline_client_certificates_location" "$deadline_proxy_certificate" "$enable_license_forwarder" "$license_forwarder"
   fi
 
   # Install Worker
