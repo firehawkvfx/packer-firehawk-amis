@@ -708,10 +708,20 @@ build {
     source      = "${local.template_dir}/scripts/zip-each-folder"
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
-  provisioner "shell" { ### Download and Install Deadline for DB, RCS Client
+
+  provisioner "shell" { ### Download Deadline install script
     inline = [
       "cd /var/tmp; git clone --branch v0.0.3 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
-      "sudo chown -R ${var.deadlineuser_name}:${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline",
+      "sudo chown -R ${var.deadlineuser_name}:${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline"
+    ]
+    only = [
+      "amazon-ebs.deadline-db-ubuntu18-ami",
+      "amazon-ebs.centos7-rendernode-ami"
+      ]
+  }
+
+  provisioner "shell" { ### Install Deadline for DB, RCS Client
+    inline = [
       "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages",
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "sudo rm -fv /var/tmp/downloads/AWSPortalLink*",
@@ -733,7 +743,7 @@ build {
       "amazon-ebs.centos7-rendernode-ami"
     ]
   }
-  provisioner "shell" { ### Download and Install Deadline for Client Worker
+  provisioner "shell" { ### Install Deadline for Client Worker
     inline = [
       "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages",
       "sudo rm -fv /tmp/Deadline-${var.deadline_version}-linux-installers.tar",
