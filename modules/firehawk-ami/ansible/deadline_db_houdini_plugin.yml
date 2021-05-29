@@ -18,11 +18,11 @@
   #   - /deployuser/ansible/group_vars/all/vars
 
   tasks:
-  - name: aquire vars from secrets path before using defaults
-    include_vars: "{{ item }}"
-    with_first_found: "{{ vars_files_locs }}"
-    tags:
-    - always
+  # - name: aquire vars from secrets path before using defaults
+  #   include_vars: "{{ item }}"
+  #   with_first_found: "{{ vars_files_locs }}"
+  #   tags:
+  #   - always
 
   - name: setup houdini plugin in deadline repository for each major version.  This identical role use occurs in 2 locations - after deadline install and with install of Houdini
     include_role:
@@ -32,10 +32,10 @@
           - install_deadline_db
     tags:
     - always
-    loop: "{{ houdini_major_version_list }}"
-    loop_control:
-      loop_var: houdini_major_version
-    when: houdini_install_type != "server"
+    # loop: "{{ houdini_major_version_list }}"
+    # loop_control:
+    #   loop_var: houdini_major_version
+    # when: houdini_install_type != "server"
 
   - name: ensure db is still valid.  a corrupted db may fail at this point if entryies have not been modified correctly
     shell: |
