@@ -824,7 +824,6 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
     ]
   }
 
