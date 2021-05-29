@@ -2,8 +2,8 @@
   remote_user: "{{ variable_user | default('centos') }}"
   gather_facts: "{{ variable_gather_facts | default('false') }}"
   become: true
-  vars_files:
-    - "{{ playbook_dir }}/vars/main.yml"
+  # vars_files:
+  #   - "{{ playbook_dir }}/vars/main.yml"
 
   vars:
     variable_user: centos
