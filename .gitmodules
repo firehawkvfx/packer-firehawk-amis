@@ -7,3 +7,6 @@
 [submodule "modules/firehawk-base-ami"]
 	path = modules/firehawk-base-ami
 	url = ../firehawk-base-ami.git
+[submodule "modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/houdini"]
+	path = modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/houdini
+	url = https://github.com/firehawkvfx/ansible_collection_houdini.git
