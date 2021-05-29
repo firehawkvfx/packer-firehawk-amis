@@ -1,5 +1,5 @@
 ---
 collections:
-  - name: https://github.com/firehawkvfx/ansible_collection_core.git # note that if an existing folder is present with the same name, it will be used in place of downloading the requirements file.
+  - name: https://github.com/firehawkvfx/ansible_collection_core.git # note that if an existing folder is present with the same name as the collection namespace (not the git url), it will be used in place of downloading the requirements file.
     type: git
     # version: 1.0.0
