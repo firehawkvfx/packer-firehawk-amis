@@ -763,7 +763,7 @@ build {
       "sudo -i -u ${var.deadlineuser_name} unzip /tmp/Houdini.zip -d /var/tmp/submission",
       "sudo -i -u ${var.deadlineuser_name} unzip /tmp/HServer.zip -d /var/tmp/submission",
       "sudo ls -ltriah /var/tmp/submission/Houdini/Client",
-      "sudo systemctl disable deadline10launcher", # Ensure the launcher does not start automatically on first boot.  User data will aquire the certificates first, then the service will be started and enabled for subsequent reboots
+      "sudo systemctl disable deadline10launcher", # Ensure the launcher does not start automatically on first boot.  User data must aquire the certificates first, then the service will be started and enabled for subsequent reboots.
       "sudo systemctl stop deadline10launcher"
     ]
     only = [
