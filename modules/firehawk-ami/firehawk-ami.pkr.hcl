@@ -460,7 +460,7 @@ build {
 
 #### TODO remove: resting block for fsx
    provisioner "ansible" {
-    playbook_file = "./ansible/collections/ansible_collections/firehawkvfx/fsx/fsx_packages.yaml"
+    playbook_file = "./ansible/fsx_packages.yaml"
     extra_arguments = [
       "-vv",
       "--extra-vars",
@@ -794,7 +794,7 @@ build {
 
   ### Install Houdini Plugin for Deadline DB ###
   provisioner "ansible" {
-    playbook_file = "./ansible/collections/ansible_collections/firehawkvfx/houdini/deadline_db_houdini_plugin.yml"
+    playbook_file = "./ansible/deadline_db_houdini_plugin.yml"
     extra_arguments = [
       # "-vvv",
       "--extra-vars",
@@ -812,7 +812,7 @@ build {
   ### Install FSX fsx_packages.yaml
 
   provisioner "ansible" {
-    playbook_file = "./ansible/collections/ansible_collections/firehawkvfx/fsx/fsx_packages.yaml"
+    playbook_file = "./ansible/fsx_packages.yaml"
     extra_arguments = [
       "-vv",
       "--extra-vars",
@@ -830,7 +830,7 @@ build {
   ### Install Houdini ### Requires you create a SESI API Key on the Side FX website to auto download.
 
   provisioner "ansible" {
-    playbook_file = "./ansible/collections/ansible_collections/firehawkvfx/houdini/houdini_module.yaml"
+    playbook_file = "./ansible/houdini_module.yaml"
     extra_arguments = [
       "-vv",
       "--extra-vars",
