@@ -466,6 +466,21 @@ build {
     only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
+  ### Init ansible collections for all hosts.
+
+  provisioner "ansible" { # See https://github.com/hashicorp/packer-plugin-ansible/issues/47#issuecomment-852443057
+    playbook_file = "./ansible/ansible_init.yaml"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "variable_host=default package_python_interpreter=/usr/bin/python2.7"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+  }
+
   provisioner "shell" { # Vault client probably wont be installed on bastions in future, but most hosts that will authenticate will require it.
     inline = [
       "git config --global advice.detachedHead false",                                                                              # disable warning about detached head because we dont care, it is a software installation
