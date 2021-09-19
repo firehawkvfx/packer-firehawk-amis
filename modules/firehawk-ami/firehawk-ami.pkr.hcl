@@ -735,6 +735,9 @@ build {
       ]
   }
 
+# example command
+# sudo -i -u deadlineuser /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version 10.1.18.5 --db-host-name deadlinedb.service.consul --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages
+
   provisioner "shell" { ### Install Deadline for DB, RCS Client
     inline = [
       "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages",
@@ -758,8 +761,12 @@ build {
       "amazon-ebs.centos7-rendernode-ami"
     ]
   }
+
+  # sudo -i -u deadlineuser /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version 10.1.18.5 --db-host-name deadlinedb.service.consul --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages
   provisioner "shell" { ### Install Deadline for Client Worker
     inline = [
+      "sudo -i -u ${var.deadlineuser_name} mkdir -p /home/${var.deadlineuser_name}/Thinkbox/Deadline10",
+      "sudo -i -u ${var.deadlineuser_name} touch /home/${var.deadlineuser_name}/Thinkbox/Deadline10/secure.ini", # bug in deadline installer, doesn't set correct permissions.
       "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages",
       "sudo rm -fv /tmp/Deadline-${var.deadline_version}-linux-installers.tar",
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
