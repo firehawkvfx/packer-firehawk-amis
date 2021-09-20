@@ -737,7 +737,8 @@ build {
 
   provisioner "shell" { ### Install Deadline for DB, RCS Client
     inline = [
-      "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages",
+      "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages --installers-bucket ${local.installers_bucket}",
+      # "sudo -i -u ${var.deadlineuser_name} aws s3 sync /tmp \"s3://${local.installers_bucket}/\" --include \"Deadline-${var.deadline_version}-linux-installers.tar\""
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "sudo rm -fv /var/tmp/downloads/AWSPortalLink*",
       "sudo rm /tmp/Deadline-${var.deadline_version}-linux-installers.tar",
