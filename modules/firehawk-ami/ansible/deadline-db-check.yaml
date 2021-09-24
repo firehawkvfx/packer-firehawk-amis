@@ -4,7 +4,7 @@
   gather_facts: "{{ variable_gather_facts | default('false') }}"
   # become_user: root
   any_errors_fatal: true
-  
+
   pre_tasks:
   - name: Connection test without sudo- whoami
     command: "echo 'connected'; whoami"
@@ -15,7 +15,7 @@
   # become_user: root
   become: true
   any_errors_fatal: true
-  
+
   pre_tasks:
   - name: Connection test without sudo
     command: "echo connected; whoami"

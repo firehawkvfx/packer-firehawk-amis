@@ -89,11 +89,6 @@ variable "test_consul" { # If a consul cluster is running, attempt to join the c
   type    = bool
   default = false
 }
-variable "deadline_version" {
-  description = "The version of the deadline installer to aquire"
-  type        = string
-  # default     = "10.1.14.5" # this should be added as a tag for the ami.
-}
 variable "deadlineuser_name" {
   description = "The deadline user name for render nodes and deadline DB"
   type = string
@@ -130,7 +125,7 @@ variable "SSL_expiry" {
 locals {
   timestamp         = regex_replace(timestamp(), "[- TZ:]", "")
   template_dir      = path.root
-  deadline_version  = var.deadline_version
+  deadline_version  = "10.1.18.5"
   installers_bucket = var.installers_bucket
   common_ami_tags = {
     "packer_template" : "firehawk-ami",
@@ -138,7 +133,7 @@ locals {
     "commit_hash_short" : var.commit_hash_short,
     "resourcetier" : var.resourcetier,
     "sslexpiry" : var.SSL_expiry,
-    "deadline_version" : var.deadline_version
+    "deadline_version" : local.deadline_version
   }
   syscontrol_gid                 = "9003"
   deployuser_uid                 = "9004"
@@ -354,7 +349,7 @@ source "amazon-ebs" "ubuntu18-vault-consul-server-ami" {
 
 source "amazon-ebs" "deadline-db-ubuntu18-ami" {
   tags            = merge({ "ami_role" : "firehawk_deadlinedb_ami" }, local.common_ami_tags)
-  ami_description = "An Ubuntu 18.04 AMI with Deadline DB ${var.deadline_version} server."
+  ami_description = "An Ubuntu 18.04 AMI with Deadline DB ${local.deadline_version} server."
   ami_name        = "firehawk-deadlinedb-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = var.aws_region
@@ -456,7 +451,7 @@ build {
   # }
 
   ### This block will install Vault and Consul Agent for DNS
- 
+
   # Ensure no more updates are running
   provisioner "shell" {
     inline = [
@@ -737,17 +732,17 @@ build {
 
   provisioner "shell" { ### Install Deadline for DB, RCS Client
     inline = [
-      "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages --installers-bucket ${local.installers_bucket}",
-      # "sudo -i -u ${var.deadlineuser_name} aws s3 sync /tmp \"s3://${local.installers_bucket}/\" --include \"Deadline-${var.deadline_version}-linux-installers.tar\""
+      "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages --installers-bucket ${local.installers_bucket}",
+      # "sudo -i -u ${var.deadlineuser_name} aws s3 sync /tmp \"s3://${local.installers_bucket}/\" --include \"Deadline-${local.deadline_version}-linux-installers.tar\""
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "sudo rm -fv /var/tmp/downloads/AWSPortalLink*",
-      "sudo rm /tmp/Deadline-${var.deadline_version}-linux-installers.tar",
+      "sudo rm /tmp/Deadline-${local.deadline_version}-linux-installers.tar",
       "sudo apt-get install -y zip unzip",
       "sudo -i -u ${var.deadlineuser_name} /tmp/zip-each-folder /opt/Thinkbox/DeadlineRepository10/submission",
       # "cd /opt/Thinkbox/DeadlineRepository10/submission",
       # "sudo find . -type d -maxdepth 1 -mindepth 1 -exec zip -r -D '{}.zip' '{}' \\; ",
       # "sudo ls -ltriah",
-      "sudo -i -u ${var.deadlineuser_name} aws s3 sync /opt/Thinkbox/DeadlineRepository10/submission \"s3://${local.installers_bucket}/Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission\""
+      "sudo -i -u ${var.deadlineuser_name} aws s3 sync /opt/Thinkbox/DeadlineRepository10/submission \"s3://${local.installers_bucket}/Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission\""
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
@@ -763,19 +758,19 @@ build {
     inline = [
       "sudo -i -u ${var.deadlineuser_name} mkdir -p /home/${var.deadlineuser_name}/Thinkbox/Deadline10",
       "sudo -i -u ${var.deadlineuser_name} touch /home/${var.deadlineuser_name}/Thinkbox/Deadline10/secure.ini", # to fix a bug introduced by Thinkbox in 10.1.17.x
-      "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${var.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages",
-      "sudo rm -fv /tmp/Deadline-${var.deadline_version}-linux-installers.tar",
+      "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages",
+      "sudo rm -fv /tmp/Deadline-${local.deadline_version}-linux-installers.tar",
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
       "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "echo '...Wait for Submission/Client plugin from bucket'",
       # The need to wait for this dependency is unfortunate... the deadline repository /submission scripts for the render node are not available until the repostory is installed.  Rather than break the parallel build workflow, we test for existance of the required file in the s3 bucket for a duration limit (15 mins) before failing the render node build.  The deadline DB places those files in the bucket when installing, so if this fails, it should be because the Deadline repository build failed.
-      "sudo -i -u ${var.deadlineuser_name} /tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip' 'Wait for file to arrive in bucket...'",
+      "sudo -i -u ${var.deadlineuser_name} /tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip' 'Wait for file to arrive in bucket...'",
       "echo '...Retrieve file...'",
-      "sudo -i -u ${var.deadlineuser_name} aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip /tmp/Houdini.zip",
-      "sudo -i -u ${var.deadlineuser_name} /tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip' 'Wait for file to arrive in bucket...'",
+      "sudo -i -u ${var.deadlineuser_name} aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip /tmp/Houdini.zip",
+      "sudo -i -u ${var.deadlineuser_name} /tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip' 'Wait for file to arrive in bucket...'",
       "echo '...Retrieve file...'",
-      "sudo -i -u ${var.deadlineuser_name} aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${var.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip /tmp/HServer.zip",
+      "sudo -i -u ${var.deadlineuser_name} aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip /tmp/HServer.zip",
       "echo '...Create /var/tmp/submission'",
       "sudo -i -u ${var.deadlineuser_name} mkdir -p /var/tmp/submission",
       "sudo -i -u ${var.deadlineuser_name} unzip /tmp/Houdini.zip -d /var/tmp/submission",
@@ -888,7 +883,7 @@ build {
     ]
     only = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
-  # The servers dont require the same config for DNS to function 
+  # The servers dont require the same config for DNS to function
 
 
   provisioner "shell" {

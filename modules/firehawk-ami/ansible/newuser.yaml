@@ -13,7 +13,7 @@
     my_password: # If no password is defined it will not be set.
     sudo: true
     passwordless_sudo: false
-  
+
   pre_tasks:
   - name: "Test connection as {{ ansible_user }}"
     debug:
@@ -81,7 +81,7 @@
   - fail:
       msg: "Bailing out: this play requires 'variable_user'"
     when: variable_user is not defined
-    
+
   - name: Wait 10 seconds - Test connection for user - with sudo
     wait_for_connection:
       timeout: 10
@@ -89,4 +89,4 @@
     failed_when: result['failed']
     become_user: "{{ variable_user }}"
     become: true
-    when: sudo | bool 
+    when: sudo | bool

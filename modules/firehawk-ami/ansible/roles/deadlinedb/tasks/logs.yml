@@ -9,7 +9,7 @@
   become: true
   no_log: true
   when: result.stat.exists
-  
+
 - name: Get latest file
   set_fact:
     latest_file: "{{ found_files.files | sort(attribute='mtime',reverse=true) | first }}"

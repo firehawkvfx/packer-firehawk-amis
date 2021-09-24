@@ -10,4 +10,3 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" # 
 cd $1
 sudo find . -type d -maxdepth 1 -mindepth 1 -exec zip -r -D '{}.zip' '{}' \;
 cd $pwd
-

@@ -25,7 +25,7 @@
 
   # vars_files:
   #   - /deployuser/ansible/group_vars/all/vars
-  
+
 
   tasks:
   - name: test vars_files_locs
@@ -49,7 +49,7 @@
 #   remote_user: deployuser
 #   gather_facts: "{{ variable_gather_facts | default('false') }}"
 #   become: true
-  
+
 #   vars:
 #     vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/collections/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
 
@@ -142,7 +142,7 @@
   remote_user: "{{ variable_connect_as_user | default('deadlineuser') }}"
   gather_facts: "{{ variable_gather_facts | default('false') }}"
   # become: true
-  
+
   vars:
     secrets_path: "{{ playbook_dir }}"
     # vars_files_locs: [ "/{{ secrets_path }}/overrides/ansible/collections/ansible_collections/firehawkvfx/houdini/vars/main.yml", "{{ playbook_dir }}/vars/main.yml" ] # The first file found will be used, allowing the one in your secrets location to override defaults.
@@ -227,4 +227,3 @@
 #     no_log: true
 #     become: true
 #     tags: install_deadline_db
-

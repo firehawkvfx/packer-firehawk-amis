@@ -6,7 +6,7 @@
     name: xdg-utils
     state: present
   become: yes
-  
+
 - name: Ensures dir exists to avoid log error
   file:
     path: "/usr/share/desktop-directories"
@@ -45,7 +45,7 @@
   become: yes
 
 - name: deadline must have full access to repository
-  file: 
+  file:
     path: /opt/Thinkbox/DeadlineRepository10
     owner: "{{ user_deadlineuser_name }}"
     mode: u=rwX,g=rwX,o=r
@@ -152,10 +152,10 @@
 #   register: deadline_rcs_install_output_shell
 #   args:
 #     executable: /bin/bash
-#   become: true  
+#   become: true
 
 - name: install deadline rcs
-  block: 
+  block:
     - name: install deadline rcs
       shell: |
         # set -x
@@ -215,7 +215,7 @@
   any_errors_fatal: yes
 
 - name: check /var/lib/Thinkbox/Deadline10/deadline.ini
-  command: cat /var/lib/Thinkbox/Deadline10/deadline.ini 
+  command: cat /var/lib/Thinkbox/Deadline10/deadline.ini
   register: deadline_config
 
 - debug: msg="{{ deadline_config.stdout }}"
@@ -249,7 +249,7 @@
   become: true
 
 - name: check /var/lib/Thinkbox/Deadline10/deadline.ini
-  command: cat /var/lib/Thinkbox/Deadline10/deadline.ini 
+  command: cat /var/lib/Thinkbox/Deadline10/deadline.ini
   register: deadline_config
 
 - debug: msg="{{ deadline_config.stdout }}"
@@ -275,7 +275,7 @@
 # prep permissions for worker install
 
 - name: set permissions Thinkbox dir - non recursive
-  file: 
+  file:
     path: /opt/Thinkbox/
     state: directory
     mode: u+rX,g+rX,o-rwx
@@ -284,7 +284,7 @@
   become: yes
 
 - name: set permissions Thinkbox cert dir - non recursive
-  file: 
+  file:
     path: /opt/Thinkbox/certs
     state: directory
     mode: u=rwX,g=rX,o-rwx

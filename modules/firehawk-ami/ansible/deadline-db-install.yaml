@@ -26,4 +26,3 @@
     #     delegate_host: "{{ delegate_host }}"
   - role: deadline-mongo
   - {role: deadlinedb, tags: 'deadlinedb'}
-    

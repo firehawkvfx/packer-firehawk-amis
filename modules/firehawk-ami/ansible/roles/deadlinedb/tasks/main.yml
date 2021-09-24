@@ -18,7 +18,7 @@
   - "/{{ user_deadlineuser_name }}/tmp/DeadlineDatabase10/mongo/backup/"
   - "/usr/share/desktop-directories/" # required to avoid xdg-utils error.
   when: reinstallation | bool
-      
+
 - name: Find backups if present - DeadlineDatabase10
   find: paths=/opt/Thinkbox/DeadlineDatabase10/mongo/backup/ file_type=directory patterns="*"
   register: backup_paths
@@ -75,7 +75,7 @@
 - name: Get the current caller identity information
   aws_caller_info:
   register: caller_info
-  become_user: "{{ user_deadlineuser_name }}" 
+  become_user: "{{ user_deadlineuser_name }}"
 
 - name: show aws caller info
   debug:
@@ -93,7 +93,7 @@
   tags:
   - install
   - sync_installers
-  
+
 - name: If no file retrieved, ensure installer is pulled from AWS.  This should be a sync operation if list permissions are provided.
   shell: |
     if [[ -f {{ deadline_linux_installers_tar }} ]]; then
@@ -257,7 +257,7 @@
 #   when: stat_result.stat.exists
 #   tags:
 #   - install
-  
+
 
 
 - name: Install Deadline DB & pull latest log.
@@ -341,6 +341,3 @@
   any_errors_fatal: yes
   tags:
   - install
-
-
-

@@ -108,7 +108,7 @@
 # - name: generate certs with vault for mongo db server
 #   shell: |
 #     export VAULT_ADDR=https://vault.service.consul:8200
-#     vault login -method=aws header_value=vault.service.consul role=provisioner-vault-role  
+#     vault login -method=aws header_value=vault.service.consul role=provisioner-vault-role
 #     vault write -format=json pki_int/issue/firehawkvfx-dot-com \
 #     common_name=deadlinedb.service.consul \
 #     ttl=8760h | tee \
@@ -123,7 +123,7 @@
 # - name: generate certs with vault for mongo db client
 #   shell: |
 #     export VAULT_ADDR=https://vault.service.consul:8200
-#     vault login -method=aws header_value=vault.service.consul role=provisioner-vault-role  
+#     vault login -method=aws header_value=vault.service.consul role=provisioner-vault-role
 #     vault write -format=json pki_int/issue/firehawkvfx-dot-com \
 #     common_name=deadlinedb.service.consul \
 #     ttl=8760h | tee \
@@ -138,7 +138,7 @@
 # - name: generate certs with vault for mongo db remote client
 #   shell: |
 #     export VAULT_ADDR=https://vault.service.consul:8200
-#     vault login -method=aws header_value=vault.service.consul role=provisioner-vault-role  
+#     vault login -method=aws header_value=vault.service.consul role=provisioner-vault-role
 #     vault write -format=json pki_int/issue/firehawkvfx-dot-com \
 #     common_name=deadlinedb.service.consul \
 #     ttl=8760h | tee \
@@ -156,13 +156,13 @@
     dest: "/tmp/mongodb-linux-x86_64-ubuntu1604-3.6.19.tgz"
 
 # - name: Create mongo app dir
-#   file: 
+#   file:
 #     path: /opt/Thinkbox/DeadlineDatabase10/mongo/application
 #     state: directory
 #   become: true
 
 # - name: Create mongo data dir
-#   file: 
+#   file:
 #     path: /opt/Thinkbox/DeadlineDatabase10/mongo/data
 #     state: directory
 #   become: true
@@ -172,32 +172,32 @@
 #     src: "/tmp/mongodb-linux-x86_64-ubuntu1604-3.6.19.tgz"
 #     dest: "/opt/Thinkbox/DeadlineDatabase10/mongo/application"
 #     extra_opts:
-#     - --strip-components=1 
+#     - --strip-components=1
 #     remote_src: true
 #   become: true
 
 # - name: Create mongo log dir
-#   file: 
+#   file:
 #     path: /opt/Thinkbox/DeadlineDatabase10/mongo/data/logs
 #     state: directory
 #   become: true
 
 # - name: mongodb service config file
-#   copy: 
+#   copy:
 #     src: "config.conf"
 #     dest: "/opt/Thinkbox/DeadlineDatabase10/mongo/data/"
 #     mode: '0755'
 #   become: true
 
 # - name: deadline_mongo wrapper executable helper
-#   copy: 
+#   copy:
 #     src: "deadline_mongo"
 #     dest: "/opt/Thinkbox/DeadlineDatabase10/mongo/application/bin"
 #     mode: '0755'
 #   become: true
 
 # - name: mongodb service
-#   copy: 
+#   copy:
 #     src: "Deadline10db"
 #     dest: "/etc/init.d/"
 #     mode: '0755'
@@ -205,7 +205,7 @@
 
 # - name: Init admin, test, and x509 user # https://docs.mongodb.com/manual/tutorial/enable-authentication/
 #   shell: |
-    
+
 #     cd /opt/Thinkbox/DeadlineDatabase10/mongo/application/bin
 #     ls -ltriah
 #     ./mongod --port 27017 --dbpath /opt/Thinkbox/DeadlineDatabase10/mongo/data

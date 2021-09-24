@@ -8,7 +8,7 @@
 #       - 'min'
 #   tags:
 #   - always
-  
+
 - name: ansible distro
   debug:
     var: ansible_distribution
@@ -18,7 +18,7 @@
     name:
     - python-pip
     - python-apt
-    - python-netaddr # For jinja ip address filtering 
+    - python-netaddr # For jinja ip address filtering
     - whois
     - python-passlib
     - zip

@@ -11,7 +11,7 @@
     basename: "{{ no_extension.split('/')[-1] }}"
     houdini_major_version: 18.5
     ubl: true
-    
+
   roles:
     - role: deadlinercs
     - role: deadline-db-check # Check the db is functioning.
@@ -23,7 +23,7 @@
   remote_user: "{{ variable_connect_as_user | default('deployuser') }}"
   gather_facts: "{{ variable_gather_facts | default('false') }}"
   become: true
-  
+
   tasks:
   - name: reset ssh connection to allow user changes to affect 'current login user'
     meta: reset_connection

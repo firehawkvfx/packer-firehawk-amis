@@ -41,7 +41,7 @@
 
   post_tasks:
   - name: create Thinkbox dir
-    file: 
+    file:
       path: /opt/Thinkbox/
       state: directory
       mode: u=rwX,g=rX,o-rwx
@@ -50,7 +50,7 @@
     become: true
 
   - name: create Thinkbox cert dir
-    file: 
+    file:
       path: /opt/Thinkbox/certs
       state: directory
       mode: u=rwX,g=rX,o-rwx
@@ -59,7 +59,7 @@
     become: true
 
   - name: Create submission scripts dir if it doesn't exist on remote
-    file: 
+    file:
       path: /opt/Thinkbox/DeadlineRepository10/submission
       state: directory
       mode: u=rX,g=rX,o-rwx
@@ -95,7 +95,7 @@
       var: check_permisions.stdout
 
   - name: set deadline remote client certificate permissions locally - deadline-worker-install.yaml
-    file: 
+    file:
       path: "{{ deadline_certificates_location }}/{{ deadline_proxy_certificate }}"
       mode: u=rw,g=r,o=r
       owner: "{{ variable_user }}"
@@ -109,7 +109,7 @@
 
   tasks:
   - name: Fetch deadline remote client certificate and store on ansible_control
-    fetch: 
+    fetch:
       src: "{{ deadline_certificates_location }}/{{ deadline_proxy_certificate }}"
       dest: "/secrets/keys/"
       mode: '0600'
@@ -123,7 +123,7 @@
   remote_user: "{{ variable_connect_as_user | default('deployuser') }}"
   gather_facts: "{{ variable_gather_facts | default('false') }}"
   become: true
-  
+
   tasks:
 # these packages are required to pass an encrypted string via commandline into a user pass and are suited to centos.
   - name: install expect
@@ -134,12 +134,12 @@
       ansible_python_interpreter: "{{ package_python_interpreter }}"
 
   - name: restart sshd.service
-    service: 
+    service:
       name: sshd
       state: restarted
 
   - name: Copy deadline remote client certificate
-    copy: 
+    copy:
       src: "/secrets/keys/{{ deadline_proxy_certificate }}"
       dest: "/opt/Thinkbox/certs/"
       mode: '0600'
@@ -275,7 +275,7 @@
       msg: "{{ deadline_client_install_output_shell.stdout }}"
 
   - name: check /var/lib/Thinkbox/Deadline10/deadline.ini
-    command: cat /var/lib/Thinkbox/Deadline10/deadline.ini 
+    command: cat /var/lib/Thinkbox/Deadline10/deadline.ini
     register: deadline_config
 
   - debug: msg="{{ deadline_config.stdout }}"
@@ -324,7 +324,7 @@
     become: true
     tags:
     - multi-slave
-    
+
   - name: Start service multislaveservice, if not started
     service:
       name: multislaveservice
