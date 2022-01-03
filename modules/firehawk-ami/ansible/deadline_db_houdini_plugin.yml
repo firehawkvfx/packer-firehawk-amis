@@ -26,7 +26,7 @@
 
   - name: setup houdini plugin in deadline repository for each major version.  This identical role use occurs in 2 locations - after deadline install and with install of Houdini
     include_role:
-      name: firehawkvfx.houdini.deadlinedb_houdini_plugins
+      name: firehawkvfx.ansible_collection_houdini.deadlinedb_houdini_plugins
       apply:
         tags:
           - install_deadline_db

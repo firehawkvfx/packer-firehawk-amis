@@ -160,7 +160,7 @@
 
   - name: Install Houdini
     include_role:
-      name: firehawkvfx.houdini.houdini_role
+      name: firehawkvfx.ansible_collection_houdini.houdini_role
       apply:
         tags:
           - install_houdini
@@ -168,7 +168,7 @@
 
   - name: Configure Hserver
     include_role:
-      name: firehawkvfx.houdini.set_hserver_role
+      name: firehawkvfx.ansible_collection_houdini.set_hserver_role
       apply:
         tags:
           - set_hserver
@@ -176,7 +176,7 @@
 
   - name: Install Deadline
     include_role:
-      name: firehawkvfx.houdini.configure_deadline_houdini_role
+      name: firehawkvfx.ansible_collection_houdini.configure_deadline_houdini_role
       apply:
         tags:
           - install_deadline_db

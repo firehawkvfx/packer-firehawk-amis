@@ -83,7 +83,7 @@
 
 - name: s3-sync pull deadline installer # need cli installed.
   import_role:
-    name: firehawkvfx.core.s3_sync
+    name: firehawkvfx.ansible_collection_core.s3_sync
   vars:
     mode: "pull"
     bucket: "{{ installers_bucket }}"
@@ -111,7 +111,7 @@
 
 # - name: s3-sync pull deadline installer # need cli installed.
 #   import_role:
-#     name: firehawkvfx.core.s3_sync
+#     name: firehawkvfx.ansible_collection_core.s3_sync
 #   vars:
 #     mode: "pull"
 #     bucket: "{{ installers_bucket }}"
@@ -139,7 +139,7 @@
 
 - name: s3-sync push deadline installer
   import_role:
-    name: firehawkvfx.core.s3_sync
+    name: firehawkvfx.ansible_collection_core.s3_sync
   vars:
     mode: "push"
     bucket: "{{ installers_bucket }}"
