@@ -33,7 +33,7 @@ variable "resourcetier" {
 }
 variable "ca_public_key_path" {
   type    = string
-  default = "/home/ec2-user/.ssh/tls/ca.crt.pem"
+  # default = "/home/ec2-user/.ssh/tls/ca.crt.pem"
 }
 variable "consul_download_url" {
   type    = string
@@ -45,11 +45,11 @@ variable "install_auth_signing_script" {
 }
 variable "tls_private_key_path" {
   type    = string
-  default = "/home/ec2-user/.ssh/tls/vault.key.pem"
+  # default = "/home/ec2-user/.ssh/tls/vault.key.pem"
 }
 variable "tls_public_key_path" {
   type    = string
-  default = "/home/ec2-user/.ssh/tls/vault.crt.pem"
+  # default = "/home/ec2-user/.ssh/tls/vault.crt.pem"
 }
 variable "vault_download_url" {
   type    = string
@@ -995,7 +995,6 @@ build {
       "wget -O ~/FirefoxSetup.tar.bz2 \"https://download.mozilla.org/?product=firefox-latest&os=linux64\"",
       "sudo tar xvjf ~/FirefoxSetup.tar.bz2 -C /opt/",
       "sudo ln -s /opt/firefox/firefox /usr/bin/firefox"
-      # "sudo ln -s /opt/firefox/firefox /home/ec2-user/Desktop"
     ]
     only = ["amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"]
   }
