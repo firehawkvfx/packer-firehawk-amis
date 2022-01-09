@@ -42,7 +42,7 @@ export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/meta-data/plac
 # export TF_VAR_instance_id_main_cloud9=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 # export TF_VAR_resourcetier="$(aws ec2 describe-tags --filters Name=resource-id,Values=$TF_VAR_instance_id_main_cloud9 --out=json|jq '.Tags[]| select(.Key == "resourcetier")|.Value' --raw-output)" # Can be dev,green,blue,main.  it is pulled from this instance's tags by default
 export PKR_VAR_resourcetier="$TF_VAR_resourcetier"
-export PKR_VAR_ami_role="$(basename $SCRIPTDIR)"
+export PKR_VAR_ami_role="firehawk-ami"
 export PKR_VAR_commit_hash="$(git rev-parse HEAD)"
 export PKR_VAR_commit_hash_short="$(git rev-parse --short HEAD)"
 export PKR_VAR_account_id=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep -oP '(?<="accountId" : ")[^"]*(?=")')
