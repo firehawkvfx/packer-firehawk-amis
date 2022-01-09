@@ -20,9 +20,9 @@
       msg: 'test msg'
 
   roles:
-    - role: firehawkvfx.ansible_collection_core.pip
-    - role: firehawkvfx.ansible_collection_core.aws_cli_ec2_install
-    # - role: firehawkvfx.ansible_collection_fsx.fsx_packages # this will trigger a reboot
+    - role: firehawkvfx.core.pip
+    - role: firehawkvfx.core.aws_cli_ec2_install
+    # - role: firehawkvfx.fsx.fsx_packages # this will trigger a reboot
 
 # example:
 # ansible-playbook -i ansible/inventory ansible/aws-cli-ec2.yaml -v --extra-vars "variable_user=centos variable_host=role_softnas"

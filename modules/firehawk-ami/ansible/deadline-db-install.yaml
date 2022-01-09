@@ -18,10 +18,10 @@
     command: "echo connected; ip a"
     delegate_to: "{{ delegate_host }}"
   # collections:
-  #   - firehawkvfx.ansible_collection_core
+  #   - firehawkvfx.core
 
   roles:
-    # - role: firehawkvfx.ansible_collection_core.s3_bucket_shared
+    # - role: firehawkvfx.core.s3_bucket_shared
     #   vars:
     #     delegate_host: "{{ delegate_host }}"
   - role: deadline-mongo

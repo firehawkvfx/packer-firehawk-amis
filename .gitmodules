@@ -1,12 +1,12 @@
-[submodule "modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/ansible_collection_core"]
-	path = modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/ansible_collection_core
+[submodule "modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/core"]
+	path = modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/core
 	url = https://github.com/firehawkvfx/ansible_collection_core.git
-[submodule "modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/ansible_collection_fsx"]
-	path = modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/ansible_collection_fsx
+[submodule "modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/fsx"]
+	path = modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/fsx
 	url = https://github.com/firehawkvfx/ansible_collection_fsx.git
 [submodule "modules/firehawk-base-ami"]
 	path = modules/firehawk-base-ami
 	url = https://github.com/firehawkvfx/firehawk-base-ami.git
-[submodule "modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/ansible_collection_houdini"]
-	path = modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/ansible_collection_houdini
+[submodule "modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/houdini"]
+	path = modules/firehawk-ami/ansible/collections/ansible_collections/firehawkvfx/houdini
 	url = https://github.com/firehawkvfx/ansible_collection_houdini.git

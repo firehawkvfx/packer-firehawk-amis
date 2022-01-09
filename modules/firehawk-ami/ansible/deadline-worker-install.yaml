@@ -37,7 +37,7 @@
     ansible_become_pass: "{{ user_deadlineuser_pw }}"
 
   roles:
-    - role: firehawkvfx.ansible_collection_core.pip
+    - role: firehawkvfx.core.pip
 
   post_tasks:
   - name: create Thinkbox dir
@@ -178,7 +178,7 @@
 
   - name: "s3-sync get {{ deadline_linux_filename }} from {{ installers_bucket }}"
     import_role:
-      name: firehawkvfx.ansible_collection_core.s3_sync
+      name: firehawkvfx.core.s3_sync
     vars:
       mode: "pull"
       bucket: "{{ installers_bucket }}"
