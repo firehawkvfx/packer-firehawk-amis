@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+echo "Building AMI's for deployment..."
+
 function log {
   local -r level="$1"
   local -r message="$2"
