@@ -465,6 +465,7 @@ build {
 
   provisioner "ansible" { # See https://github.com/hashicorp/packer-plugin-ansible/issues/47#issuecomment-852443057
     playbook_file = "./ansible/ansible_init.yaml"
+    user = "ec2-user"
     extra_arguments = [
       "-v",
       "--extra-vars",
