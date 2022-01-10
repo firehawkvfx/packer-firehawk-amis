@@ -88,7 +88,7 @@ mkdir -p "$SCRIPTDIR/tmp/log"
 (return 0 2>/dev/null) && sourced=1 || sourced=0
 echo "Script sourced: $sourced"
 if [[ "$sourced" -eq 0 ]]; then
-    packer build "$@" $SCRIPTDIR/firehawk-ami.pkr.hcl -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem"
+    packer build "$@" -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" $SCRIPTDIR/firehawk-ami.pkr.hcl
 fi
 cd $EXECDIR
 
