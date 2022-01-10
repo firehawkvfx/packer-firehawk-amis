@@ -45,7 +45,7 @@ export PKR_VAR_resourcetier="$TF_VAR_resourcetier"
 export PKR_VAR_ami_role="firehawk-ami"
 export PKR_VAR_commit_hash="$(git rev-parse HEAD)"
 export PKR_VAR_commit_hash_short="$(git rev-parse --short HEAD)"
-export PKR_VAR_account_id=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep -oP '(?<="accountId" : ")[^"]*(?=")')
+# export PKR_VAR_account_id=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep -oP '(?<="accountId" : ")[^"]*(?=")')
 cd $SCRIPTDIR/../firehawk-base-ami
 export PKR_VAR_ingress_commit_hash="$(git rev-parse HEAD)" # the commit hash for incoming amis
 export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
