@@ -32,7 +32,7 @@ variable "resourcetier" {
   type        = string
 }
 variable "ca_public_key_path" {
-  type    = string
+  type = string
   # default = "/home/ec2-user/.ssh/tls/ca.crt.pem"
 }
 variable "consul_download_url" {
@@ -44,11 +44,11 @@ variable "install_auth_signing_script" {
   default = "true"
 }
 variable "tls_private_key_path" {
-  type    = string
+  type = string
   # default = "/home/ec2-user/.ssh/tls/vault.key.pem"
 }
 variable "tls_public_key_path" {
-  type    = string
+  type = string
   # default = "/home/ec2-user/.ssh/tls/vault.crt.pem"
 }
 variable "vault_download_url" {
@@ -61,7 +61,7 @@ variable "vault_version" {
   default = "1.6.1"
 }
 variable "vault_module_version" { # The hashicorp github module version to clone.
-  default = "v0.15.1"    # from "v0.15.1", this resolves consul dns issues on start.  This is likely resolved by Hashicorp now.
+  default = "v0.15.1"             # from "v0.15.1", this resolves consul dns issues on start.  This is likely resolved by Hashicorp now.
 }
 variable "consul_module_version" {
   type    = string
@@ -91,14 +91,14 @@ variable "test_consul" { # If a consul cluster is running, attempt to join the c
 }
 variable "deadlineuser_name" {
   description = "The deadline user name for render nodes and deadline DB"
-  type = string
-  default = "deadlineuser"
+  type        = string
+  default     = "deadlineuser"
 }
 
 variable "db_host_name" {
   description = "The hostname for deadline DB"
-  type = string
-  default = "deadlinedb.service.consul"
+  type        = string
+  default     = "deadlinedb.service.consul"
 }
 variable "installers_bucket" {
   description = "The installer bucket to persist installations to"
@@ -465,7 +465,7 @@ build {
 
   provisioner "ansible" { # See https://github.com/hashicorp/packer-plugin-ansible/issues/47#issuecomment-852443057
     playbook_file = "./ansible/ansible_init.yaml"
-    user = "ec2-user"
+    user          = "ec2-user"
     extra_arguments = [
       "-v",
       "--extra-vars",
@@ -479,7 +479,7 @@ build {
 
   provisioner "shell" { # Vault client probably wont be installed on bastions in future, but most hosts that will authenticate will require it.
     inline = [
-      "git config --global advice.detachedHead false",                                                                              # disable warning about detached head because we dont care, it is a software installation
+      "git config --global advice.detachedHead false",                                                                                # disable warning about detached head because we dont care, it is a software installation
       "git clone --branch ${var.vault_module_version} https://github.com/hashicorp/terraform-aws-vault.git /tmp/terraform-aws-vault", # This can be replaced with a local copy if required.
       "if test -n '${var.vault_download_url}'; then",
       " /tmp/terraform-aws-vault/modules/install-vault/install-vault --download-url ${var.vault_download_url} --skip-package-update;",
@@ -720,7 +720,7 @@ build {
   provisioner "file" { # fix apt upgrades to not hold up boot
     destination = "/tmp/zip-each-folder"
     source      = "${local.template_dir}/scripts/zip-each-folder"
-    only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+    only        = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
   provisioner "shell" { ### Download Deadline install script
@@ -731,7 +731,7 @@ build {
     only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
       "amazon-ebs.centos7-rendernode-ami"
-      ]
+    ]
   }
 
   provisioner "shell" { ### Install Deadline for DB, RCS Client
@@ -808,7 +808,7 @@ build {
 
   ### Install FSX fsx_packages.yaml
 
-   provisioner "ansible" {
+  provisioner "ansible" {
     playbook_file = "./ansible/fsx_packages.yaml"
     extra_arguments = [
       "-vv",
@@ -952,6 +952,7 @@ build {
       "user_access"
     ]
     playbook_file    = "./ansible/init-packages.yaml"
+    user             = "openvpnas"
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
