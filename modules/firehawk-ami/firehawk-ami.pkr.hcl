@@ -704,6 +704,7 @@ build {
 
   provisioner "ansible" {
     playbook_file = "./ansible/transparent-hugepages-disable.yml"
+    user          = "ubuntu"
     extra_arguments = [
       "-v",
       "--extra-vars",
