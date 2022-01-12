@@ -623,6 +623,7 @@ build {
 
   provisioner "ansible" {
     playbook_file = "./ansible/newuser.yaml"
+    user          = "centos"
     extra_arguments = [
       "-v",
       "--extra-vars",
