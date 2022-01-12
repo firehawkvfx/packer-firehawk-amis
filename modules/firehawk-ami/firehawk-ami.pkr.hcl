@@ -842,6 +842,7 @@ build {
 
   provisioner "ansible" {
     playbook_file = "./ansible/fsx_packages.yaml"
+    user          = "centos"
     extra_arguments = [
       "-vv",
       "--extra-vars",
@@ -1026,7 +1027,7 @@ build {
   ### Configure NICEDCV workstation - Always create session.  Install browser
   provisioner "shell" { # Install Firefox
     inline = [
-      "wget -O ~/FirefoxSetup.tar.bz2 \"https://download.mozilla.org/?product=firefox-latest&os=linux64\"",
+      "wget -O ~/FirefoxSetup.tar.bz2 \"https://download.mozilla.org/?product=firefox-latest&os=linux64\" --quiet",
       "sudo tar xvjf ~/FirefoxSetup.tar.bz2 -C /opt/",
       "sudo ln -s /opt/firefox/firefox /usr/bin/firefox"
     ]
