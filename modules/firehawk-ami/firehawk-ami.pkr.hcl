@@ -465,6 +465,24 @@ build {
 
   provisioner "ansible" { # See https://github.com/hashicorp/packer-plugin-ansible/issues/47#issuecomment-852443057
     playbook_file = "./ansible/ansible_init.yaml"
+    user          = "centos"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "variable_host=default package_python_interpreter=/usr/bin/python2.7"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only = [
+      "amazon-ebs.centos7-ami",
+      "amazon-ebs.centos7-rendernode-ami",
+    ]
+  }
+
+  provisioner "ansible" { # See https://github.com/hashicorp/packer-plugin-ansible/issues/47#issuecomment-852443057
+    playbook_file = "./ansible/ansible_init.yaml"
     user          = "ec2-user"
     extra_arguments = [
       "-v",
@@ -475,7 +493,16 @@ build {
     roles_path       = "./ansible/roles"
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
     galaxy_file      = "./requirements.yml"
+    only = [
+      "amazon-ebs.amazonlinux2-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
+      "amazon-ebs.ubuntu18-ami",
+      "amazon-ebs.deadline-db-ubuntu18-ami",
+      "amazon-ebs.openvpn-server-ami",
+      "ubuntu18-vault-consul-server-ami"
+    ]
   }
+
 
   provisioner "shell" { # Vault client probably wont be installed on bastions in future, but most hosts that will authenticate will require it.
     inline = [
@@ -588,6 +615,7 @@ build {
 
   provisioner "ansible" { # Disable SELINUX for rendernodes until tested and working when enabled.
     playbook_file = "./ansible/selinux.yaml"
+    user          = "centos"
     extra_arguments = [
       "-v",
       "--extra-vars",
