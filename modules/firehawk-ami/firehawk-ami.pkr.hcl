@@ -604,6 +604,7 @@ build {
 
   provisioner "ansible" { # Add user deployuser
     playbook_file = "./ansible/newuser.yaml"
+    user          = "centos"
     extra_arguments = [
       "-v",
       "--extra-vars",
@@ -640,6 +641,7 @@ build {
 
   provisioner "ansible" {
     playbook_file = "./ansible/newuser.yaml"
+    user          = "ubuntu"
     extra_arguments = [
       "-v",
       "--extra-vars",
