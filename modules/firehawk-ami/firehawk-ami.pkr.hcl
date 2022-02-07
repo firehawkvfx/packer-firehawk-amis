@@ -461,14 +461,13 @@ build {
     only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
-  ### install cloudwatch logs agent for amazon linux
-  
+  ### Install cloudwatch logs agent for Amazon Linux and configure the region
   provisioner "shell" {
     inline = [
       "sudo yum install -y awslogs",
       "sudo systemctl start awslogsd",
       "sudo systemctl enable awslogsd.service",
-      "sudo sed -i \"s/region =.*/region = ap-southeast-2/\" /etc/awslogs/awscli.conf"
+      "sudo sed -i \"s/region =.*/region = ${var.aws_region}/\" /etc/awslogs/awscli.conf"
     ]
     only = [
       "amazon-ebs.amazonlinux2-ami"
