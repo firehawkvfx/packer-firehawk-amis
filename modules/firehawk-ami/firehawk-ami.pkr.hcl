@@ -461,6 +461,20 @@ build {
     only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
+  ### install cloudwatch logs agent for amazon linux
+  
+  provisioner "shell" {
+    inline = [
+      "sudo yum install -y awslogs",
+      "sudo systemctl start awslogsd",
+      "sudo systemctl enable awslogsd.service",
+      "sudo sed -i \"s/region =.*/region = ap-southeast-2/\" /etc/awslogs/awscli.conf"
+    ]
+    only = [
+      "amazon-ebs.amazonlinux2-ami"
+    ]
+  }
+
   ### Init ansible collections for all hosts.
 
   provisioner "ansible" { # See https://github.com/hashicorp/packer-plugin-ansible/issues/47#issuecomment-852443057
