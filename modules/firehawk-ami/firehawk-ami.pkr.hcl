@@ -464,10 +464,11 @@ build {
   ### Install cloudwatch logs agent for Amazon Linux and configure the region
   provisioner "shell" {
     inline = [
-      "sudo yum install -y awslogs",
-      "sudo systemctl start awslogsd",
-      "sudo systemctl enable awslogsd.service",
-      "sudo sed -i \"s/region =.*/region = ${var.aws_region}/\" /etc/awslogs/awscli.conf"
+      # "sudo yum install -y awslogs",
+      # "sudo systemctl start awslogsd",
+      # "sudo systemctl enable awslogsd.service",
+      # "sudo sed -i \"s/region =.*/region = ${var.aws_region}/\" /etc/awslogs/awscli.conf"
+      "sudo yum install amazon-cloudwatch-agent -y"
     ]
     only = [
       "amazon-ebs.amazonlinux2-ami"
