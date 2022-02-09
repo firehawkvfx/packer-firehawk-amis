@@ -461,14 +461,27 @@ build {
     only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
-  ### Install cloudwatch logs agent for Amazon Linux and configure the region
+  ### Install cloudwatch logs agent, and terraform, terragrunt, packer for Amazon Linux and configure the region
   provisioner "shell" {
     inline = [
       # "sudo yum install -y awslogs",
       # "sudo systemctl start awslogsd",
       # "sudo systemctl enable awslogsd.service",
       # "sudo sed -i \"s/region =.*/region = ${var.aws_region}/\" /etc/awslogs/awscli.conf"
-      "sudo yum install amazon-cloudwatch-agent -y"
+      "sudo yum install amazon-cloudwatch-agent -y",
+      "sudo yum install -y python",
+      "sudo yum install -y python3.7",
+      "sudo yum install -y python3-pip", # for a specific python version - https://realpython.com/intro-to-pyenv/
+      "sudo yum install -y jq",
+      "wget https://releases.hashicorp.com/terraform/0.13.7/terraform_0.13.7_linux_amd64.zip -P /tmp/ --quiet", # Get terraform
+      "sudo unzip /tmp/terraform_0.13.7_linux_amd64.zip -d /tmp/",
+      "sudo mv /tmp/terraform /usr/local/bin/.",
+      # "wget https://releases.hashicorp.com/packer/1.7.2/packer_1.7.2_linux_amd64.zip -P /tmp/ --quiet" # Get Packer
+      # "sudo unzip /tmp/packer_1.7.2_linux_amd64.zip -d /tmp/"
+      # "sudo mv /tmp/packer /usr/local/bin/."
+      "wget https://github.com/gruntwork-io/terragrunt/releases/download/v0.30.3/terragrunt_linux_386 -P /tmp/ --quiet", # Get Terragrunt
+      "sudo mv /tmp/terragrunt_linux_386 /usr/local/bin/terragrunt",
+      "sudo chmod +x /usr/local/bin/terragrunt"
     ]
     only = [
       "amazon-ebs.amazonlinux2-ami"
