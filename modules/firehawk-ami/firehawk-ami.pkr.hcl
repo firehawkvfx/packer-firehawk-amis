@@ -82,7 +82,7 @@ variable "consul_cluster_tag_value" {
   type    = string
   default = ""
 }
-variable "provisioner_iam_profile_name" { # Required for some builds requiring S3 Installers
+variable "packer_iam_profile_name" { # Required for some builds requiring S3 Installers
   type = string
 }
 variable "test_consul" { # If a consul cluster is running, attempt to join the cluster. This can be useful for debugging, but will prevent inital builds if you have no infrastructure running yet.  This test may not also work unless the appropriate role is assigned.
@@ -226,7 +226,7 @@ source "amazon-ebs" "amazonlinux2-nicedcv-nvidia-ami" {
   #   virtual_name = "ephemeral1"
   # }
   ssh_username         = "ec2-user"
-  iam_instance_profile = var.provisioner_iam_profile_name # provide read and write s3 access for updating and retrieving installers
+  iam_instance_profile = var.packer_iam_profile_name # provide read and write s3 access for updating and retrieving installers
 
 }
 
@@ -276,7 +276,7 @@ source "amazon-ebs" "centos7-rendernode-ami" {
   }
   ssh_username = "centos"
 
-  iam_instance_profile = var.provisioner_iam_profile_name # provide read and write s3 access for updating and retrieving installers
+  iam_instance_profile = var.packer_iam_profile_name # provide read and write s3 access for updating and retrieving installers
 
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
@@ -367,7 +367,7 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
   }
   ssh_username = "ubuntu"
 
-  iam_instance_profile = var.provisioner_iam_profile_name
+  iam_instance_profile = var.packer_iam_profile_name
 
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
