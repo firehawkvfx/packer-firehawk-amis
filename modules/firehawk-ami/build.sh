@@ -52,7 +52,7 @@ cd $SCRIPTDIR/../firehawk-base-ami
 export PKR_VAR_ingress_commit_hash="$(git rev-parse HEAD)" # the commit hash for incoming amis
 export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
 
-cd $SCRIPTDIR/terraform-remote-state-inputs
+cd $SCRIPTDIR/../../init/modules/terraform-remote-state-inputs
 terragrunt init \
     -input=false
 terragrunt plan -out=tfplan -input=false
