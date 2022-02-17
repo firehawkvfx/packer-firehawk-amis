@@ -164,7 +164,7 @@ function export_vars {
   else
     export TF_VAR_environment="prod"
   fi
-  export TF_VAR_firehawk_path="$SCRIPTDIR/deploy/firehawk-main"
+  # export TF_VAR_firehawk_path="$SCRIPTDIR/deploy/firehawk-main"
 
   # Packer Vars
   export TF_VAR_deadline_version="10.1.18.5"
@@ -185,7 +185,7 @@ function export_vars {
   # fi
   # AMI query by commit - Vault and Consul Servers
 
-  export TF_VAR_ami_commit_hash="$(cd $TF_VAR_firehawk_path/../packer-firehawk-amis/modules/firehawk-ami; git rev-parse HEAD)" 
+  export TF_VAR_ami_commit_hash="$(cd $SCRIPTDIR/modules/firehawk-ami; git rev-parse HEAD)" 
 
   if [[ "$skip_find_amis" == "false" ]]; then
     # AMI query by commit - Vault and Consul Server
