@@ -23,7 +23,7 @@ bridgenic: "{{ lookup('env','TF_VAR_bridgenic') }}"
 terraform_version: "{{ lookup('env','TF_VAR_terraform_version') }}"
 inventory: "{{ lookup('env','TF_VAR_inventory') }}"
 
-firehawk_path: "{{ lookup('env','TF_VAR_firehawk_path') }}"
+# firehawk_path: "{{ lookup('env','TF_VAR_firehawk_path') }}"
 secrets_path: "{{ lookup('env','TF_VAR_secrets_path') }}"
 
 # domains
