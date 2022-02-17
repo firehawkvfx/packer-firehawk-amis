@@ -1,0 +1,90 @@
+#!/bin/bash
+
+# 1st arg is the branch name
+
+set -e # exit on failure
+
+EXECDIR="$(pwd)"
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" # The directory of this script
+cd $SCRIPTDIR
+
+function clearcache {
+  echo "...Clearing cache recursively"
+  find . -type d -name ".terragrunt-cache" -prune -exec rm -rf {} \;
+  echo "git status"
+  git status
+}
+
+function deinitsubmodules {
+  echo "...deinit submodules"
+  git submodule deinit -f $SCRIPTDIR
+}
+
+function initsubmodules {
+  echo "...submodule update"
+  git submodule update --init --recursive
+}
+
+function options {
+  branch=""
+
+  while [[ $# > 0 ]]; do
+    local key="$1"
+    clear_cache="false"
+    deinit_submodules="true"
+    init_submodules="false"
+
+    case "$key" in
+      --clear-cache)
+        clear_cache="true"
+        ;;
+      --init-submodules)
+        init_submodules="true"
+        ;;
+      --init-all)
+        init_submodules="true"
+        clear_cache="true"
+        ;;
+      --skip-deinit)
+        deinit_submodules="false"
+        ;;
+      --branch)
+        branch="$2"
+        shift
+        ;;
+    #   --help)
+    #     print_usage
+    #     exit
+    #     ;;
+      *)
+        log_error "Unrecognized argument: $key"
+        print_usage
+        exit 1
+        ;;
+    esac
+
+    shift
+  done
+
+  if [[ "$clear_cache" == "true" ]]; then
+    clearcache
+  fi
+  if [[ "$init_submodules" == "true" ]]; then
+    if [[ "$deinit_submodules" == "true" ]]; then
+      deinitsubmodules
+    fi
+    initsubmodules
+  fi
+
+}
+
+options "$@"
+
+# git pull origin $branch --recurse
+echo "...Submodule status"
+git submodule status --recursive
+
+cd ~
+cd $EXECDIR
+
+echo "Done pulling git repo."
