@@ -61,7 +61,7 @@ variable "vault_version" {
   default = "1.6.1"
 }
 variable "vault_module_version" { # The hashicorp github module version to clone.
-  default = "v0.15.1"             # from "v0.15.1", this resolves consul dns issues on start.  This is likely resolved by Hashicorp now.
+  default = "v0.17.0"             # from "v0.17.0", this resolves consul dns issues on start.  This is likely resolved by Hashicorp now.
 }
 variable "consul_module_version" {
   type    = string
