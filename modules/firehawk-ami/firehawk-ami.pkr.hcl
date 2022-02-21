@@ -55,18 +55,6 @@ variable "vault_download_url" {
   type    = string
   default = ""
 }
-
-variable "vault_version" {
-  type    = string
-  default = "1.6.1"
-}
-variable "vault_module_version" { # The hashicorp github module version to clone.
-  default = "v0.17.0"             # from "v0.17.0", this resolves consul dns issues on start.  This is likely resolved by Hashicorp now.
-}
-variable "consul_module_version" {
-  type    = string
-  default = "v0.8.0"
-}
 variable "consul_version" {
   type    = string
   default = "1.9.2"
@@ -534,11 +522,11 @@ build {
   provisioner "shell" { # Vault client probably wont be installed on bastions in future, but most hosts that will authenticate will require it.
     inline = [
       "git config --global advice.detachedHead false",                                                                                # disable warning about detached head because we dont care, it is a software installation
-      "git clone --branch ${var.vault_module_version} https://github.com/hashicorp/terraform-aws-vault.git /tmp/terraform-aws-vault", # This can be replaced with a local copy if required.
+      "set -x; git clone --branch v0.17.0 https://github.com/hashicorp/terraform-aws-vault.git /tmp/terraform-aws-vault", # This can be replaced with a local copy if required.
       "if test -n '${var.vault_download_url}'; then",
-      " /tmp/terraform-aws-vault/modules/install-vault/install-vault --download-url ${var.vault_download_url} --skip-package-update;",
+      " set -x; /tmp/terraform-aws-vault/modules/install-vault/install-vault --download-url ${var.vault_download_url} --skip-package-update",
       "else",
-      " /tmp/terraform-aws-vault/modules/install-vault/install-vault --version ${var.vault_version} --skip-package-update;",
+      " set -x; /tmp/terraform-aws-vault/modules/install-vault/install-vault --version 1.6.1 --skip-package-update",
       "fi"
     ]
   }
@@ -927,11 +915,11 @@ build {
   provisioner "shell" {
     inline = [
       "git config --global advice.detachedHead false", # disable warning about detached head because we dont care, it is a software installation
-      "git clone --branch ${var.consul_module_version} https://github.com/hashicorp/terraform-aws-consul.git /tmp/terraform-aws-consul",
+      "git clone --branch v0.8.0 https://github.com/hashicorp/terraform-aws-consul.git /tmp/terraform-aws-consul",
       "if test -n \"${var.consul_download_url}\"; then",
-      " /tmp/terraform-aws-consul/modules/install-consul/install-consul --download-url ${var.consul_download_url};",
+      " /tmp/terraform-aws-consul/modules/install-consul/install-consul --download-url ${var.consul_download_url}",
       "else",
-      " /tmp/terraform-aws-consul/modules/install-consul/install-consul --version ${var.consul_version};",
+      " /tmp/terraform-aws-consul/modules/install-consul/install-consul --version 1.9.2",
     "fi"]
   }
 
