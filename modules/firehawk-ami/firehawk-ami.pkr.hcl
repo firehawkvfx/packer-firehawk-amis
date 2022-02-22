@@ -473,6 +473,7 @@ build {
       "sudo yum install -y python3.7",
       "sudo yum install -y python3-pip", # for a specific python version - https://realpython.com/intro-to-pyenv/
       "sudo yum install -y jq",
+      "python3 -m pip install ansible botocore",
       "wget https://releases.hashicorp.com/terraform/0.13.7/terraform_0.13.7_linux_amd64.zip -P /tmp/ --quiet", # Get terraform
       "sudo unzip /tmp/terraform_0.13.7_linux_amd64.zip -d /tmp/",
       "sudo mv /tmp/terraform /usr/local/bin/.",
