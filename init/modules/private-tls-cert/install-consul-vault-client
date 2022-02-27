@@ -85,11 +85,11 @@ function run {
     rm -fr /tmp/terraform-aws-vault
     git clone --branch $vault_module_version https://github.com/hashicorp/terraform-aws-vault.git /tmp/terraform-aws-vault
 
-    if test -n "$vault_download_url"; then
-        /tmp/terraform-aws-vault/modules/install-vault/install-vault --download-url $vault_download_url --skip-package-update
-    else
-        /tmp/terraform-aws-vault/modules/install-vault/install-vault --version $vault_version --skip-package-update
-    fi
+    # if test -n "$vault_download_url"; then
+    #     /tmp/terraform-aws-vault/modules/install-vault/install-vault --download-url $vault_download_url --skip-package-update
+    # else
+    #     /tmp/terraform-aws-vault/modules/install-vault/install-vault --version $vault_version --skip-package-update
+    # fi
 
     if [[ "$install_auth_signing_script" == 'true' ]]; then
         # sudo cp $SCRIPTDIR/auth/sign-request.py /opt/vault/scripts/
