@@ -10,7 +10,7 @@ locals {
 inputs = local.common_vars.inputs
 
 terraform { # After SSL certs have been generated, isntall them to the current instance. 
-  source = "${get_env("TF_VAR_firehawk_path", "")}/modules/private-tls-cert"
+  source = "github.com/firehawkvfx/firehawk-main.git//modules/private-tls-cert?ref=v0.0.29"
   # after_hook "after_hook_0" {
   #   commands = ["apply"]
   #   execute  = ["bash", "install-consul-vault-client", 
