@@ -1,5 +1,6 @@
 # Vault and Consul AMI
 
+
 This folder shows an example of how to use the [install-vault module](https://github.com/hashicorp/terraform-aws-vault/tree/master/modules/install-vault) from this Module and
 the [install-consul](https://github.com/hashicorp/terraform-aws-consul/tree/master/modules/install-consul)
 and [install-dnsmasq](https://github.com/hashicorp/terraform-aws-consul/tree/master/modules/install-dnsmasq) or the
