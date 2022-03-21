@@ -31,6 +31,16 @@ variable "resourcetier" {
   description = "The current environment ( dev / green / blue / main )"
   type        = string
 }
+variable "terraform_version" {
+  description = "The current environment ( dev / green / blue / main )"
+  type        = string
+  default     = "1.1.7"
+}
+variable "terragrunt_version" {
+  description = "The current environment ( dev / green / blue / main )"
+  type        = string
+  default     = "0.36.0"
+}
 variable "ca_public_key_path" {
   type = string
   # default = "/home/ec2-user/.ssh/tls/ca.crt.pem"
@@ -452,23 +462,16 @@ build {
   ### Install cloudwatch logs agent, and terraform, terragrunt, packer for Amazon Linux and configure the region
   provisioner "shell" {
     inline = [
-      # "sudo yum install -y awslogs",
-      # "sudo systemctl start awslogsd",
-      # "sudo systemctl enable awslogsd.service",
-      # "sudo sed -i \"s/region =.*/region = ${var.aws_region}/\" /etc/awslogs/awscli.conf"
       "sudo yum install amazon-cloudwatch-agent -y",
       "sudo yum install -y python",
       "sudo yum install -y python3.7",
       "sudo yum install -y python3-pip", # for a specific python version - https://realpython.com/intro-to-pyenv/
       "sudo yum install -y jq",
       "python3 -m pip install ansible botocore",
-      "wget https://releases.hashicorp.com/terraform/0.13.7/terraform_0.13.7_linux_amd64.zip -P /tmp/ --quiet", # Get terraform
-      "sudo unzip /tmp/terraform_0.13.7_linux_amd64.zip -d /tmp/",
+      "wget https://releases.hashicorp.com/terraform/${var.terraform_version}/terraform_${var.terraform_version}_linux_amd64.zip -P /tmp/ --quiet", # Get terraform
+      "sudo unzip /tmp/terraform_${var.terraform_version}_linux_amd64.zip -d /tmp/",
       "sudo mv /tmp/terraform /usr/local/bin/.",
-      # "wget https://releases.hashicorp.com/packer/1.7.2/packer_1.7.2_linux_amd64.zip -P /tmp/ --quiet" # Get Packer
-      # "sudo unzip /tmp/packer_1.7.2_linux_amd64.zip -d /tmp/"
-      # "sudo mv /tmp/packer /usr/local/bin/."
-      "wget https://github.com/gruntwork-io/terragrunt/releases/download/v0.30.3/terragrunt_linux_386 -P /tmp/ --quiet", # Get Terragrunt
+      "wget https://github.com/gruntwork-io/terragrunt/releases/download/v${var.terragrunt_version}/terragrunt_linux_386 -P /tmp/ --quiet", # Get Terragrunt
       "sudo mv /tmp/terragrunt_linux_386 /usr/local/bin/terragrunt",
       "sudo chmod +x /usr/local/bin/terragrunt"
     ]
@@ -522,7 +525,7 @@ build {
 
   provisioner "shell" { # Vault client probably wont be installed on bastions in future, but most hosts that will authenticate will require it.
     inline = [
-      "git config --global advice.detachedHead false",                                                                                # disable warning about detached head because we dont care, it is a software installation
+      "git config --global advice.detachedHead false",                                                                    # disable warning about detached head because we dont care, it is a software installation
       "set -x; git clone --branch v0.17.0 https://github.com/hashicorp/terraform-aws-vault.git /tmp/terraform-aws-vault", # This can be replaced with a local copy if required.
       "if test -n '${var.vault_download_url}'; then",
       " set -x; /tmp/terraform-aws-vault/modules/install-vault/install-vault --download-url ${var.vault_download_url} --skip-package-update",
