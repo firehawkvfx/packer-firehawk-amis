@@ -33,6 +33,7 @@ $SUDOCMD yum update -y
 $SUDOCMD yum install -y jq openssl python python3.8 python3-pip # for a specific python version - https://realpython.com/intro-to-pyenv/
 mkdir -p $SCRIPTDIR/tmp
 
+#: Codebuild requires python 3.8 instead of python 3.7 used in the amis for ansible to work. 
 python3.8 -m pip install --upgrade pip \
     && python3.8 -m pip install --user ansible boto3 botocore \
     && /root/.local/bin/ansible --version \
