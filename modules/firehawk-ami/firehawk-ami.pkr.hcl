@@ -464,7 +464,7 @@ build {
     inline = [
       "sudo yum install amazon-cloudwatch-agent -y",
       "sudo yum install -y python",
-      "sudo yum install -y python3.7",
+      "sudo yum install -y python3.8",
       "sudo yum install -y python3-pip", # for a specific python version - https://realpython.com/intro-to-pyenv/
       "sudo yum install -y jq",
       "python3 -m pip install ansible botocore",
