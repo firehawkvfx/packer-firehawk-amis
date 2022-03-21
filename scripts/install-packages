@@ -1,9 +1,13 @@
 #!/bin/bash
 
-set -e
-set -x
-
 echo "Installing packages for AWS codebuild environment"
+
+terraform_version="1.1.7"
+terragrunt_version="0.36.0"
+packer_version="1.7.2"
+
+set -e
+# set -x
 
 aws sts get-caller-identity
 
@@ -19,7 +23,6 @@ cd $SCRIPTDIR
 SUDOCMD="" # replace with text sudo to use elevated permissions
 
 $SUDOCMD yum install -y sudo
-
 # This fixes yum update problems with codebuild
 $SUDOCMD yum install -y yum-utils
 $SUDOCMD yum remove -y libuv-1.39.0-1.amzn2.x86_64
@@ -27,42 +30,28 @@ $SUDOCMD yum clean all
 $SUDOCMD rm -rf /var/cache/yum
 $SUDOCMD yum update -y
 
-$SUDOCMD yum install -y python
-$SUDOCMD yum install -y python3.7
-$SUDOCMD yum install -y python3-pip # for a specific python version - https://realpython.com/intro-to-pyenv/
-
-$SUDOCMD yum install -y jq
+$SUDOCMD yum install -y jq openssl python python3.7 python3-pip # for a specific python version - https://realpython.com/intro-to-pyenv/
 mkdir -p $SCRIPTDIR/tmp
 
-wget https://releases.hashicorp.com/terraform/0.13.7/terraform_0.13.7_linux_amd64.zip -P /tmp/ --quiet # Get terraform
-$SUDOCMD unzip /tmp/terraform_0.13.7_linux_amd64.zip -d /tmp/
-$SUDOCMD mv /tmp/terraform /usr/local/bin/.
+if terraform --version 2> /dev/null | grep -nq "Terraform v$terraform_version"; then
+    echo 'terraform already installed'
+else
+    wget https://releases.hashicorp.com/terraform/$terraform_version/terraform_${terraform_version}_linux_amd64.zip -P /tmp/ --quiet # Get terraform
+    $SUDOCMD unzip /tmp/terraform_${terraform_version}_linux_amd64.zip -d /tmp/
+    $SUDOCMD mv /tmp/terraform /usr/local/bin/.
+fi
 
-wget https://releases.hashicorp.com/packer/1.7.2/packer_1.7.2_linux_amd64.zip -P /tmp/ --quiet # Get Packer
-$SUDOCMD unzip /tmp/packer_1.7.2_linux_amd64.zip -d /tmp/
+wget https://releases.hashicorp.com/packer/$packer_version/packer_$packer_version_linux_amd64.zip -P /tmp/ --quiet # Get Packer
+$SUDOCMD unzip /tmp/packer_$packer_version_linux_amd64.zip -d /tmp/
 $SUDOCMD mv /tmp/packer /usr/local/bin/.
 
-wget https://github.com/gruntwork-io/terragrunt/releases/download/v0.30.3/terragrunt_linux_386 -P /tmp/ --quiet # Get Terragrunt
-$SUDOCMD mv /tmp/terragrunt_linux_386 /usr/local/bin/terragrunt
-$SUDOCMD chmod +x /usr/local/bin/terragrunt
-
-# echo "Set ownership to ec2-user for: $SCRIPTDIR"
-# $SUDOCMD chown -R ec2-user:ec2-user $SCRIPTDIR
-
-# $SUDOCMD rm -fr /tmp/terraform-aws-consul
-# git clone --branch "pull-request-241" https://github.com/queglay/terraform-aws-consul.git /tmp/terraform-aws-consul
-# /tmp/terraform-aws-consul/modules/install-consul/install-consul --version "1.9.2" --skip-package-update
-
-# # echo "...Search /etc/dhcp/dhclient*"
-# # ls /etc/dhcp/dhclient*
-# $SUDOCMD yum install dhclient -y
-# # echo "WARNING: IT IS HIGHLY LIKELY CREATING THIS NEXT FILE WILL NOT FIX DNSMASQ /etc/dhcp/dhclient.conf"
-# # mkdir -p /etc/dhcp
-# # touch /etc/dhcp/dhclient.conf
-# /tmp/terraform-aws-consul/modules/install-dnsmasq/install-dnsmasq --skip-package-update
-# sleep 2
-# # $SUDOCMD service dnsmasq restart
-# $SUDOCMD systemctl enable dnsmasq # starting the service is required for it to function on first boot.
+if terragrunt --version 2> /dev/null | grep -nq "terragrunt version v$terragrunt_version"; then
+    echo 'Terragrunt already installed'
+else
+    wget https://github.com/gruntwork-io/terragrunt/releases/download/v$terragrunt_version/terragrunt_linux_386 -P /tmp/ --quiet # Get Terragrunt
+    $SUDOCMD mv /tmp/terragrunt_linux_386 /usr/local/bin/terragrunt
+    $SUDOCMD chmod +x /usr/local/bin/terragrunt
+fi
 
 mkdir -p "$HOME/.ssh/tls" # The directory to store TLS certificates in.
 
