@@ -7,7 +7,7 @@ terragrunt_version="0.36.0"
 packer_version="1.7.2"
 
 set -e
-# set -x
+set -x
 
 aws sts get-caller-identity
 
@@ -33,22 +33,22 @@ $SUDOCMD yum update -y
 $SUDOCMD yum install -y jq openssl python python3.7 python3-pip # for a specific python version - https://realpython.com/intro-to-pyenv/
 mkdir -p $SCRIPTDIR/tmp
 
-if terraform --version 2> /dev/null | grep -nq "Terraform v$terraform_version"; then
+if terraform --version 2> /dev/null | grep -nq "Terraform v${terraform_version}"; then
     echo 'terraform already installed'
 else
-    wget https://releases.hashicorp.com/terraform/$terraform_version/terraform_${terraform_version}_linux_amd64.zip -P /tmp/ --quiet # Get terraform
+    wget https://releases.hashicorp.com/terraform/${terraform_version}/terraform_${terraform_version}_linux_amd64.zip -P /tmp/ --quiet # Get terraform
     $SUDOCMD unzip /tmp/terraform_${terraform_version}_linux_amd64.zip -d /tmp/
     $SUDOCMD mv /tmp/terraform /usr/local/bin/.
 fi
 
-wget https://releases.hashicorp.com/packer/$packer_version/packer_$packer_version_linux_amd64.zip -P /tmp/ --quiet # Get Packer
-$SUDOCMD unzip /tmp/packer_$packer_version_linux_amd64.zip -d /tmp/
+wget https://releases.hashicorp.com/packer/${packer_version}/packer_${packer_version}_linux_amd64.zip -P /tmp/ --quiet # Get Packer
+$SUDOCMD unzip /tmp/packer_${packer_version}_linux_amd64.zip -d /tmp/
 $SUDOCMD mv /tmp/packer /usr/local/bin/.
 
-if terragrunt --version 2> /dev/null | grep -nq "terragrunt version v$terragrunt_version"; then
+if terragrunt --version 2> /dev/null | grep -nq "terragrunt version v${terragrunt_version}"; then
     echo 'Terragrunt already installed'
 else
-    wget https://github.com/gruntwork-io/terragrunt/releases/download/v$terragrunt_version/terragrunt_linux_386 -P /tmp/ --quiet # Get Terragrunt
+    wget https://github.com/gruntwork-io/terragrunt/releases/download/v${terragrunt_version}/terragrunt_linux_386 -P /tmp/ --quiet # Get Terragrunt
     $SUDOCMD mv /tmp/terragrunt_linux_386 /usr/local/bin/terragrunt
     $SUDOCMD chmod +x /usr/local/bin/terragrunt
 fi
