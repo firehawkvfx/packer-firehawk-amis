@@ -463,11 +463,14 @@ build {
   provisioner "shell" {
     inline = [
       "sudo yum install amazon-cloudwatch-agent -y",
-      "sudo yum install -y python",
-      "sudo yum install -y python3.8",
-      "sudo yum install -y python3-pip", # for a specific python version - https://realpython.com/intro-to-pyenv/
+      # "sudo yum install -y python",
+      # "sudo yum install -y python3.7",
+      # "sudo yum install -y python3-pip", # for a specific python version - https://realpython.com/intro-to-pyenv/
       "sudo yum install -y jq",
-      "python3 -m pip install ansible botocore",
+      # "python3 -m pip install ansible botocore",
+      # "python3.7 -m pip install --upgrade pip", #: upgrade should only be done in the base image.
+      "python3.7 -m pip install --user ansible boto3 botocore", #: Install ansible using the same method we use to install it to codebuild
+      "/root/.local/bin/ansible --version",
       "wget https://releases.hashicorp.com/terraform/${var.terraform_version}/terraform_${var.terraform_version}_linux_amd64.zip -P /tmp/ --quiet", # Get terraform
       "sudo unzip /tmp/terraform_${var.terraform_version}_linux_amd64.zip -d /tmp/",
       "sudo mv /tmp/terraform /usr/local/bin/.",
