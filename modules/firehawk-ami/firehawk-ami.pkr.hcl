@@ -780,7 +780,7 @@ build {
 
   provisioner "shell" { ### Download Deadline install script
     inline = [
-      "cd /var/tmp; git clone --branch v0.0.4 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
+      "cd /var/tmp; git clone --branch v0.0.3 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
       "sudo chown -R ${var.deadlineuser_name}:${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline"
     ]
     only = [
@@ -792,11 +792,15 @@ build {
   provisioner "shell" { ### Install Deadline for DB, RCS Client
     inline = [
       "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages --installers-bucket ${local.installers_bucket}",
+      # "sudo -i -u ${var.deadlineuser_name} aws s3 sync /tmp \"s3://${local.installers_bucket}/\" --include \"Deadline-${local.deadline_version}-linux-installers.tar\""
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "sudo rm -fv /var/tmp/downloads/AWSPortalLink*",
       "sudo rm /tmp/Deadline-${local.deadline_version}-linux-installers.tar",
       "sudo apt-get install -y zip unzip",
       "sudo -i -u ${var.deadlineuser_name} /tmp/zip-each-folder /opt/Thinkbox/DeadlineRepository10/submission",
+      # "cd /opt/Thinkbox/DeadlineRepository10/submission",
+      # "sudo find . -type d -maxdepth 1 -mindepth 1 -exec zip -r -D '{}.zip' '{}' \\; ",
+      # "sudo ls -ltriah",
       "sudo -i -u ${var.deadlineuser_name} aws s3 sync /opt/Thinkbox/DeadlineRepository10/submission \"s3://${local.installers_bucket}/Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission\""
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
