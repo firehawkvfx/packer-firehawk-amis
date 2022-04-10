@@ -715,6 +715,8 @@ build {
       "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.5.4.zip\" -o \"awscliv2.zip\"",
       "unzip -q awscliv2.zip",
       "sudo ./aws/install -b /usr/local/bin",
+      "/usr/local/bin/aws --version",
+      "echo \"awscli test request: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\"",
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
