@@ -780,7 +780,7 @@ build {
 
   provisioner "shell" { ### Download Deadline install script
     inline = [
-      "cd /var/tmp; git clone --branch v0.0.7 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
+      "cd /var/tmp; git clone --branch v0.0.6 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
       "sudo chown -R ${var.deadlineuser_name}:${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline"
     ]
     only = [
