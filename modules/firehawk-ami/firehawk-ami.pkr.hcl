@@ -711,10 +711,10 @@ build {
   provisioner "shell" {
     ### AWS CLI
     inline = [
-      "python3 -m pip install --user --upgrade awscli"
-      # "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.5.4.zip\" -o \"awscliv2.zip\"",
-      # "unzip -q awscliv2.zip",
-      # "sudo ./aws/install -b /usr/local/bin",
+      # "python3 -m pip install --user --upgrade awscli",
+      "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.5.4.zip\" -o \"awscliv2.zip\"",
+      "unzip -q awscliv2.zip",
+      "sudo ./aws/install -b /usr/local/bin",
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
