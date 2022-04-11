@@ -720,8 +720,8 @@ build {
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
-      "amazon-ebs.amazonlinux2-ami",
+      # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami", These come with the cli already
+      # "amazon-ebs.amazonlinux2-ami",
       "amazon-ebs.openvpn-server-ami",
       "amazon-ebs.deadline-db-ubuntu18-ami"
     ]
