@@ -708,24 +708,24 @@ build {
     ]
   }
 
-  provisioner "shell" {
-    ### AWS CLI
-    inline = [
-      # "python3 -m pip install --user --upgrade awscli",
-      "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.5.4.zip\" -o \"awscliv2.zip\"",
-      "unzip -q awscliv2.zip",
-      "sudo ./aws/install -b /usr/local/bin",
-      "/usr/local/bin/aws --version",
-      "echo \"awscli test request: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\"",
-    ]
-    only = [
-      "amazon-ebs.centos7-rendernode-ami",
-      # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami", These come with the cli already
-      # "amazon-ebs.amazonlinux2-ami",
-      "amazon-ebs.openvpn-server-ami",
-      "amazon-ebs.deadline-db-ubuntu18-ami"
-    ]
-  }
+  # provisioner "shell" {
+  #   ### AWS CLI
+  #   inline = [
+  #     # "python3 -m pip install --user --upgrade awscli",
+  #     "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.5.4.zip\" -o \"awscliv2.zip\"",
+  #     "unzip -q awscliv2.zip",
+  #     "sudo ./aws/install -b /usr/local/bin",
+  #     "/usr/local/bin/aws --version",
+  #     "echo \"awscli test request: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\"",
+  #   ]
+  #   only = [
+  #     "amazon-ebs.centos7-rendernode-ami",
+  #     # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami", These come with the cli already
+  #     # "amazon-ebs.amazonlinux2-ami",
+  #     "amazon-ebs.openvpn-server-ami",
+  #     "amazon-ebs.deadline-db-ubuntu18-ami"
+  #   ]
+  # }
 
   ### Install Mongo / Deadline DB
 
