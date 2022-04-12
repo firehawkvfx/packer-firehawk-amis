@@ -777,6 +777,16 @@ build {
     ]
   }
 
+  provisioner "shell" {
+    ### AWS CLI
+    inline = [
+      "echo \"awscli test request firehawk-ami 17: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
+    ]
+    only = [
+      "amazon-ebs.centos7-rendernode-ami"
+    ]
+  }
+
   provisioner "ansible" {
     playbook_file = "./ansible/transparent-hugepages-disable.yml"
     user          = "ubuntu"
@@ -799,6 +809,16 @@ build {
     only        = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
+  provisioner "shell" {
+    ### AWS CLI
+    inline = [
+      "echo \"awscli test request firehawk-ami 20: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
+    ]
+    only = [
+      "amazon-ebs.centos7-rendernode-ami"
+    ]
+  }
+
   provisioner "shell" { ### Download Deadline install script
     inline = [
       "cd /var/tmp; git clone --branch v0.0.7 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
@@ -806,6 +826,16 @@ build {
     ]
     only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
+      "amazon-ebs.centos7-rendernode-ami"
+    ]
+  }
+
+  provisioner "shell" {
+    ### AWS CLI
+    inline = [
+      "echo \"awscli test request firehawk-ami 21: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
+    ]
+    only = [
       "amazon-ebs.centos7-rendernode-ami"
     ]
   }
