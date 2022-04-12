@@ -860,11 +860,22 @@ build {
       "amazon-ebs.centos7-rendernode-ami"
     ]
   }
+
+  provisioner "shell" {
+    ### AWS CLI
+    inline = [
+      "sudo -i -u ${var.deadlineuser_name} echo \"awscli test request firehawk-ami 22: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
+    ]
+    only = [
+      "amazon-ebs.centos7-rendernode-ami"
+    ]
+  }
+
   provisioner "shell" { ### Install Deadline for Client Worker
     inline = [
       "sudo -i -u ${var.deadlineuser_name} mkdir -p /home/${var.deadlineuser_name}/Thinkbox/Deadline10",
       "sudo -i -u ${var.deadlineuser_name} touch /home/${var.deadlineuser_name}/Thinkbox/Deadline10/secure.ini", # to fix a bug introduced by Thinkbox in 10.1.17.x
-      "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages",
+      "sudo -i -u ${var.deadlineuser_name} set -x; /var/tmp/aws-thinkbox-deadline/install-deadline --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages",
       "sudo rm -fv /tmp/Deadline-${local.deadline_version}-linux-installers.tar",
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
       "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
