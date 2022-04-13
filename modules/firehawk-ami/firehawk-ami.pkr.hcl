@@ -876,7 +876,7 @@ build {
       "sudo -i -u ${var.deadlineuser_name} mkdir -p /home/${var.deadlineuser_name}/Thinkbox/Deadline10",
       "sudo -i -u ${var.deadlineuser_name} touch /home/${var.deadlineuser_name}/Thinkbox/Deadline10/secure.ini", # to fix a bug introduced by Thinkbox in 10.1.17.x
       "echo 'Get aws version C:'",
-      "sudo -i -u ${var.deadlineuser_name} echo \"$(aws --version)\""
+      "sudo -i -u ${var.deadlineuser_name} echo \"$(aws --version)\"",
       "sudo -i -u ${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline/install-deadline --verbose --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages",
       "sudo rm -fv /tmp/Deadline-${local.deadline_version}-linux-installers.tar",
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
