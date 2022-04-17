@@ -97,7 +97,7 @@ if [[ "$sourced" -eq 0 ]]; then
     packer build "$@" -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
       -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
       -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
-      -only "amazon-ebs.centos7-rendernode-ami"
+      -only="amazon-ebs.centos7-rendernode-ami"
       $SCRIPTDIR/firehawk-ami.pkr.hcl
 fi
 cd $EXECDIR
