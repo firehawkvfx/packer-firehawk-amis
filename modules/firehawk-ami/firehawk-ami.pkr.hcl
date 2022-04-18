@@ -510,8 +510,8 @@ build {
       # "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.5.4.zip\" -o \"awscliv2.zip\"",
       # "unzip -q awscliv2.zip",
       # "sudo ./aws/install -b /usr/local/bin",
-      # "/usr/local/bin/aws --version",
-      "echo \"awscli test request firehawk-ami 01: $(/usr/local/bin/aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
+      # "aws --version",
+      "echo \"awscli test request firehawk-ami 01: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
@@ -737,8 +737,8 @@ build {
       # "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.5.4.zip\" -o \"awscliv2.zip\"",
       # "unzip -q awscliv2.zip",
       # "sudo ./aws/install -b /usr/local/bin",
-      # "/usr/local/bin/aws --version",
-      "echo \"awscli test request firehawk-ami 10: $(/usr/local/bin/aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
+      # "aws --version",
+      "echo \"awscli test request firehawk-ami 10: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
@@ -783,7 +783,7 @@ build {
   provisioner "shell" {
     ### AWS CLI
     inline = [
-      "echo \"awscli test request firehawk-ami 17: $(/usr/local/bin/aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
+      "echo \"awscli test request firehawk-ami 17: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami"
@@ -815,7 +815,7 @@ build {
   provisioner "shell" {
     ### AWS CLI
     inline = [
-      "echo \"awscli test request firehawk-ami 20: $(/usr/local/bin/aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
+      "echo \"awscli test request firehawk-ami 20: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami"
@@ -824,7 +824,7 @@ build {
 
   provisioner "shell" { ### Download Deadline install script
     inline = [
-      "cd /var/tmp; git clone --branch v0.0.11 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
+      "cd /var/tmp; git clone --branch v0.0.12 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
       "sudo chown -R ${var.deadlineuser_name}:${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline"
     ]
     only = [
@@ -836,7 +836,7 @@ build {
   provisioner "shell" {
     ### AWS CLI
     inline = [
-      "echo \"awscli test request firehawk-ami 21: $(/usr/local/bin/aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
+      "echo \"awscli test request firehawk-ami 21: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami"
@@ -851,7 +851,7 @@ build {
       "sudo rm /tmp/Deadline-${local.deadline_version}-linux-installers.tar",
       "sudo apt-get install -y zip unzip",
       "sudo su - ${var.deadlineuser_name} -c \"/tmp/zip-each-folder /opt/Thinkbox/DeadlineRepository10/submission\"",
-      "sudo su - ${var.deadlineuser_name} -c \"/usr/local/bin/aws s3 sync /opt/Thinkbox/DeadlineRepository10/submission \"s3://${local.installers_bucket}/Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission\"\""
+      "sudo su - ${var.deadlineuser_name} -c \"aws s3 sync /opt/Thinkbox/DeadlineRepository10/submission \"s3://${local.installers_bucket}/Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission\"\""
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
@@ -867,7 +867,7 @@ build {
   provisioner "shell" {
     ### AWS CLI
     inline = [
-      "sudo su - ${var.deadlineuser_name} -c \"echo \"awscli test request firehawk-ami 22: $(/usr/local/bin/aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\"\""
+      "sudo su - ${var.deadlineuser_name} -c \"echo \"awscli test request firehawk-ami 22: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\"\""
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami"
@@ -879,7 +879,7 @@ build {
       "sudo su - ${var.deadlineuser_name} -c \"mkdir -p /home/${var.deadlineuser_name}/Thinkbox/Deadline10\"",
       "sudo su - ${var.deadlineuser_name} -c \"touch /home/${var.deadlineuser_name}/Thinkbox/Deadline10/secure.ini\"", # to fix a bug introduced by Thinkbox in 10.1.17.x
       "echo 'Get aws version C:'",
-      "sudo su - ${var.deadlineuser_name} -c \"echo \"$(/usr/local/bin/aws --version)\"\"",
+      "sudo su - ${var.deadlineuser_name} -c \"echo \"$(aws --version)\"\"",
       "sudo su - ${var.deadlineuser_name} -c \"/var/tmp/aws-thinkbox-deadline/install-deadline --verbose --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages\"",
       "sudo rm -fv /tmp/Deadline-${local.deadline_version}-linux-installers.tar",
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
@@ -887,12 +887,12 @@ build {
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "echo '...Wait for Submission/Client plugin from bucket'",
       # The need to wait for this dependency is unfortunate... the deadline repository /submission scripts for the render node are not available until the repostory is installed.  Rather than break the parallel build workflow, we test for existance of the required file in the s3 bucket for a duration limit (15 mins) before failing the render node build.  The deadline DB places those files in the bucket when installing, so if this fails, it should be because the Deadline repository build failed.
-      "sudo su - ${var.deadlineuser_name} -c \"/tmp/retry '/usr/local/bin/aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip' 'Wait for file to arrive in bucket...'\"",
+      "sudo su - ${var.deadlineuser_name} -c \"/tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip' 'Wait for file to arrive in bucket...'\"",
       "echo '...Retrieve file...'",
-      "sudo su - ${var.deadlineuser_name} -c \"/usr/local/bin/aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip /tmp/Houdini.zip\"",
-      "sudo su - ${var.deadlineuser_name} -c \"/tmp/retry '/usr/local/bin/aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip' 'Wait for file to arrive in bucket...'\"",
+      "sudo su - ${var.deadlineuser_name} -c \"aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip /tmp/Houdini.zip\"",
+      "sudo su - ${var.deadlineuser_name} -c \"/tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip' 'Wait for file to arrive in bucket...'\"",
       "echo '...Retrieve file...'",
-      "sudo su - ${var.deadlineuser_name} -c \"/usr/local/bin/aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip /tmp/HServer.zip\"",
+      "sudo su - ${var.deadlineuser_name} -c \"aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip /tmp/HServer.zip\"",
       "echo '...Create /var/tmp/submission'",
       "sudo su - ${var.deadlineuser_name} -c \"mkdir -p /var/tmp/submission\"",
       "sudo su - ${var.deadlineuser_name} -c \"unzip /tmp/Houdini.zip -d /var/tmp/submission\"",
