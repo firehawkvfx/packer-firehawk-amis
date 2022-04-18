@@ -503,24 +503,6 @@ build {
     ]
   }
 
-  provisioner "shell" {
-    ### AWS CLI
-    inline = [
-      # # "python3 -m pip install --user --upgrade awscli",
-      # "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.5.4.zip\" -o \"awscliv2.zip\"",
-      # "unzip -q awscliv2.zip",
-      # "sudo ./aws/install -b /usr/local/bin",
-      # "aws --version",
-      "echo \"awscli test request firehawk-ami 01: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
-    ]
-    only = [
-      "amazon-ebs.centos7-rendernode-ami",
-      # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami", These come with the cli already
-      # "amazon-ebs.amazonlinux2-ami",
-      # "amazon-ebs.openvpn-server-ami",
-      # "amazon-ebs.deadline-db-ubuntu18-ami"
-    ]
-  }
 
   provisioner "ansible" { # See https://github.com/hashicorp/packer-plugin-ansible/issues/47#issuecomment-852443057
     playbook_file = "./ansible/ansible_init.yaml"
@@ -730,25 +712,6 @@ build {
     ]
   }
 
-  provisioner "shell" {
-    ### AWS CLI
-    inline = [
-      # # "python3 -m pip install --user --upgrade awscli",
-      # "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.5.4.zip\" -o \"awscliv2.zip\"",
-      # "unzip -q awscliv2.zip",
-      # "sudo ./aws/install -b /usr/local/bin",
-      # "aws --version",
-      "echo \"awscli test request firehawk-ami 10: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
-    ]
-    only = [
-      "amazon-ebs.centos7-rendernode-ami",
-      # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami", These come with the cli already
-      # "amazon-ebs.amazonlinux2-ami",
-      # "amazon-ebs.openvpn-server-ami",
-      # "amazon-ebs.deadline-db-ubuntu18-ami"
-    ]
-  }
-
   ### Install Mongo / Deadline DB
 
   provisioner "shell" {
@@ -780,16 +743,6 @@ build {
     ]
   }
 
-  provisioner "shell" {
-    ### AWS CLI
-    inline = [
-      "echo \"awscli test request firehawk-ami 17: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
-    ]
-    only = [
-      "amazon-ebs.centos7-rendernode-ami"
-    ]
-  }
-
   provisioner "ansible" {
     playbook_file = "./ansible/transparent-hugepages-disable.yml"
     user          = "ubuntu"
@@ -812,33 +765,13 @@ build {
     only        = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
-  provisioner "shell" {
-    ### AWS CLI
-    inline = [
-      "echo \"awscli test request firehawk-ami 20: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
-    ]
-    only = [
-      "amazon-ebs.centos7-rendernode-ami"
-    ]
-  }
-
   provisioner "shell" { ### Download Deadline install script
     inline = [
-      "cd /var/tmp; git clone --branch v0.0.12 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
+      "cd /var/tmp; git clone --branch v0.0.13 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
       "sudo chown -R ${var.deadlineuser_name}:${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline"
     ]
     only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
-      "amazon-ebs.centos7-rendernode-ami"
-    ]
-  }
-
-  provisioner "shell" {
-    ### AWS CLI
-    inline = [
-      "echo \"awscli test request firehawk-ami 21: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\""
-    ]
-    only = [
       "amazon-ebs.centos7-rendernode-ami"
     ]
   }
@@ -864,22 +797,10 @@ build {
     ]
   }
 
-  provisioner "shell" {
-    ### AWS CLI
-    inline = [
-      "sudo su - ${var.deadlineuser_name} -c \"echo \"awscli test request firehawk-ami 22: $(aws s3api head-object --bucket thinkbox-installers --key Deadline/10.1.18.5/Linux/Deadline-10.1.18.5-linux-installers.tar)\"\""
-    ]
-    only = [
-      "amazon-ebs.centos7-rendernode-ami"
-    ]
-  }
-
   provisioner "shell" { ### Install Deadline for Client Worker
     inline = [
       "sudo su - ${var.deadlineuser_name} -c \"mkdir -p /home/${var.deadlineuser_name}/Thinkbox/Deadline10\"",
       "sudo su - ${var.deadlineuser_name} -c \"touch /home/${var.deadlineuser_name}/Thinkbox/Deadline10/secure.ini\"", # to fix a bug introduced by Thinkbox in 10.1.17.x
-      "echo 'Get aws version C:'",
-      "sudo su - ${var.deadlineuser_name} -c \"echo \"$(aws --version)\"\"",
       "sudo su - ${var.deadlineuser_name} -c \"/var/tmp/aws-thinkbox-deadline/install-deadline --verbose --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages\"",
       "sudo rm -fv /tmp/Deadline-${local.deadline_version}-linux-installers.tar",
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
