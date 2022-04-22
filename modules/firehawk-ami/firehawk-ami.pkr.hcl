@@ -535,7 +535,7 @@ build {
       " set -x; /tmp/terraform-aws-vault/modules/install-vault/install-vault --download-url ${var.vault_download_url} --skip-package-update",
       "else",
       " set -x; /tmp/terraform-aws-vault/modules/install-vault/install-vault --version 1.6.1 --skip-package-update",
-      "fi",
+      "fi"
       # "if [[ -n \"$(command -v yum)\" ]]; then sudo yum remove awscli -y; fi", # uninstall AWS CLI v1
       # "if [[ -n \"$(command -v apt-get)\" ]]; then sudo apt-get remove awscli -y; fi", # uninstall AWS CLI v1
       # "if sudo test -f /bin/aws; then sudo rm -f /bin/aws; fi" # Ensure AWS CLI v1 doesn't exist
