@@ -9,8 +9,6 @@ packer_version="1.7.2"
 set -e
 set -x
 
-aws sts get-caller-identity
-
 SOURCE=${BASH_SOURCE[0]} # resolve the script dir even if a symlink is used to this script
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
