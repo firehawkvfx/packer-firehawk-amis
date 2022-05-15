@@ -844,6 +844,20 @@ build {
     galaxy_file      = "./requirements.yml"
     only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
+  
+  provisioner "shell" { ### Validate deadline has houdini plugin configured for intended version
+    inline = [
+      "cat \"/opt/Thinkbox/DeadlineRepository10/plugins/Houdini/Houdini.param\" | grep -m 1 \"19.000\bin\Hython\" && passed=\"true\""
+      "if [[ \"$passed\" != \"true\" ]]; then;",
+      "  echo 'no match for houdini version 19.0 in Deadline config'",
+      "  exit 1", 
+      "fi"
+    ]
+    only = [
+      "amazon-ebs.deadline-db-ubuntu18-ami"
+    ]
+    inline_shebang = "/bin/bash -e"
+  }
 
   ### Install FSX fsx_packages.yaml
 
