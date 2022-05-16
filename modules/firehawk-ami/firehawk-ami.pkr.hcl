@@ -888,7 +888,7 @@ build {
     extra_arguments = [
       "-vv",
       "--extra-vars",
-      "variable_user=deadlineuser resourcetier=${var.resourcetier} houdini_major_version_list=['19.0'] installers_bucket=${local.installers_bucket} variable_host=default houdini_build=${local.houdini_build} sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key} houdini_license_server_address=${var.houdini_license_server_address} user_deadlineuser_pw='' package_python_interpreter=/usr/bin/python2.7 firehawk_houdini_tools=/home/deadlineuser/openfirehawk-houdini-tools",
+      "variable_user=deadlineuser resourcetier=${var.resourcetier} houdini_major_version_list=[19.0] installers_bucket=${local.installers_bucket} variable_host=default houdini_build=${local.houdini_build} sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key} houdini_license_server_address=${var.houdini_license_server_address} user_deadlineuser_pw='' package_python_interpreter=/usr/bin/python2.7 firehawk_houdini_tools=/home/deadlineuser/openfirehawk-houdini-tools",
       "--tags",
       "install_houdini,set_hserver,install_deadline_db"
     ]
