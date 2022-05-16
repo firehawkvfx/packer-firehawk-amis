@@ -18,13 +18,7 @@
   #   - /deployuser/ansible/group_vars/all/vars
 
   tasks:
-  # - name: aquire vars from secrets path before using defaults
-  #   include_vars: "{{ item }}"
-  #   with_first_found: "{{ vars_files_locs }}"
-  #   tags:
-  #   - always
-
-  - name: setup houdini plugin in deadline repository for each major version.  This identical role use occurs in 2 locations - after deadline install and with install of Houdini
+  - name: "Setup houdini plugin in deadline repository for each major version {{ houdini_major_version_list }}.  This identical role use occurs in 2 locations - after deadline install and with install of Houdini"
     include_role:
       name: firehawkvfx.houdini.deadlinedb_houdini_plugins
       apply:
