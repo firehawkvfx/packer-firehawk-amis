@@ -836,7 +836,7 @@ build {
       "--extra-vars",
       "resourcetier=${var.resourcetier} houdini_major_version_list=['19.0'] variable_host=default houdini_build=${local.houdini_build}",
       "--tags",
-      "install_houdini"
+      "install_houdini,install_deadline_db"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
