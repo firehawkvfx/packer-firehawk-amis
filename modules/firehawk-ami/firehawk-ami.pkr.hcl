@@ -123,7 +123,7 @@ variable "SSL_expiry" {
 locals {
   timestamp         = regex_replace(timestamp(), "[- TZ:]", "")
   template_dir      = path.root
-  deadline_version  = "10.1.18.5"
+  deadline_version  = "10.1.21.4"
   installers_bucket = var.installers_bucket
   common_ami_tags = {
     "packer_template" : "firehawk-ami",
