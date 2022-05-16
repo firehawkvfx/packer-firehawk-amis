@@ -850,7 +850,7 @@ build {
     inline = [
       # "sudo cat \"/opt/Thinkbox/DeadlineRepository10/plugins/Houdini/Houdini.param\" | grep -m 1 '19.0.000\\bin\\Hython' && passed=\"true\"",
       # "if [[ \"$passed\" != \"true\" ]]; then",
-      "if ! grep -Fxq \"19.0.000\bin\Hython\" /opt/Thinkbox/DeadlineRepository10/plugins/Houdini/Houdini.param; then",
+      "if ! grep -li \"19.0.000\\bin\\Hython\" /opt/Thinkbox/DeadlineRepository10/plugins/Houdini/Houdini.param; then",
       "  echo 'no match for houdini version 19.0 in Deadline config'",
       "  sudo cat \"/opt/Thinkbox/DeadlineRepository10/plugins/Houdini/Houdini.param\"",
       "  exit 1", 
