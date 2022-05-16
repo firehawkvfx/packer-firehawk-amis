@@ -831,10 +831,11 @@ build {
   ### Install Houdini Plugin for Deadline DB ###
   provisioner "ansible" {
     playbook_file = "./ansible/deadline_db_houdini_plugin.yml"
+    user          = "ubuntu"
     extra_arguments = [
       "-vvv",
       "--extra-vars",
-      "resourcetier=${var.resourcetier} variable_host=default variable_connect_as_user=ubuntu houdini_build=${local.houdini_build}",
+      "resourcetier=${var.resourcetier} variable_host=default variable_connect_as_user=ubuntu houdini_build=${local.houdini_build} delegate_host=localhost",
       "--tags",
       "install_houdini,install_deadline_db"
     ]
