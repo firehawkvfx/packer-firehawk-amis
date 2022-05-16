@@ -832,7 +832,7 @@ build {
   provisioner "ansible" {
     playbook_file = "./ansible/deadline_db_houdini_plugin.yml"
     extra_arguments = [
-      # "-vvv",
+      "-vvv",
       "--extra-vars",
       "resourcetier=${var.resourcetier} variable_host=default variable_connect_as_user=ubuntu houdini_build=${local.houdini_build}",
       "--tags",
