@@ -18,7 +18,7 @@
   #   - /deployuser/ansible/group_vars/all/vars
 
   tasks:
-  - name: "Setup houdini plugin in deadline repository for each major version {{ houdini_major_version_list }}.  This identical role use occurs in 2 locations - after deadline install and with install of Houdini"
+  - name: "Setup houdini plugin in deadline repository for {{ houdini_major_version_list|length }} major versions {{ houdini_major_version_list }}.  This identical role use occurs in 2 locations - after deadline install and with install of Houdini"
     include_role:
       name: firehawkvfx.houdini.deadlinedb_houdini_plugins
       apply:
