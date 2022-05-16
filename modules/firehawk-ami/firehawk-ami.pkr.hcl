@@ -834,7 +834,7 @@ build {
     extra_arguments = [
       # "-vvv",
       "--extra-vars",
-      "resourcetier=${var.resourcetier} variable_host=default houdini_build=${local.houdini_build}",
+      "resourcetier=${var.resourcetier} variable_host=default variable_connect_as_user=ubuntu houdini_build=${local.houdini_build}",
       "--tags",
       "install_houdini,install_deadline_db"
     ]
