@@ -875,6 +875,29 @@ build {
     extra_arguments = [
       "-vv",
       "--extra-vars",
+      jsonencode(
+        { 
+          "houdini_major_version_list" = ["19.0"],
+          "houdini_version_list": [
+            {
+              "houdini_major_version": 19,
+              "houdini_auto_version": true,
+              "houdini_minor_version": "auto",
+              "houdini_linux_tar_filename": "auto",
+              "houdini_build": "daily"
+            }
+          ],
+          "houdini_license_server_version_list": [
+            {
+              "houdini_major_version": 19,
+              "houdini_auto_version": true,
+              "houdini_minor_version": "auto",
+              "houdini_linux_tar_filename": "auto",
+              "houdini_build": "production"
+            }
+          ]
+        }
+      ),
       "variable_user=deadlineuser resourcetier=${var.resourcetier} installers_bucket=${local.installers_bucket} variable_host=default houdini_build=${local.houdini_build} sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key} houdini_license_server_address=${var.houdini_license_server_address} user_deadlineuser_pw='' package_python_interpreter=/usr/bin/python2.7 firehawk_houdini_tools=/home/deadlineuser/openfirehawk-houdini-tools",
       "--tags",
       "install_houdini,set_hserver,install_deadline_db"
