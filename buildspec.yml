@@ -24,7 +24,7 @@ phases:
       - ./init/init
   build:
     commands:
-      - source ./update_vars.sh --codebuild --resourcetier $resourcetier
-      - ./modules/firehawk-base-ami/build.sh
+      # - source ./update_vars.sh --codebuild --resourcetier $resourcetier
+      # - ./modules/firehawk-base-ami/build.sh
       - source ./update_vars.sh --codebuild --resourcetier $resourcetier
       - ./modules/firehawk-ami/build.sh
