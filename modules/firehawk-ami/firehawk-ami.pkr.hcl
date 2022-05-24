@@ -767,7 +767,7 @@ build {
 
   provisioner "shell" { ### Download Deadline install script
     inline = [
-      "cd /var/tmp; git clone --branch v0.0.13 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
+      "cd /var/tmp; git clone --branch main https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
       "sudo chown -R ${var.deadlineuser_name}:${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline"
     ]
     only = [
@@ -778,7 +778,7 @@ build {
 
   provisioner "shell" { ### Install Deadline for DB, RCS Client
     inline = [
-      "sudo su - ${var.deadlineuser_name} -c \"/var/tmp/aws-thinkbox-deadline/install-deadline --verbose --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages --installers-bucket ${local.installers_bucket}\"",
+      "set -x; sudo su - ${var.deadlineuser_name} -c \"/var/tmp/aws-thinkbox-deadline/install-deadline --verbose --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --skip-certgen-during-db-install --skip-certgen-during-rcs-install --skip-install-validation --skip-install-packages --installers-bucket ${local.installers_bucket}\"",
       "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
       "sudo rm -fv /var/tmp/downloads/AWSPortalLink*",
       "sudo rm /tmp/Deadline-${local.deadline_version}-linux-installers.tar",
@@ -801,7 +801,7 @@ build {
     inline = [
       "sudo su - ${var.deadlineuser_name} -c \"mkdir -p /home/${var.deadlineuser_name}/Thinkbox/Deadline10\"",
       "sudo su - ${var.deadlineuser_name} -c \"touch /home/${var.deadlineuser_name}/Thinkbox/Deadline10/secure.ini\"", # to fix a bug introduced by Thinkbox in 10.1.17.x
-      "sudo su - ${var.deadlineuser_name} -c \"/var/tmp/aws-thinkbox-deadline/install-deadline --verbose --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages\"",
+      "sudo su - ${var.deadlineuser_name} -c \"/var/tmp/aws-thinkbox-deadline/install-deadline --verbose --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages --installers-bucket ${local.installers_bucket}\"",
       "sudo rm -fv /tmp/Deadline-${local.deadline_version}-linux-installers.tar",
       "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
       "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
