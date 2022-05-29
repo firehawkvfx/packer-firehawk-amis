@@ -42,7 +42,7 @@ variable "terragrunt_version" {
   default     = "0.36.0"
 }
 variable "firehawk_deadline_installer_version" {
-  description = "The current environment ( dev / green / blue / main )"
+  description = "The firehawk repo aws-thinkbox-deadline version to install/configure Deadline"
   type        = string
   default     = "v0.0.16"
 }
