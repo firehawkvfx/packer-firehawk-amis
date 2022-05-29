@@ -41,6 +41,11 @@ variable "terragrunt_version" {
   type        = string
   default     = "0.36.0"
 }
+variable "firehawk_deadline_installer_version" {
+  description = "The current environment ( dev / green / blue / main )"
+  type        = string
+  default     = "v0.0.16"
+}
 variable "ca_public_key_path" {
   type = string
   # default = "/home/ec2-user/.ssh/tls/ca.crt.pem"
@@ -143,7 +148,11 @@ locals {
 }
 
 source "amazon-ebs" "openvpn-server-ami" {
-  tags            = merge({ "ami_role" : "firehawk_openvpn_server_ami" }, local.common_ami_tags)
+  tags = merge(
+    { "ami_role" : "firehawk_openvpn_server_ami" },
+    { "Name" : "firehawk_openvpn_server_ami" },
+    local.common_ami_tags
+  )
   ami_description = "An Open VPN Access Server AMI configured for Firehawk"
   ami_name        = "firehawk-openvpn-server-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -171,7 +180,11 @@ EOF
 }
 
 source "amazon-ebs" "amazonlinux2-ami" {
-  tags            = merge({ "ami_role" : "firehawk_amazonlinux2_ami" }, local.common_ami_tags)
+  tags = merge(
+    { "ami_role" : "firehawk_amazonlinux2_ami" },
+    { "Name" : "firehawk_amazonlinux2_ami" },
+    local.common_ami_tags
+  )
   ami_description = "An Amazon Linux 2 AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-bastion-amazonlinux2-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -192,7 +205,11 @@ source "amazon-ebs" "amazonlinux2-ami" {
 }
 
 source "amazon-ebs" "amazonlinux2-nicedcv-nvidia-ami" {
-  tags            = merge({ "ami_role" : "firehawk_amazonlinux2_nicedcv_ami" }, local.common_ami_tags)
+  tags = merge(
+    { "ami_role" : "firehawk_amazonlinux2_nicedcv_ami" },
+    { "Name" : "firehawk_amazonlinux2_nicedcv_ami" },
+    local.common_ami_tags
+  )
   ami_description = "A Graphical Amazon Linux 2 NICE DCV AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-workstation-amazonlinux2-nicedcv-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -233,7 +250,11 @@ source "amazon-ebs" "amazonlinux2-nicedcv-nvidia-ami" {
 #could not parse template for following block: "template: generated:4: function \"clean_resource_name\" not defined"
 
 source "amazon-ebs" "centos7-ami" {
-  tags            = merge({ "ami_role" : "firehawk_centos7_ami" }, local.common_ami_tags)
+  tags = merge(
+    { "ami_role" : "firehawk_centos7_ami" },
+    { "Name" : "firehawk_centos7_ami" },
+    local.common_ami_tags
+  )
   ami_description = "A Cent OS 7 AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-bastion-centos7-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -255,7 +276,12 @@ source "amazon-ebs" "centos7-ami" {
 }
 
 source "amazon-ebs" "centos7-rendernode-ami" {
-  tags            = merge({ "ami_role" : "firehawk_centos7_rendernode_ami" }, local.common_ami_tags)
+  tags = merge(
+    { "ami_role" : "firehawk_centos7_rendernode_ami" },
+    { "Name" : "firehawk_centos7_rendernode_ami" },
+    { "firehawk_deadline_installer_version" : "${var.firehawk_deadline_installer_version}" },
+    local.common_ami_tags
+  )
   ami_description = "A Cent OS 7 AMI rendernode."
   ami_name        = "firehawk-rendernode-centos7-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -293,7 +319,11 @@ source "amazon-ebs" "centos7-rendernode-ami" {
 }
 
 source "amazon-ebs" "ubuntu18-ami" {
-  tags            = merge({ "ami_role" : "firehawk_ubuntu18_ami" }, local.common_ami_tags)
+  tags = merge(
+    { "ami_role" : "firehawk_ubuntu18_ami" },
+    { "Name" : "firehawk_ubuntu18_ami" },
+    local.common_ami_tags
+  )
   ami_description = "An Ubuntu 18.04 AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-bastion-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -314,7 +344,11 @@ source "amazon-ebs" "ubuntu18-ami" {
 }
 
 source "amazon-ebs" "ubuntu18-vault-consul-server-ami" {
-  tags            = merge({ "ami_role" : "firehawk_ubuntu18_vault_consul_server_ami" }, local.common_ami_tags)
+  tags = merge(
+    { "ami_role" : "firehawk_ubuntu18_vault_consul_server_ami" },
+    { "Name" : "firehawk_ubuntu18_vault_consul_server_ami" },
+    local.common_ami_tags
+  )
   ami_description = "An Ubuntu 18.04 AMI Vault and Consul Server."
   ami_name        = "firehawk-vault-consul-server-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -346,7 +380,12 @@ source "amazon-ebs" "ubuntu18-vault-consul-server-ami" {
 }
 
 source "amazon-ebs" "deadline-db-ubuntu18-ami" {
-  tags            = merge({ "ami_role" : "firehawk_deadlinedb_ami" }, local.common_ami_tags)
+  tags = merge(
+    { "ami_role" : "firehawk_deadlinedb_ami" },
+    { "Name" : "firehawk_deadlinedb_ami" },
+    { "firehawk_deadline_installer_version" : "${var.firehawk_deadline_installer_version}" },
+    local.common_ami_tags
+  )
   ami_description = "An Ubuntu 18.04 AMI with Deadline DB ${local.deadline_version} server."
   ami_name        = "firehawk-deadlinedb-ubuntu18-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
@@ -767,7 +806,7 @@ build {
 
   provisioner "shell" { ### Download Deadline install script
     inline = [
-      "cd /var/tmp; git clone --branch v0.0.14 https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
+      "cd /var/tmp; git clone --branch ${firehawk_deadline_installer_version} https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
       "sudo chown -R ${var.deadlineuser_name}:${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline"
     ]
     only = [
@@ -880,20 +919,20 @@ build {
           "houdini_major_version_list" = ["19.0"],
           "houdini_version_list" = [
             {
-              "houdini_major_version" = "19.0",
-              "houdini_auto_version" = "true",
-              "houdini_minor_version" = "auto",
+              "houdini_major_version"      = "19.0",
+              "houdini_auto_version"       = "true",
+              "houdini_minor_version"      = "auto",
               "houdini_linux_tar_filename" = "auto",
-              "houdini_build" = "daily"
+              "houdini_build"              = "daily"
             }
           ],
           "houdini_license_server_version_list" : [
             {
-              "houdini_major_version" = "19.0",
-              "houdini_auto_version" = "true",
-              "houdini_minor_version" = "auto",
+              "houdini_major_version"      = "19.0",
+              "houdini_auto_version"       = "true",
+              "houdini_minor_version"      = "auto",
               "houdini_linux_tar_filename" = "auto",
-              "houdini_build" = "production"
+              "houdini_build"              = "production"
             }
           ]
         }
