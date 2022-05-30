@@ -2,6 +2,41 @@
 set -e
 set -x
 
+# Header to get this script's path
+EXECDIR="$(pwd)"
+SOURCE=${BASH_SOURCE[0]}   # resolve the script dir even if a symlink is used to this script
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR=$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
+  SOURCE=$(readlink "$SOURCE")
+  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+SCRIPTDIR=$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
+cd $SCRIPTDIR
+
+
+### Vars
+build_list="amazon-ebs.amazonlinux2-ami,\
+amazon-ebs.amazonlinux2-nicedcv-nvidia-ami,\
+amazon-ebs.centos7-ami,\
+amazon-ebs.centos7-rendernode-ami,\
+amazon-ebs.ubuntu18-ami,\
+amazon-ebs.ubuntu18-vault-consul-server-ami,\
+amazon-ebs.deadline-db-ubuntu18-ami,\
+amazon-ebs.openvpn-server-ami"
+
+export PKR_VAR_resourcetier="$TF_VAR_resourcetier"
+export PKR_VAR_ami_role="firehawk-ami"
+export PKR_VAR_commit_hash="$(git rev-parse HEAD)"
+export PKR_VAR_commit_hash_short="$(git rev-parse --short HEAD)"
+export PKR_VAR_aws_region="$AWS_DEFAULT_REGION"
+export PACKER_LOG=1
+export PACKER_LOG_PATH="$SCRIPTDIR/packerlog.log"
+
+cd $SCRIPTDIR/../firehawk-base-ami
+export PKR_VAR_ingress_commit_hash="$(git rev-parse HEAD)" # the commit hash for incoming amis
+export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
+cd $SCRIPTDIR
+
 echo "Building AMI's for deployment..."
 
 function log {
@@ -33,45 +68,51 @@ function error_if_empty {
   return
 }
 
-EXECDIR="$(pwd)"
-SOURCE=${BASH_SOURCE[0]}   # resolve the script dir even if a symlink is used to this script
-while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR=$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
-  SOURCE=$(readlink "$SOURCE")
-  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-done
-SCRIPTDIR=$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
-cd $SCRIPTDIR
-# source ../../../../update_vars.sh --sub-script --skip-find-amis
-# AMI TAGS
-# Get the resourcetier from the instance tag.
-# export TF_VAR_instance_id_main_cloud9=$(curl http://169.254.169.254/latest/meta-data/instance-id)
-# export TF_VAR_resourcetier="$(aws ec2 describe-tags --filters Name=resource-id,Values=$TF_VAR_instance_id_main_cloud9 --out=json|jq '.Tags[]| select(.Key == "resourcetier")|.Value' --raw-output)" # Can be dev,green,blue,main.  it is pulled from this instance's tags by default
-export PKR_VAR_resourcetier="$TF_VAR_resourcetier"
-export PKR_VAR_ami_role="firehawk-ami"
-export PKR_VAR_commit_hash="$(git rev-parse HEAD)"
-export PKR_VAR_commit_hash_short="$(git rev-parse --short HEAD)"
-# export PKR_VAR_account_id=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep -oP '(?<="accountId" : ")[^"]*(?=")')
-cd $SCRIPTDIR/../firehawk-base-ami
-export PKR_VAR_ingress_commit_hash="$(git rev-parse HEAD)" # the commit hash for incoming amis
-export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
+### Idempotency logic: exit if all images exist
+error_if_empty "Missing: PKR_VAR_commit_hash_short: $PKR_VAR_commit_hash_short"
+error_if_empty "Missing: build_list: $build_list"
 
+ami_query=$(aws ec2 describe-images --owners self --filters "Name=tag:commit_hash_short,Values=[$PKR_VAR_commit_hash_short]" --query "Images[*].{ImageId:ImageId,date:CreationDate,Name:Name,SnapshotId:BlockDeviceMappings[0].Ebs.SnapshotId,commit_hash_short:[Tags[?Key=='commit_hash_short']][0][0].Value,packer_source:[Tags[?Key=='packer_source']][0][0].Value}")
+
+total_built_images=$(echo $ami_query | jq -r '. | length')
+
+missing_images_for_hash=$(echo $ami_query \
+| jq -r '
+  .[].packer_source' \
+| jq --arg BUILDLIST "$build_list" --slurp --raw-input 'split("\n")[:-1] as $existing_names 
+| ($existing_names | unique) as $existing_names_set
+| ($BUILDLIST | split(",") | unique) as $intended_names_set
+| $intended_names_set - $existing_names_set
+')
+
+count_missing_images_for_hash=$(jq -n --argjson data "$missing_images_for_hash" '$data | length')
+
+if [[ "$count_missing_images_for_hash" -eq 0 ]]; then
+  echo "All images have already been built for this hash and build list."
+  echo
+  echo "To force a build, ensure at least one image from the build list is missing.  The builder will erase all images for the commit hash and rebuild."
+
+  cd $EXECDIR
+  set +e
+  exit 0
+fi
+
+
+### Ensure certs exist
+echo "Ensuring certificates exit for AMI's and consul"
 cd $SCRIPTDIR/../../init/modules/terraform-remote-state-inputs
 terragrunt init \
   -input=false
 terragrunt plan -out=tfplan -input=false
 terragrunt apply -input=false tfplan
-export PKR_VAR_provisioner_iam_profile_name="$(terragrunt output instance_profile_name)"
+# export PKR_VAR_provisioner_iam_profile_name="$(terragrunt output instance_profile_name)"
 echo "Using profile: $PKR_VAR_provisioner_iam_profile_name"
-export PKR_VAR_installers_bucket="$(terragrunt output installers_bucket)"
+error_if_empty "Missing: PKR_VAR_provisioner_iam_profile_name" "$PKR_VAR_provisioner_iam_profile_name"
+# export PKR_VAR_installers_bucket="$(terragrunt output installers_bucket)"
 echo "Using installers bucket: $PKR_VAR_installers_bucket"
-
+error_if_empty "Missing: PKR_VAR_installers_bucket" "$PKR_VAR_installers_bucket"
 cd $SCRIPTDIR
 
-# Packer Vars
-export PKR_VAR_aws_region="$AWS_DEFAULT_REGION"
-export PACKER_LOG=1
-export PACKER_LOG_PATH="$SCRIPTDIR/packerlog.log"
 
 # retrieve secretsmanager secrets
 sesi_client_secret_key_path="/firehawk/resourcetier/${TF_VAR_resourcetier}/sesi_client_secret_key"
@@ -98,41 +139,13 @@ if [[ ! "$sourced" -eq 0 ]]; then
   exit 0
 fi
 
-build_list="amazon-ebs.amazonlinux2-ami,\
-amazon-ebs.amazonlinux2-nicedcv-nvidia-ami,\
-amazon-ebs.centos7-ami,\
-amazon-ebs.centos7-rendernode-ami,\
-amazon-ebs.ubuntu18-ami,\
-amazon-ebs.ubuntu18-vault-consul-server-ami,\
-amazon-ebs.deadline-db-ubuntu18-ami,\
-amazon-ebs.openvpn-server-ami"
-
-missing_images_for_hash=$(aws ec2 describe-images --owners self --filters "Name=tag:commit_hash_short,Values=[$PKR_VAR_commit_hash_short]" --query "Images[*].{ImageId:ImageId,date:CreationDate,Name:Name,SnapshotId:BlockDeviceMappings[0].Ebs.SnapshotId,commit_hash_short:[Tags[?Key=='commit_hash_short']][0][0].Value,packer_source:[Tags[?Key=='packer_source']][0][0].Value}" \
-| jq -r '
-  .[].packer_source' \
-| jq --arg BUILDLIST "$build_list" --slurp --raw-input 'split("\n")[:-1] as $existing_names 
-| ($existing_names | unique) as $existing_names_set
-| ($BUILDLIST | split(",") | unique) as $intended_names_set
-| $intended_names_set - $existing_names_set
-')
-
-count_missing_images_for_hash=$(jq -n --argjson data "$missing_images_for_hash" '$data | length')
-
-if [[ "$count_missing_images_for_hash" -eq 0 ]]; then
-  echo "All images have already been built for this hash and build list."
-  echo
-  echo "To force a build, ensure at least one image from the build list is missing.  The builder will erase all images for the commit hash and rebuild."
-
-  cd $EXECDIR
-  set +e
-  exit 0
-fi
-
 echo "The following images have not yet been built:"
 echo "$missing_images_for_hash"
-echo "Packer will erase all images for this commit hash and rebuild all images"
 
-$SCRIPTDIR/delete-all-old-amis.sh --commit-hash-short-list $PKR_VAR_commit_hash_short --auto-approve
+if [[ $total_built_images -gt 0]]; then
+  echo "Packer will erase all images for this commit hash and rebuild all images"
+  $SCRIPTDIR/delete-all-old-amis.sh --commit-hash-short-list $PKR_VAR_commit_hash_short --auto-approve
+fi
 
 # Validate
 packer validate "$@" -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
