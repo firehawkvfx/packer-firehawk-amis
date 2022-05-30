@@ -149,6 +149,7 @@ locals {
 
 source "amazon-ebs" "openvpn-server-ami" {
   tags = merge(
+    { "packer_source" : "amazon-ebs.openvpn-server-ami" },
     { "ami_role" : "firehawk_openvpn_server_ami" },
     { "Name" : "firehawk_openvpn_server_ami" },
     local.common_ami_tags
@@ -181,6 +182,7 @@ EOF
 
 source "amazon-ebs" "amazonlinux2-ami" {
   tags = merge(
+    { "packer_source" : "amazon-ebs.amazonlinux2-ami" },
     { "ami_role" : "firehawk_amazonlinux2_ami" },
     { "Name" : "firehawk_amazonlinux2_ami" },
     local.common_ami_tags
@@ -206,6 +208,7 @@ source "amazon-ebs" "amazonlinux2-ami" {
 
 source "amazon-ebs" "amazonlinux2-nicedcv-nvidia-ami" {
   tags = merge(
+    { "packer_source" : "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami" },
     { "ami_role" : "firehawk_amazonlinux2_nicedcv_ami" },
     { "Name" : "firehawk_amazonlinux2_nicedcv_ami" },
     local.common_ami_tags
@@ -251,6 +254,7 @@ source "amazon-ebs" "amazonlinux2-nicedcv-nvidia-ami" {
 
 source "amazon-ebs" "centos7-ami" {
   tags = merge(
+    { "packer_source" : "amazon-ebs.centos7-ami" },
     { "ami_role" : "firehawk_centos7_ami" },
     { "Name" : "firehawk_centos7_ami" },
     local.common_ami_tags
@@ -277,6 +281,7 @@ source "amazon-ebs" "centos7-ami" {
 
 source "amazon-ebs" "centos7-rendernode-ami" {
   tags = merge(
+    { "packer_source" : "amazon-ebs.centos7-rendernode-ami" },
     { "ami_role" : "firehawk_centos7_rendernode_ami" },
     { "Name" : "firehawk_centos7_rendernode_ami" },
     { "firehawk_deadline_installer_version" : "${var.firehawk_deadline_installer_version}" },
@@ -320,6 +325,7 @@ source "amazon-ebs" "centos7-rendernode-ami" {
 
 source "amazon-ebs" "ubuntu18-ami" {
   tags = merge(
+    { "packer_source" : "amazon-ebs.ubuntu18-ami" },
     { "ami_role" : "firehawk_ubuntu18_ami" },
     { "Name" : "firehawk_ubuntu18_ami" },
     local.common_ami_tags
@@ -345,6 +351,7 @@ source "amazon-ebs" "ubuntu18-ami" {
 
 source "amazon-ebs" "ubuntu18-vault-consul-server-ami" {
   tags = merge(
+    { "packer_source" : "amazon-ebs.ubuntu18-vault-consul-server-ami" },
     { "ami_role" : "firehawk_ubuntu18_vault_consul_server_ami" },
     { "Name" : "firehawk_ubuntu18_vault_consul_server_ami" },
     local.common_ami_tags
@@ -381,6 +388,7 @@ source "amazon-ebs" "ubuntu18-vault-consul-server-ami" {
 
 source "amazon-ebs" "deadline-db-ubuntu18-ami" {
   tags = merge(
+    { "packer_source" : "amazon-ebs.deadline-db-ubuntu18-ami" },
     { "ami_role" : "firehawk_deadlinedb_ami" },
     { "Name" : "firehawk_deadlinedb_ami" },
     { "firehawk_deadline_installer_version" : "${var.firehawk_deadline_installer_version}" },

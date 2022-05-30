@@ -34,13 +34,13 @@ function error_if_empty {
 }
 
 EXECDIR="$(pwd)"
-SOURCE=${BASH_SOURCE[0]} # resolve the script dir even if a symlink is used to this script
+SOURCE=${BASH_SOURCE[0]}   # resolve the script dir even if a symlink is used to this script
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+  DIR=$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
   SOURCE=$(readlink "$SOURCE")
   [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
-SCRIPTDIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+SCRIPTDIR=$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
 cd $SCRIPTDIR
 # source ../../../../update_vars.sh --sub-script --skip-find-amis
 
@@ -60,7 +60,7 @@ export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
 
 cd $SCRIPTDIR/../../init/modules/terraform-remote-state-inputs
 terragrunt init \
-    -input=false
+  -input=false
 terragrunt plan -out=tfplan -input=false
 terragrunt apply -input=false tfplan
 export PKR_VAR_provisioner_iam_profile_name="$(terragrunt output instance_profile_name)"
@@ -93,19 +93,30 @@ mkdir -p "$SCRIPTDIR/tmp/log"
 # If sourced, dont execute
 (return 0 2>/dev/null) && sourced=1 || sourced=0
 echo "Script sourced: $sourced"
+
+build_list="amazon-ebs.amazonlinux2-ami,\
+amazon-ebs.amazonlinux2-nicedcv-nvidia-ami,\
+amazon-ebs.centos7-ami,\
+amazon-ebs.centos7-rendernode-ami,\
+amazon-ebs.ubuntu18-ami,\
+amazon-ebs.ubuntu18-vault-consul-server-ami,\
+amazon-ebs.deadline-db-ubuntu18-ami,\
+amazon-ebs.openvpn-server-ami"
+
 if [[ "$sourced" -eq 0 ]]; then
-    # Validate
-    packer validate "$@" -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
-      -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
-      -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
-      $SCRIPTDIR/firehawk-ami.pkr.hcl
-      # -only=amazon-ebs.centos7-rendernode-ami \
-    # Build
-    packer build "$@" -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
-      -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
-      -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
-      $SCRIPTDIR/firehawk-ami.pkr.hcl
-      # -only=amazon-ebs.centos7-rendernode-ami \
+  # Validate
+  packer validate "$@" -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
+    -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
+    -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
+    -only=$build_list \
+    $SCRIPTDIR/firehawk-ami.pkr.hcl
+
+  # Build
+  packer build "$@" -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
+    -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
+    -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
+    -only=$build_list \
+    $SCRIPTDIR/firehawk-ami.pkr.hcl
 fi
 cd $EXECDIR
 
