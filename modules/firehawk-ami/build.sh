@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-set -x
+# set -x
 
 # Header to get this script's path
 EXECDIR="$(pwd)"
@@ -31,7 +31,7 @@ export PKR_VAR_commit_hash_short="$(git rev-parse --short HEAD)"
 export PKR_VAR_aws_region="$AWS_DEFAULT_REGION"
 export PACKER_LOG=1
 export PACKER_LOG_PATH="$SCRIPTDIR/packerlog.log"
-
+export PKR_VAR_manifest_path="$SCRIPTDIR/manifest.json"
 cd $SCRIPTDIR/../firehawk-base-ami
 export PKR_VAR_ingress_commit_hash="$(git rev-parse HEAD)" # the commit hash for incoming amis
 export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
@@ -68,6 +68,7 @@ function error_if_empty {
   return
 }
 
+
 ### Idempotency logic: exit if all images exist
 error_if_empty "Missing: PKR_VAR_commit_hash_short: $PKR_VAR_commit_hash_short"
 error_if_empty "Missing: build_list: $build_list"
@@ -98,23 +99,29 @@ if [[ "$count_missing_images_for_hash" -eq 0 ]]; then
 fi
 
 
-### Ensure certs exist
-echo "Ensuring certificates exit for AMI's and consul"
-cd $SCRIPTDIR/../../init/modules/terraform-remote-state-inputs
-terragrunt init \
-  -input=false
-terragrunt plan -out=tfplan -input=false
-terragrunt apply -input=false tfplan
+# ### Get inputs
+# echo "Ensuring certificates exit for AMI's and consul"
+# cd $SCRIPTDIR/../../init/modules/terraform-remote-state-inputs
+# terragrunt init \
+#   -input=false
+# terragrunt plan -out=tfplan -input=false
+# terragrunt apply -input=false tfplan
+
+
+### Packer profile
 # export PKR_VAR_provisioner_iam_profile_name="$(terragrunt output instance_profile_name)"
 echo "Using profile: $PKR_VAR_provisioner_iam_profile_name"
 error_if_empty "Missing: PKR_VAR_provisioner_iam_profile_name" "$PKR_VAR_provisioner_iam_profile_name"
+
+
+### Software Bucket
 # export PKR_VAR_installers_bucket="$(terragrunt output installers_bucket)"
 echo "Using installers bucket: $PKR_VAR_installers_bucket"
 error_if_empty "Missing: PKR_VAR_installers_bucket" "$PKR_VAR_installers_bucket"
 cd $SCRIPTDIR
 
 
-# retrieve secretsmanager secrets
+# Retrieve secretsmanager secrets
 sesi_client_secret_key_path="/firehawk/resourcetier/${TF_VAR_resourcetier}/sesi_client_secret_key"
 get_secret_strings=$(aws secretsmanager get-secret-value --secret-id "$sesi_client_secret_key_path")
 if [[ $? -eq 0 ]]; then
@@ -126,13 +133,10 @@ else
   return
 fi
 
-# ansible log path
-mkdir -p "$SCRIPTDIR/tmp/log"
 
 # If sourced, dont execute
 (return 0 2>/dev/null) && sourced=1 || sourced=0
 echo "Script sourced: $sourced"
-
 if [[ ! "$sourced" -eq 0 ]]; then
   cd $EXECDIR
   set +e
@@ -148,14 +152,22 @@ if [[ $total_built_images -gt 0]]; then
 fi
 
 # Validate
-packer validate "$@" -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
+packer validate "$@" \
+  -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
   -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
   -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
   -only=$build_list \
   $SCRIPTDIR/firehawk-ami.pkr.hcl
 
+# Prepare for build.
+# Ansible log path
+mkdir -p "$SCRIPTDIR/tmp/log"
+# Clear previous manifest
+rm -f $PKR_VAR_manifest_path
+
 # Build
-packer build "$@" -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
+packer build "$@" \
+  -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
   -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
   -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
   -only=$build_list \
