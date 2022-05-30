@@ -146,7 +146,8 @@ fi
 echo "The following images have not yet been built:"
 echo "$missing_images_for_hash"
 
-if [[ $total_built_images -gt 0]]; then
+echo "total_built_images: $total_built_images"
+if [[ $total_built_images -gt 0 ]]; then
   echo "Packer will erase all images for this commit hash and rebuild all images"
   $SCRIPTDIR/delete-all-old-amis.sh --commit-hash-short-list $PKR_VAR_commit_hash_short --auto-approve
 fi
