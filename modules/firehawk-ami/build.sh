@@ -16,13 +16,14 @@ cd $SCRIPTDIR
 
 ### Vars
 build_list="amazon-ebs.amazonlinux2-ami,\
-amazon-ebs.amazonlinux2-nicedcv-nvidia-ami,\
 amazon-ebs.centos7-ami,\
 amazon-ebs.centos7-rendernode-ami,\
 amazon-ebs.ubuntu18-ami,\
 amazon-ebs.ubuntu18-vault-consul-server-ami,\
 amazon-ebs.deadline-db-ubuntu18-ami,\
 amazon-ebs.openvpn-server-ami"
+
+# amazon-ebs.amazonlinux2-nicedcv-nvidia-ami,\
 
 export PKR_VAR_resourcetier="$TF_VAR_resourcetier"
 export PKR_VAR_ami_role="firehawk-ami"
@@ -152,14 +153,6 @@ if [[ $total_built_images -gt 0 ]]; then
   $SCRIPTDIR/delete-all-old-amis.sh --commit-hash-short-list $PKR_VAR_commit_hash_short --auto-approve
 fi
 
-# Validate
-packer validate "$@" \
-  -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
-  -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
-  -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
-  -only=$build_list \
-  $SCRIPTDIR/firehawk-ami.pkr.hcl
-
 # Prepare for build.
 # Ansible log path
 mkdir -p "$SCRIPTDIR/tmp/log"
@@ -167,12 +160,29 @@ mkdir -p "$SCRIPTDIR/tmp/log"
 rm -f $PKR_VAR_manifest_path
 # Ensure certs exist for Consul and Vault
 $SCRIPTDIR/../../init/init
+if [[ -f "$TF_VAR_ca_public_key_file_path" ]]; then
+  export SSL_expiry=$(cat "$TF_VAR_ca_public_key_file_path" | openssl x509 -noout -enddate | awk -F "=" '{print $2}')
+  # export PKR_VAR_SSL_expiry="$TF_VAR_SSL_expiry"
+  echo "Current SSL Certificates will expire at: $SSL_expiry"
+else
+  echo "Warning: No SSL Certifcates exist."
+fi
+
+# Validate
+packer validate "$@" \
+  -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
+  -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
+  -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
+  -var "SSL_expiry=$SSL_expiry" \
+  -only=$build_list \
+  $SCRIPTDIR/firehawk-ami.pkr.hcl
 
 # Build
 packer build "$@" \
   -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
   -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
   -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
+  -var "SSL_expiry=$SSL_expiry" \
   -only=$build_list \
   $SCRIPTDIR/firehawk-ami.pkr.hcl
 
