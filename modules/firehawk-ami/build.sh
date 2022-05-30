@@ -43,8 +43,6 @@ done
 SCRIPTDIR=$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
 cd $SCRIPTDIR
 # source ../../../../update_vars.sh --sub-script --skip-find-amis
-
-# export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
 # AMI TAGS
 # Get the resourcetier from the instance tag.
 # export TF_VAR_instance_id_main_cloud9=$(curl http://169.254.169.254/latest/meta-data/instance-id)
@@ -94,6 +92,12 @@ mkdir -p "$SCRIPTDIR/tmp/log"
 (return 0 2>/dev/null) && sourced=1 || sourced=0
 echo "Script sourced: $sourced"
 
+if [[ ! "$sourced" -eq 0 ]]; then
+  cd $EXECDIR
+  set +e
+  exit 0
+fi
+
 build_list="amazon-ebs.amazonlinux2-ami,\
 amazon-ebs.amazonlinux2-nicedcv-nvidia-ami,\
 amazon-ebs.centos7-ami,\
@@ -103,21 +107,46 @@ amazon-ebs.ubuntu18-vault-consul-server-ami,\
 amazon-ebs.deadline-db-ubuntu18-ami,\
 amazon-ebs.openvpn-server-ami"
 
-if [[ "$sourced" -eq 0 ]]; then
-  # Validate
-  packer validate "$@" -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
-    -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
-    -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
-    -only=$build_list \
-    $SCRIPTDIR/firehawk-ami.pkr.hcl
+missing_images_for_hash=$(aws ec2 describe-images --owners self --filters "Name=tag:commit_hash_short,Values=[$PKR_VAR_commit_hash_short]" --query "Images[*].{ImageId:ImageId,date:CreationDate,Name:Name,SnapshotId:BlockDeviceMappings[0].Ebs.SnapshotId,commit_hash_short:[Tags[?Key=='commit_hash_short']][0][0].Value,packer_source:[Tags[?Key=='packer_source']][0][0].Value}" \
+| jq -r '
+  .[].packer_source' \
+| jq --arg BUILDLIST "$build_list" --slurp --raw-input 'split("\n")[:-1] as $existing_names 
+| ($existing_names | unique) as $existing_names_set
+| ($BUILDLIST | split(",") | unique) as $intended_names_set
+| $intended_names_set - $existing_names_set
+')
 
-  # Build
-  packer build "$@" -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
-    -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
-    -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
-    -only=$build_list \
-    $SCRIPTDIR/firehawk-ami.pkr.hcl
+count_missing_images_for_hash=$(jq -n --argjson data "$missing_images_for_hash" '$data | length')
+
+if [[ "$count_missing_images_for_hash" -eq 0 ]]; then
+  echo "All images have already been built for this hash and build list."
+  echo
+  echo "To force a build, ensure at least one image from the build list is missing.  The builder will erase all images for the commit hash and rebuild."
+
+  cd $EXECDIR
+  set +e
+  exit 0
 fi
-cd $EXECDIR
 
+echo "The following images have not yet been built:"
+echo "$missing_images_for_hash"
+echo "Packer will erase all images for this commit hash and rebuild all images"
+
+$SCRIPTDIR/delete-all-old-amis.sh --commit-hash-short-list $PKR_VAR_commit_hash_short
+
+# Validate
+packer validate "$@" -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
+  -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
+  -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
+  -only=$build_list \
+  $SCRIPTDIR/firehawk-ami.pkr.hcl
+
+# Build
+packer build "$@" -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
+  -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
+  -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
+  -only=$build_list \
+  $SCRIPTDIR/firehawk-ami.pkr.hcl
+
+cd $EXECDIR
 set +e
