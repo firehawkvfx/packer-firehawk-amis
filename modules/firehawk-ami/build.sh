@@ -38,7 +38,7 @@ export PKR_VAR_ingress_commit_hash="$(git rev-parse HEAD)" # the commit hash for
 export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
 cd $SCRIPTDIR
 
-echo "Building AMI's for deployment..."
+echo "Building AMI's for deployment: $PKR_VAR_ami_role"
 
 function log {
   local -r level="$1"
@@ -90,9 +90,10 @@ missing_images_for_hash=$(echo $ami_query \
 count_missing_images_for_hash=$(jq -n --argjson data "$missing_images_for_hash" '$data | length')
 
 if [[ "$count_missing_images_for_hash" -eq 0 ]]; then
-  echo "All images have already been built for this hash and build list."
   echo
+  echo "All images have already been built for this hash and build list."
   echo "To force a build, ensure at least one image from the build list is missing.  The builder will erase all images for the commit hash and rebuild."
+  echo
 
   cd $EXECDIR
   set +e
