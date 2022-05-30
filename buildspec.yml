@@ -20,8 +20,8 @@ phases:
       - ./scripts/install-packages
       - export PATH=$PATH:/root/.local/bin
       - echo "PATH=$PATH"
-      - source ./update_vars.sh --codebuild --resourcetier $resourcetier
-      - ./init/init
+      # - source ./update_vars.sh --codebuild --resourcetier $resourcetier
+      # - ./init/init # Ensure certs exist
   build:
     commands:
       - source ./update_vars.sh --codebuild --resourcetier $resourcetier
