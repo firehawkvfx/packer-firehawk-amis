@@ -10,7 +10,7 @@ locals {
 inputs = local.common_vars.inputs
 
 terraform { # After SSL certs have been generated, isntall them to the current instance. 
-  source = "github.com/firehawkvfx/firehawk-main.git//modules/private-tls-cert?ref=v0.0.47"
+  source = "github.com/firehawkvfx/firehawk-main.git//modules/private-tls-cert"
   after_hook "after_hook_1" {
     commands = ["apply"]
     execute  = ["bash", "validate-cert"]
