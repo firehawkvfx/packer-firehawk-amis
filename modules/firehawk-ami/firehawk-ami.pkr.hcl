@@ -924,7 +924,6 @@ build {
       "--extra-vars",
       jsonencode(
         {
-          "houdini_major_version_list" = ["19.0"],
           "houdini_version_list" = [
             {
               "houdini_major_version"      = "19.0",
