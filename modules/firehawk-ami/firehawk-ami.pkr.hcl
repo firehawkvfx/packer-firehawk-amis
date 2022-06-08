@@ -926,7 +926,7 @@ build {
         {
           "houdini_version_list" = [
             {
-              "houdini_major_version"      = "19.0",
+              "houdini_major_version"      = "18.5",
               "houdini_auto_version"       = "true",
               "houdini_minor_version"      = "auto",
               "houdini_linux_tar_filename" = "auto",
