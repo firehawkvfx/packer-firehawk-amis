@@ -145,6 +145,28 @@ locals {
   sesi_client_id                 = var.sesi_client_id
   sesi_client_secret_key         = var.sesi_client_secret_key
   houdini_license_server_address = var.houdini_license_server_address
+  houdini_json_vars = jsonencode(
+    {
+      "houdini_version_list" = [
+        {
+          "houdini_major_version"      = "18.5",
+          "houdini_auto_version"       = "true",
+          "houdini_minor_version"      = "auto",
+          "houdini_linux_tar_filename" = "auto",
+          "houdini_build"              = "daily"
+        }
+      ],
+      "houdini_license_server_version_list" : [
+        {
+          "houdini_major_version"      = "19.0",
+          "houdini_auto_version"       = "true",
+          "houdini_minor_version"      = "auto",
+          "houdini_linux_tar_filename" = "auto",
+          "houdini_build"              = "production"
+        }
+      ]
+    }
+  )
 }
 
 source "amazon-ebs" "openvpn-server-ami" {
@@ -285,6 +307,7 @@ source "amazon-ebs" "centos7-rendernode-ami" {
     { "ami_role" : "firehawk_centos7_rendernode_ami" },
     { "Name" : "firehawk_centos7_rendernode_ami" },
     { "firehawk_deadline_installer_version" : "${var.firehawk_deadline_installer_version}" },
+    { "houdini_major_version" : local.houdini_json_vars["houdini_version_list"][0]["houdini_major_version"] },
     local.common_ami_tags
   )
   ami_description = "A Cent OS 7 AMI rendernode."
@@ -392,6 +415,7 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
     { "ami_role" : "firehawk_deadlinedb_ami" },
     { "Name" : "firehawk_deadlinedb_ami" },
     { "firehawk_deadline_installer_version" : "${var.firehawk_deadline_installer_version}" },
+    { "houdini_major_version" : local.houdini_json_vars["houdini_version_list"][0]["houdini_major_version"] },
     local.common_ami_tags
   )
   ami_description = "An Ubuntu 18.04 AMI with Deadline DB ${local.deadline_version} server."
@@ -922,28 +946,7 @@ build {
     extra_arguments = [
       "-vv",
       "--extra-vars",
-      jsonencode(
-        {
-          "houdini_version_list" = [
-            {
-              "houdini_major_version"      = "18.5",
-              "houdini_auto_version"       = "true",
-              "houdini_minor_version"      = "auto",
-              "houdini_linux_tar_filename" = "auto",
-              "houdini_build"              = "daily"
-            }
-          ],
-          "houdini_license_server_version_list" : [
-            {
-              "houdini_major_version"      = "19.0",
-              "houdini_auto_version"       = "true",
-              "houdini_minor_version"      = "auto",
-              "houdini_linux_tar_filename" = "auto",
-              "houdini_build"              = "production"
-            }
-          ]
-        }
-      ),
+      local.houdini_json_vars,
       "--extra-vars",
       "variable_user=deadlineuser resourcetier=${var.resourcetier} installers_bucket=${local.installers_bucket} variable_host=default houdini_build=${local.houdini_build} sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key} houdini_license_server_address=${var.houdini_license_server_address} user_deadlineuser_pw='' package_python_interpreter=/usr/bin/python2.7 firehawk_houdini_tools=/home/deadlineuser/openfirehawk-houdini-tools",
       "--tags",
