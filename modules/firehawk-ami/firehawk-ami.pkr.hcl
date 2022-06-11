@@ -44,7 +44,7 @@ variable "terragrunt_version" {
 variable "firehawk_deadline_installer_version" {
   description = "The firehawk repo aws-thinkbox-deadline version to install/configure Deadline"
   type        = string
-  default     = "v0.0.17"
+  default     = "v0.0.18"
 }
 variable "ca_public_key_path" {
   type = string
@@ -148,12 +148,12 @@ locals {
   houdini_json_vars = {
     "houdini_version_list" = [
       {
-        "houdini_major_version"      = "18.5",
+        "houdini_major_version"      = "19.0",
         "houdini_auto_version"       = "true",
         "houdini_minor_version"      = "auto",
         "houdini_linux_tar_filename" = "auto",
         "houdini_build"              = "daily",
-        "python_libs_folder"         = "python2.7libs"
+        "python_libs_folder"         = "python3.7libs"
       }
     ],
     "houdini_license_server_version_list" : [
