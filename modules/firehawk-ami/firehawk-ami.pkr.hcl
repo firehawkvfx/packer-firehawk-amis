@@ -44,7 +44,7 @@ variable "terragrunt_version" {
 variable "firehawk_deadline_installer_version" {
   description = "The firehawk repo aws-thinkbox-deadline version to install/configure Deadline"
   type        = string
-  default     = "v0.0.16"
+  default     = "v0.0.17"
 }
 variable "ca_public_key_path" {
   type = string
