@@ -151,18 +151,9 @@ locals {
   houdini_json_vars = {
     "houdini_version_list" = [
       {
-        "houdini_major_version"      = "19.0",
+        "houdini_major_version"      = "18.5",
         
-        "python_libs_folder"         = "python3.7libs",
-        "houdini_auto_version"       = "true",
-        "houdini_minor_version"      = "auto",
-        "houdini_linux_tar_filename" = "auto",
-        "houdini_build"              = "production"
-      }
-    ],
-    "houdini_license_server_version_list" : [
-      {
-        "houdini_major_version"      = "19.0",
+        "python_libs_folder"         = "python2.7libs",
         "houdini_auto_version"       = "true",
         "houdini_minor_version"      = "auto",
         "houdini_linux_tar_filename" = "auto",
@@ -170,6 +161,16 @@ locals {
       }
     ]
   }
+  # deprecated: this is only needed if installing a license server
+    #   "houdini_license_server_version_list" : [
+    #   {
+    #     "houdini_major_version"      = "19.0",
+    #     "houdini_auto_version"       = "true",
+    #     "houdini_minor_version"      = "auto",
+    #     "houdini_linux_tar_filename" = "auto",
+    #     "houdini_build"              = "production"
+    #   }
+    # ]
 }
 
 source "amazon-ebs" "openvpn-server-ami" {
