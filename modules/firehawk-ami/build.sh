@@ -188,13 +188,18 @@ packer build "$@" \
   -only=$build_list \
   $SCRIPTDIR/firehawk-ami.pkr.hcl
 
+
+# Track the houdini build by adding an extra tag to the AMI.  
+# ...Since the build version downloaded cannot always be known until after install.
 echo "Get downloadeded versions to tag ami from: /tmp/houdini_download_result.txt"
 cat /tmp/houdini_download_result.txt
-
 echo "Parse manfiest content: $PKR_VAR_manifest_path"
-# cat $PKR_VAR_manifest_path
-
 jq . $PKR_VAR_manifest_path
+houdini_ami_to_update="$(jq -r '.builds[] | select(.name=="centos7-rendernode-ami").artifact_id | split(":")[-1]' $PKR_VAR_manifest_path)"
+result_houdini_build="$(cat /tmp/houdini_download_result.txt)"
+echo "Add tag: houdini_build=$result_houdini_build to ami: $houdini_ami_to_update"
+aws ec2 create-tags \
+    --resources $houdini_ami_to_update --tags Key=houdini_build,Value=$result_houdini_build
 
 cd $EXECDIR
 set +e

@@ -152,7 +152,7 @@ locals {
         "houdini_auto_version"       = "true",
         "houdini_minor_version"      = "auto",
         "houdini_linux_tar_filename" = "auto",
-        "houdini_build"              = "daily",
+        "houdini_build"              = "production",
         "python_libs_folder"         = "python3.7libs"
       }
     ],
