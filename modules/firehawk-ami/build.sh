@@ -15,13 +15,14 @@ cd $SCRIPTDIR
 
 
 ### Vars
-build_list="amazon-ebs.amazonlinux2-ami,\
-amazon-ebs.centos7-ami,\
-amazon-ebs.centos7-rendernode-ami,\
-amazon-ebs.ubuntu18-ami,\
-amazon-ebs.ubuntu18-vault-consul-server-ami,\
-amazon-ebs.deadline-db-ubuntu18-ami,\
-amazon-ebs.openvpn-server-ami"
+build_list="amazon-ebs.centos7-rendernode-ami"
+# build_list="amazon-ebs.amazonlinux2-ami,\
+# amazon-ebs.centos7-ami,\
+# amazon-ebs.centos7-rendernode-ami,\
+# amazon-ebs.ubuntu18-ami,\
+# amazon-ebs.ubuntu18-vault-consul-server-ami,\
+# amazon-ebs.deadline-db-ubuntu18-ami,\
+# amazon-ebs.openvpn-server-ami"
 
 # amazon-ebs.amazonlinux2-nicedcv-nvidia-ami,\
 
@@ -186,6 +187,14 @@ packer build "$@" \
   -var "SSL_expiry=$SSL_expiry" \
   -only=$build_list \
   $SCRIPTDIR/firehawk-ami.pkr.hcl
+
+echo "Get downloadeded versions to tag ami from: /tmp/houdini_download_result.txt"
+cat /tmp/houdini_download_result.txt
+
+echo "Parse manfiest content: $PKR_VAR_manifest_path"
+# cat $PKR_VAR_manifest_path
+
+jq . $PKR_VAR_manifest_path
 
 cd $EXECDIR
 set +e
