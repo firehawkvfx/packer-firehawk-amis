@@ -145,28 +145,30 @@ locals {
   sesi_client_id                 = var.sesi_client_id
   sesi_client_secret_key         = var.sesi_client_secret_key
   houdini_license_server_address = var.houdini_license_server_address
+  
+  # python_libs_folder will change between 2.7 and 3.7 depending on your installer
+  # You may require a different version of houdini for hserver
   houdini_json_vars = {
     "houdini_version_list" = [
       {
         "houdini_major_version"      = "19.0",
-        # python_libs_folder will change between 2.7 and 3.7 depending on your installer
+        
         "python_libs_folder"         = "python3.7libs",
         "houdini_auto_version"       = "true",
         "houdini_minor_version"      = "auto",
         "houdini_linux_tar_filename" = "auto",
         "houdini_build"              = "production"
       }
+    ],
+    "houdini_license_server_version_list" : [
+      {
+        "houdini_major_version"      = "19.0",
+        "houdini_auto_version"       = "true",
+        "houdini_minor_version"      = "auto",
+        "houdini_linux_tar_filename" = "auto",
+        "houdini_build"              = "production"
+      }
     ]
-    # # You may require a different version of houdini for hserver
-    # "houdini_license_server_version_list" : [
-    #   {
-    #     "houdini_major_version"      = "19.0",
-    #     "houdini_auto_version"       = "true",
-    #     "houdini_minor_version"      = "auto",
-    #     "houdini_linux_tar_filename" = "auto",
-    #     "houdini_build"              = "production"
-    #   }
-    # ]
   }
 }
 
