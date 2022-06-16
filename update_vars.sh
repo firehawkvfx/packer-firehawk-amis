@@ -237,7 +237,7 @@ function export_vars {
   fi
 
   export TF_VAR_log_dir="$SCRIPTDIR/tmp/log"; 
-  ls -ltriah $SCRIPTDIR
+
   mkdir -p $TF_VAR_log_dir
 
   export VAULT_ADDR=https://vault.service.consul:8200 # verify dns before login with: dig vault.service.consul
