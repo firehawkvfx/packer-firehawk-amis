@@ -30,12 +30,13 @@ SUDOCMD="" # replace with text sudo to use elevated permissions
 
 # previously python3.8 worked bt it now says no package available
 
-if test -f /etc/yum/pluginconf.d/fastestmirror.conf; then 
-    echo "Show contents: /etc/yum/pluginconf.d/fastestmirror.conf"
-    cat /etc/yum/pluginconf.d/fastestmirror.conf
-fi
-# echo "exclude = mirror.aarnet.edu.au" | sudo tee -a /etc/yum/pluginconf.d/fastestmirror.conf
 $SUDOCMD yum install -y yum-fastestmirror # cache to fix broken mirrors.
+if $SUDOCMD test -f /etc/yum/pluginconf.d/fastestmirror.conf; then 
+    echo "Show contents: /etc/yum/pluginconf.d/fastestmirror.conf"
+    $SUDOCMD cat /etc/yum/pluginconf.d/fastestmirror.conf
+fi
+# echo "exclude = mirror.aarnet.edu.au" | $SUDOCMD tee -a /etc/yum/pluginconf.d/fastestmirror.conf
+
 $SUDOCMD yum install -y jq openssl python
 $SUDOCMD yum install -y python3 python3-pip # for a specific python version - https://realpython.com/intro-to-pyenv/
 mkdir -p $SCRIPTDIR/tmp
