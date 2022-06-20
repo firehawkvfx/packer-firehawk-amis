@@ -28,7 +28,9 @@ SUDOCMD="" # replace with text sudo to use elevated permissions
 # $SUDOCMD rm -rf /var/cache/yum
 # $SUDOCMD yum update -y
 
-$SUDOCMD yum install -y jq openssl python python3.8 python3-pip # for a specific python version - https://realpython.com/intro-to-pyenv/
+# previously python3.8 worked bt it now says no package available
+$SUDOCMD yum install -y jq openssl python
+$SUDOCMD yum install -y python3 python3-pip # for a specific python version - https://realpython.com/intro-to-pyenv/
 mkdir -p $SCRIPTDIR/tmp
 
 #: Codebuild requires python 3.8 instead of python 3.7 used in the amis for ansible to work. 

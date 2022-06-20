@@ -27,7 +27,7 @@ cd $SCRIPTDIR
 # amazon-ebs.deadline-db-ubuntu18-ami,\
 # amazon-ebs.openvpn-server-ami"
 
-build_list="amazon-ebs.centos7-rendernode-ami.\
+build_list="amazon-ebs.centos7-rendernode-ami,\
 amazon-ebs.deadline-db-ubuntu18-ami"
 
 export PKR_VAR_resourcetier="$TF_VAR_resourcetier"
