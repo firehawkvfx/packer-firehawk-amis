@@ -35,10 +35,10 @@ if $SUDOCMD test -f /etc/yum/pluginconf.d/fastestmirror.conf; then
     echo "Show contents: /etc/yum/pluginconf.d/fastestmirror.conf"
     $SUDOCMD cat /etc/yum/pluginconf.d/fastestmirror.conf
 fi
+# Somethimes mirrors are not available anymore and can be excluded.
 # echo "exclude = mirror.aarnet.edu.au" | $SUDOCMD tee -a /etc/yum/pluginconf.d/fastestmirror.conf
 
-$SUDOCMD yum install -y jq openssl python
-$SUDOCMD yum install -y python3 python3-pip # for a specific python version - https://realpython.com/intro-to-pyenv/
+$SUDOCMD yum install -y jq openssl python python3 python3-pip # for a specific python version - https://realpython.com/intro-to-pyenv/
 mkdir -p $SCRIPTDIR/tmp
 
 #: Codebuild requires python 3.8 instead of python 3.7 used in the amis for ansible to work. 
