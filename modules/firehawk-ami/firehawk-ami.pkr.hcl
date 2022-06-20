@@ -902,23 +902,25 @@ build {
     ]
   }
 
-  # ### Install Houdini Plugin for Deadline DB ###
-  # provisioner "ansible" {
-  #   playbook_file = "./ansible/deadline_db_houdini_plugin.yml"
-  #   user          = "ubuntu"
-  #   extra_arguments = [
-  #     "-vvv",
-  #     "--extra-vars",
-  #     "resourcetier=${var.resourcetier} variable_host=default variable_connect_as_user=ubuntu houdini_build=${local.houdini_build} delegate_host=localhost",
-  #     "--tags",
-  #     "install_houdini,install_deadline_db"
-  #   ]
-  #   collections_path = "./ansible/collections"
-  #   roles_path       = "./ansible/roles"
-  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-  #   galaxy_file      = "./requirements.yml"
-  #   only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
-  # }
+  ### Install Houdini Plugin for Deadline DB ###
+  provisioner "ansible" {
+    playbook_file = "./ansible/deadline_db_houdini_plugin.yml"
+    user          = "ubuntu"
+    extra_arguments = [
+      "-vvv",
+      "--extra-vars",
+      jsonencode(local.houdini_json_vars),
+      "--extra-vars",
+      "resourcetier=${var.resourcetier} variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost",
+      "--tags",
+      "install_houdini,install_deadline_db"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
 
 
   ### Install FSX fsx_packages.yaml
