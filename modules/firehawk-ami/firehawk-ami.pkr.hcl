@@ -44,7 +44,7 @@ variable "terragrunt_version" {
 variable "firehawk_deadline_installer_version" {
   description = "The firehawk repo aws-thinkbox-deadline version to install/configure Deadline"
   type        = string
-  default     = "main"
+  default     = "v0.0.19"
 }
 variable "ca_public_key_path" {
   type = string
@@ -812,7 +812,7 @@ build {
       "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y wget apt-transport-https software-properties-common",
       "wget -q \"https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb\"",
       "sudo dpkg -i packages-microsoft-prod.deb",
-      # sudo apt-get update
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get update", # this needs to go into the base image.
       "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y powershell"
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
