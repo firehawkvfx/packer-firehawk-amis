@@ -33,18 +33,18 @@ mkdir -p $SCRIPTDIR/tmp
 
 #: Codebuild requires python 3.8 instead of python 3.7 used in the amis for ansible to work. 
 
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-sudo unzip awscliv2.zip
-sudo ./aws/install
+# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+# sudo unzip awscliv2.zip
+# sudo ./aws/install
+# && python3.8 -m pip install --user typing_extensions --upgrade \
 
 python3.8 -m pip install --upgrade pip \
-    && python3.8 -m pip install --user typing_extensions --upgrade \
-    && python3.8 -m pip install --user ansible \
+    && python3.8 -m pip install --user "ansible==5.9.0" \
     && python3.8 -m pip install --user boto3 botocore \
     && export PATH=$PATH:/root/.local/bin \
     && ansible --version
 
-ansible [core 2.12.6]
+# ansible [core 2.12.6]
 
 if terraform --version 2> /dev/null | grep -nq "Terraform v${terraform_version}"; then
     echo 'terraform already installed'
