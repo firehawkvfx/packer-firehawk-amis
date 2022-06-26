@@ -791,16 +791,37 @@ build {
   provisioner "shell" {
     ### Install Deadline DB Ubuntu Dependencies
     inline = [
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xdg-utils lsb python-openssl netcat",
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xdg-utils lsb python-openssl netcat nfs-common",
       "sudo mkdir -p /usr/share/desktop-directories"
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
-
   provisioner "shell" {
     ### Install Deadline Worker Centos Dependencies. nc is also used to ensure a connection can be established with a port.
     inline = [
       "sudo yum install -y redhat-lsb samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap wget nc"
+    ]
+    only = [
+      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+    ]
+  }
+  # Install Powershell
+  provisioner "shell" {
+    inline = [
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y wget apt-transport-https software-properties-common",
+      "wget -q \"https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb\"",
+      "sudo dpkg -i packages-microsoft-prod.deb",
+      # sudo apt-get update
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y powershell"
+    ]
+    only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  }
+  provisioner "shell" {
+    inline = [
+      "curl https://packages.microsoft.com/config/rhel/7/prod.repo | sudo tee /etc/yum.repos.d/microsoft.repo",
+      "sudo yum makecache",
+      "sudo yum install powershell -y"
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
