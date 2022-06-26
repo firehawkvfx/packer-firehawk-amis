@@ -33,7 +33,8 @@ mkdir -p $SCRIPTDIR/tmp
 
 #: Codebuild requires python 3.8 instead of python 3.7 used in the amis for ansible to work. 
 python3.8 -m pip install --upgrade pip \
-    && python3.8 -m pip install --user ansible boto3 botocore typing_extensions \
+    && python3.8 -m pip install --user typing_extensions --upgrade \
+    && python3.8 -m pip install --user ansible boto3 botocore \
     && export PATH=$PATH:/root/.local/bin \
     && ansible --version
 
