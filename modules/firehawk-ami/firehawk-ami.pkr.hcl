@@ -540,9 +540,9 @@ build {
       "sudo systemctl start amazon-ssm-agent",
       "sudo yum install -y ruby", # the following steps are to install codedeploy agent
       "sudo yum install -y wget",
-      "CODEDEPLOY_BIN=\"/opt/codedeploy-agent/bin/codedeploy-agent\"",
-      "$CODEDEPLOY_BIN stop",
-      "sudo yum erase codedeploy-agent -y",
+      # "CODEDEPLOY_BIN=\"/opt/codedeploy-agent/bin/codedeploy-agent\"", # only required if there is an existing version
+      # "$CODEDEPLOY_BIN stop",
+      # "sudo yum erase codedeploy-agent -y",
       "cd /home/ec2-user; sudo wget https://aws-codedeploy-${var.aws_region}.s3.${var.aws_region}.amazonaws.com/latest/install; sudo chmod +x ./install; sudo ./install auto",
       "sudo service codedeploy-agent start",
       "sudo service codedeploy-agent status",
