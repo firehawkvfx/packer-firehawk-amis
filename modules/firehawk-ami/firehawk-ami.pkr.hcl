@@ -533,18 +533,41 @@ build {
     only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
-  ### Install cloudwatch logs agent, and terraform, terragrunt, packer for Amazon Linux and configure the region
+  provisioner "shell" { # Install amazon systems manager for centos intelx86/amd64
+    inline = [
+      "sudo yum install -y https://s3.${var.aws_region}.amazonaws.com/amazon-ssm-${var.aws_region}/latest/linux_amd64/amazon-ssm-agent.rpm",
+      "sudo systemctl enable amazon-ssm-agent",
+      "sudo systemctl start amazon-ssm-agent",
+      "sudo yum install -y ruby", # the following steps are to install codedeploy agent
+      "sudo yum install -y wget",
+      "CODEDEPLOY_BIN=\"/opt/codedeploy-agent/bin/codedeploy-agent\"",
+      "$CODEDEPLOY_BIN stop",
+      "sudo yum erase codedeploy-agent -y",
+      "cd /home/ec2-user; sudo wget https://aws-codedeploy-${var.aws_region}.s3.${var.aws_region}.amazonaws.com/latest/install; sudo chmod +x ./install; sudo ./install auto",
+      "sudo service codedeploy-agent start",
+      "sudo service codedeploy-agent status",
+      "sudo service codedeploy-agent enable",
+    ]
+    inline_shebang   = "/bin/bash -e"
+    only = ["amazon-ebs.centos7-rendernode-ami"]
+  }
+
+  ### Install cloudwatch logs agent
   provisioner "shell" {
     inline = [
       "sudo yum install amazon-cloudwatch-agent -y",
-      # "sudo yum install -y python",
-      # "sudo yum install -y python3.7",
-      # "sudo yum install -y python3-pip", # for a specific python version - https://realpython.com/intro-to-pyenv/
-      "sudo yum install -y jq",
-      # "python3 -m pip install ansible botocore",
-      # "python3.7 -m pip install --upgrade pip", #: upgrade should only be done in the base image.
+      "sudo yum install -y jq"
+    ]
+    only = [
+      "amazon-ebs.amazonlinux2-ami",
+      "amazon-ebs.centos7-rendernode-ami"
+    ]
+  }
+
+  # Install terraform, terragrunt, packer for Amazon Linux
+  provisioner "shell" {
+    inline = [
       "python3.7 -m pip install ansible boto3 botocore", #: Install ansible using the same method we use to install it to codebuild
-      # "/root/.local/bin/ansible --version",
       "wget https://releases.hashicorp.com/terraform/${var.terraform_version}/terraform_${var.terraform_version}_linux_amd64.zip -P /tmp/ --quiet", # Get terraform
       "sudo unzip /tmp/terraform_${var.terraform_version}_linux_amd64.zip -d /tmp/",
       "sudo mv /tmp/terraform /usr/local/bin/.",
@@ -553,7 +576,7 @@ build {
       "sudo chmod +x /usr/local/bin/terragrunt"
     ]
     only = [
-      "amazon-ebs.amazonlinux2-ami"
+      "amazon-ebs.amazonlinux2-ami",
     ]
   }
 
@@ -1157,27 +1180,6 @@ build {
     ]
     only = ["amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"]
   }
-
-  provisioner "shell" { # Install amazon systems manager for centos intelx86/amd64
-    inline = [
-      "sudo yum install -y https://s3.${var.aws_region}.amazonaws.com/amazon-ssm-${var.aws_region}/latest/linux_amd64/amazon-ssm-agent.rpm",
-      "sudo systemctl enable amazon-ssm-agent",
-      "sudo systemctl start amazon-ssm-agent",
-      "sudo yum install ruby", # the following steps are to install codedeploy agent
-      "sudo yum install wget",
-      "CODEDEPLOY_BIN=\"/opt/codedeploy-agent/bin/codedeploy-agent\"",
-      "$CODEDEPLOY_BIN stop",
-      "sudo yum erase codedeploy-agent -y",
-      "cd /home/ec2-user; sudo wget https://aws-codedeploy-${var.aws_region}.s3.${var.aws_region}.amazonaws.com/latest/install; sudo chmod +x ./install; sudo ./install auto",
-      "sudo service codedeploy-agent start",
-      "sudo service codedeploy-agent status",
-      "sudo service codedeploy-agent enable",
-    ]
-    inline_shebang   = "/bin/bash -e"
-    only = ["amazon-ebs.centos7-rendernode-ami"]
-  }
-
-
 
   post-processor "manifest" {
     output     = "${local.template_dir}/manifest.json"
