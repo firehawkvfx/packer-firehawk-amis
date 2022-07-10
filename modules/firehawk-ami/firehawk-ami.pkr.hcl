@@ -543,7 +543,7 @@ build {
       # "CODEDEPLOY_BIN=\"/opt/codedeploy-agent/bin/codedeploy-agent\"", # only required if there is an existing version
       # "$CODEDEPLOY_BIN stop",
       # "sudo yum erase codedeploy-agent -y",
-      "cd /home/ec2-user; sudo wget https://aws-codedeploy-${var.aws_region}.s3.${var.aws_region}.amazonaws.com/latest/install; sudo chmod +x ./install; sudo ./install auto",
+      "cd /home/centos; sudo wget https://aws-codedeploy-${var.aws_region}.s3.${var.aws_region}.amazonaws.com/latest/install; sudo chmod +x ./install; sudo ./install auto",
       "sudo service codedeploy-agent start",
       "sudo service codedeploy-agent status",
       "sudo service codedeploy-agent enable",
