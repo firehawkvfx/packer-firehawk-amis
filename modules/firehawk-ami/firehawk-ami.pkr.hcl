@@ -1158,6 +1158,27 @@ build {
     only = ["amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"]
   }
 
+  provisioner "shell" { # Install amazon systems manager for centos intelx86/amd64
+    inline = [
+      "sudo yum install -y https://s3.${var.aws_region}.amazonaws.com/amazon-ssm-${var.aws_region}/latest/linux_amd64/amazon-ssm-agent.rpm",
+      "sudo systemctl enable amazon-ssm-agent",
+      "sudo systemctl start amazon-ssm-agent",
+      "sudo yum install ruby", # the following steps are to install codedeploy agent
+      "sudo yum install wget",
+      "CODEDEPLOY_BIN=\"/opt/codedeploy-agent/bin/codedeploy-agent\"",
+      "$CODEDEPLOY_BIN stop",
+      "sudo yum erase codedeploy-agent -y",
+      "cd /home/ec2-user; sudo wget https://aws-codedeploy-${var.aws_region}.s3.${var.aws_region}.amazonaws.com/latest/install; sudo chmod +x ./install; sudo ./install auto",
+      "sudo service codedeploy-agent start",
+      "sudo service codedeploy-agent status",
+      "sudo service codedeploy-agent enable",
+    ]
+    inline_shebang   = "/bin/bash -e"
+    only = ["amazon-ebs.centos7-rendernode-ami"]
+  }
+
+
+
   post-processor "manifest" {
     output     = "${local.template_dir}/manifest.json"
     strip_path = true
