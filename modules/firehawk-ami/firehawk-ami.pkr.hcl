@@ -128,7 +128,7 @@ variable "SSL_expiry" {
 locals {
   timestamp         = regex_replace(timestamp(), "[- TZ:]", "")
   template_dir      = path.root
-  deadline_version  = "10.1.21.4"
+  deadline_version  = "10.1.23.6"
   installers_bucket = var.installers_bucket
   common_ami_tags = {
     "packer_template" : "firehawk-ami",
@@ -151,7 +151,7 @@ locals {
   houdini_json_vars = {
     "houdini_version_list" = [
       {
-        "houdini_major_version"      = "19.0",
+        "houdini_major_version"      = "19.5",
         "python_libs_folder"         = "python3.7libs",
         "houdini_auto_version"       = "true",
         "houdini_minor_version"      = "auto",
@@ -163,7 +163,7 @@ locals {
   # deprecated: this is only needed if installing a license server
     #   "houdini_license_server_version_list" : [
     #   {
-    #     "houdini_major_version"      = "19.0",
+    #     "houdini_major_version"      = "19.5",
     #     "houdini_auto_version"       = "true",
     #     "houdini_minor_version"      = "auto",
     #     "houdini_linux_tar_filename" = "auto",
