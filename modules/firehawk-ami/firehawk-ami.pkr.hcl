@@ -44,7 +44,7 @@ variable "terragrunt_version" {
 variable "firehawk_deadline_installer_version" {
   description = "The firehawk repo aws-thinkbox-deadline version to install/configure Deadline"
   type        = string
-  default     = "main" # This should always be a semantic version for a release, not main.
+  default     = "v0.0.20" # This should always be a semantic version for a release, not main.
 }
 variable "ca_public_key_path" {
   type = string
@@ -886,8 +886,8 @@ build {
 
   provisioner "shell" { ### Download Deadline install script
     inline = [
-      "cd /var/tmp; git clone --branch ${var.firehawk_deadline_installer_version} https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
-      "sudo chown -R ${var.deadlineuser_name}:${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline"
+      "set -x; cd /var/tmp; git clone --branch ${var.firehawk_deadline_installer_version} https://github.com/firehawkvfx/aws-thinkbox-deadline.git",
+      "set -x; sudo chown -R ${var.deadlineuser_name}:${var.deadlineuser_name} /var/tmp/aws-thinkbox-deadline"
     ]
     only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
