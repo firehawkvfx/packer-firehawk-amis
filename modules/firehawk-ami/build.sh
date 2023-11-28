@@ -13,7 +13,6 @@ done
 SCRIPTDIR=$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
 cd $SCRIPTDIR
 
-
 ### Vars
 
 # You can build a single AMI to test by modifying this list.
@@ -24,8 +23,7 @@ amazon-ebs.centos7-ami,\
 amazon-ebs.centos7-rendernode-ami,\
 amazon-ebs.ubuntu18-ami,\
 amazon-ebs.ubuntu18-vault-consul-server-ami,\
-amazon-ebs.deadline-db-ubuntu18-ami,\
-amazon-ebs.openvpn-server-ami"
+amazon-ebs.deadline-db-ubuntu18-ami"
 
 # build_list="amazon-ebs.amazonlinux2-ami,amazon-ebs.centos7-rendernode-ami"
 
@@ -48,7 +46,7 @@ function log {
   local -r level="$1"
   local -r message="$2"
   local -r timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-  >&2 echo -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
+  echo >&2 -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
 }
 
 function log_info {
@@ -73,7 +71,6 @@ function error_if_empty {
   return
 }
 
-
 ### Idempotency logic: exit if all images exist
 error_if_empty "Missing: PKR_VAR_commit_hash_short:" "$PKR_VAR_commit_hash_short"
 error_if_empty "Missing: build_list:" "$build_list"
@@ -82,10 +79,10 @@ ami_query=$(aws ec2 describe-images --owners self --filters "Name=tag:commit_has
 
 total_built_images=$(echo $ami_query | jq -r '. | length')
 
-missing_images_for_hash=$(echo $ami_query \
-| jq -r '
-  .[].packer_source' \
-| jq --arg BUILDLIST "$build_list" --slurp --raw-input 'split("\n")[:-1] as $existing_names 
+missing_images_for_hash=$(echo $ami_query |
+  jq -r '
+  .[].packer_source' |
+  jq --arg BUILDLIST "$build_list" --slurp --raw-input 'split("\n")[:-1] as $existing_names
 | ($existing_names | unique) as $existing_names_set
 | ($BUILDLIST | split(",") | unique) as $intended_names_set
 | $intended_names_set - $existing_names_set
@@ -104,7 +101,6 @@ if [[ "$count_missing_images_for_hash" -eq 0 ]]; then
   exit 0
 fi
 
-
 # ### Get inputs
 # echo "Ensuring certificates exit for AMI's and consul"
 # cd $SCRIPTDIR/../../init/modules/terraform-remote-state-inputs
@@ -113,19 +109,16 @@ fi
 # terragrunt plan -out=tfplan -input=false
 # terragrunt apply -input=false tfplan
 
-
 ### Packer profile
 # export PKR_VAR_provisioner_iam_profile_name="$(terragrunt output instance_profile_name)"
 echo "Using profile: $PKR_VAR_provisioner_iam_profile_name"
 error_if_empty "Missing: PKR_VAR_provisioner_iam_profile_name" "$PKR_VAR_provisioner_iam_profile_name"
-
 
 ### Software Bucket
 # export PKR_VAR_installers_bucket="$(terragrunt output installers_bucket)"
 echo "Using installers bucket: $PKR_VAR_installers_bucket"
 error_if_empty "Missing: PKR_VAR_installers_bucket" "$PKR_VAR_installers_bucket"
 cd $SCRIPTDIR
-
 
 # Retrieve secretsmanager secrets
 sesi_client_secret_key_path="/firehawk/resourcetier/${TF_VAR_resourcetier}/sesi_client_secret_key"
@@ -138,7 +131,6 @@ else
   log_error "Error retrieving: $sesi_client_secret_key_path"
   return
 fi
-
 
 # If sourced, dont execute
 (return 0 2>/dev/null) && sourced=1 || sourced=0
@@ -191,8 +183,7 @@ packer build "$@" \
   -only=$build_list \
   $SCRIPTDIR/firehawk-ami.pkr.hcl
 
-
-# Track the houdini build by adding an extra tag to the AMI.  
+# Track the houdini build by adding an extra tag to the AMI.
 # ...Since the build version downloaded cannot always be known until after install.
 if test -f /tmp/houdini_download_result.txt; then
   echo "Get downloadeded versions to tag ami from: /tmp/houdini_download_result.txt"
@@ -203,7 +194,7 @@ if test -f /tmp/houdini_download_result.txt; then
   result_houdini_build="$(cat /tmp/houdini_download_result.txt)"
   echo "Add tag: houdini_build=$result_houdini_build to ami: $houdini_ami_to_update"
   aws ec2 create-tags \
-      --resources $houdini_ami_to_update --tags Key=houdini_build,Value=$result_houdini_build
+    --resources $houdini_ami_to_update --tags Key=houdini_build,Value=$result_houdini_build
 fi
 
 cd $EXECDIR
