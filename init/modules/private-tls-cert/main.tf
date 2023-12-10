@@ -33,7 +33,7 @@ resource "null_resource" "ca_public_key_file_path" {
   }
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command = "echo 'set permissions init/modules/private-tls-cert' && echo '${local.tls_self_signed_cert}' > '${var.ca_public_key_file_path}' && chmod ${var.permissions} '${var.ca_public_key_file_path}' && chown ${var.cert_owner} '${var.ca_public_key_file_path}'"
+    command     = "echo 'set permissions init/modules/private-tls-cert' && echo '${local.tls_self_signed_cert}' > '${var.ca_public_key_file_path}' && chmod ${var.permissions} '${var.ca_public_key_file_path}' && chown ${var.cert_owner} '${var.ca_public_key_file_path}'"
   }
 }
 
@@ -53,7 +53,7 @@ resource "null_resource" "private_key_file_path" {
   }
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command = "echo '${local.tls_private_key}' > '${var.private_key_file_path}' && chmod ${var.permissions} '${var.private_key_file_path}' && chown ${var.cert_owner} '${var.private_key_file_path}'"
+    command     = "echo '${local.tls_private_key}' > '${var.private_key_file_path}' && chmod ${var.permissions} '${var.private_key_file_path}' && chown ${var.cert_owner} '${var.private_key_file_path}'"
   }
 }
 
@@ -85,6 +85,6 @@ resource "null_resource" "public_key_file_path" {
   }
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command = "echo '${local.tls_locally_signed_cert}' > '${var.public_key_file_path}' && chmod ${var.permissions} '${var.public_key_file_path}' && chown ${var.cert_owner} '${var.public_key_file_path}'"
+    command     = "echo '${local.tls_locally_signed_cert}' > '${var.public_key_file_path}' && chmod ${var.permissions} '${var.public_key_file_path}' && chown ${var.cert_owner} '${var.public_key_file_path}'"
   }
 }
