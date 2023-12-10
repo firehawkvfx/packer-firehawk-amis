@@ -32,6 +32,7 @@ resource "null_resource" "ca_public_key_file_path" {
     always_run = timestamp() # Always run this since we dont know if this is a new vault and an old state file.  This could be better.  perhaps track an init var in the vault?
   }
   provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
     command = "echo 'set permissions init/modules/private-tls-cert' && echo '${local.tls_self_signed_cert}' > '${var.ca_public_key_file_path}' && chmod ${var.permissions} '${var.ca_public_key_file_path}' && chown ${var.cert_owner} '${var.ca_public_key_file_path}'"
   }
 }
@@ -51,6 +52,7 @@ resource "null_resource" "private_key_file_path" {
     always_run = timestamp() # Always run this since we dont know if this is a new vault and an old state file.  This could be better.  perhaps track an init var in the vault?
   }
   provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
     command = "echo '${local.tls_private_key}' > '${var.private_key_file_path}' && chmod ${var.permissions} '${var.private_key_file_path}' && chown ${var.cert_owner} '${var.private_key_file_path}'"
   }
 }
@@ -69,7 +71,7 @@ resource "tls_cert_request" "cert" {
 
 resource "tls_locally_signed_cert" "cert" {
   cert_request_pem = tls_cert_request.cert.cert_request_pem
-  
+
   ca_private_key_pem = sensitive(tls_private_key.ca.private_key_pem)
   ca_cert_pem        = sensitive(tls_self_signed_cert.ca.cert_pem)
 
@@ -82,6 +84,7 @@ resource "null_resource" "public_key_file_path" {
     always_run = timestamp() # Always run this since we dont know if this is a new vault and an old state file.  This could be better.  perhaps track an init var in the vault?
   }
   provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
     command = "echo '${local.tls_locally_signed_cert}' > '${var.public_key_file_path}' && chmod ${var.permissions} '${var.public_key_file_path}' && chown ${var.cert_owner} '${var.public_key_file_path}'"
   }
 }
