@@ -105,7 +105,7 @@ function run {
       sudo cp -f $cert_file_path /tmp/$cert_file_name # If the file is outside the temp dir, copy it to the temp dir. This way if it was already placed there, it will be cleaned up.
     fi
     sudo mv /tmp/$cert_file_name /opt/vault/tls/ # Always move the file from the temp dir so it is not left behind.
-    
+
     sudo chown -R vault:vault /opt/vault/tls/
     sudo chmod -R 600 /opt/vault/tls
     sudo chmod 700 /opt/vault/tls
@@ -200,7 +200,7 @@ function update {
       --consul-version)
         consul_version="$2"
         shift
-        ;;        
+        ;;
       --cert-file-path)
         cert_file_path="$2"
         shift
