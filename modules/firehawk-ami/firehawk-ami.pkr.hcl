@@ -565,6 +565,18 @@ build {
     ]
   }
 
+  # install python 3.8
+  provisioner "shell" {
+    inline = [
+      "sudo yum install -y epel-release",
+      "sudo yum install -y python38"
+    ]
+    only = [
+      "amazon-ebs.amazonlinux2-ami",
+      "amazon-ebs.centos7-rendernode-ami"
+    ]
+  }
+
   # Install terraform, terragrunt, packer for Amazon Linux
   provisioner "shell" {
     inline = [
@@ -589,7 +601,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_host=default package_python_interpreter=/usr/bin/python2.7"
+      "variable_host=default package_python_interpreter=/usr/bin/python3.8"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
@@ -743,7 +755,7 @@ build {
     extra_arguments = [
       "-vvvv",
       "--extra-vars",
-      "variable_host=default set_selinux=disabled package_python_interpreter=/usr/bin/python2.7"
+      "variable_host=default set_selinux=disabled package_python_interpreter=/usr/bin/python3.8"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
