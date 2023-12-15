@@ -569,7 +569,8 @@ build {
   provisioner "shell" {
     inline = [
       "sudo yum install -y epel-release",
-      "sudo yum install -y python38"
+      "sudo yum install -y centos-release-scl",
+      "sudo yum install -y rh-python38" # scl enable rh-python38 bash
     ]
     only = [
       "amazon-ebs.amazonlinux2-ami",
