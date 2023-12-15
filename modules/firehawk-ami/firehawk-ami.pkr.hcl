@@ -145,7 +145,7 @@ locals {
   sesi_client_id                 = var.sesi_client_id
   sesi_client_secret_key         = var.sesi_client_secret_key
   houdini_license_server_address = var.houdini_license_server_address
-  
+
   # python_libs_folder will change between 2.7 and 3.7 depending on your installer
   # You may require a different version of houdini for hserver
   houdini_json_vars = {
@@ -741,7 +741,7 @@ build {
     playbook_file = "./ansible/selinux.yaml"
     user          = "centos"
     extra_arguments = [
-      "-v",
+      "-vvvv",
       "--extra-vars",
       "variable_host=default set_selinux=disabled package_python_interpreter=/usr/bin/python2.7"
     ]
