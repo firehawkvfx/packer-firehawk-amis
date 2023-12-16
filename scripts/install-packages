@@ -80,11 +80,11 @@ mkdir -p $SCRIPTDIR/tmp
 # sudo ./aws/install
 # && python3.8 -m pip install --user typing_extensions --upgrade \
 
-python3.8 -m pip install --upgrade pip &&
-    python3.8 -m pip install --user "ansible==5.9.0" &&
-    python3.8 -m pip install --user boto3 botocore &&
-    export PATH=$PATH:/root/.local/bin &&
-    ansible --version
+# python3.8 -m pip install --upgrade pip &&
+#     python3.8 -m pip install --user "ansible==5.9.0" &&
+#     python3.8 -m pip install --user boto3 botocore &&
+#     export PATH=$PATH:/root/.local/bin &&
+#     ansible --version
 
 # ansible [core 2.12.6]
 
