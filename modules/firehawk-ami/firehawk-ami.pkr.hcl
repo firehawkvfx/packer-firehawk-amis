@@ -589,7 +589,7 @@ build {
       "sudo yum install -y rh-python38" # scl enable rh-python38 bash
     ]
     only = [
-      "amazon-ebs.amazonlinux2-ami",
+      # "amazon-ebs.amazonlinux2-ami", # epel-release not used (epel)
       "amazon-ebs.centos7-rendernode-ami"
     ]
   }
