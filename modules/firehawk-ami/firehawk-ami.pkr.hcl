@@ -533,6 +533,22 @@ build {
     only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
   }
 
+  # TODO remove tofu
+  # fix pub keys for github centos and deadlineuser ?
+  provisioner "shell" {
+    inline = [
+      "echo 'Add github keys to known_hosts'",
+      "sudo su - centos -c \"mkdir -p /home/centos/.ssh\"",
+      "sudo su - centos -c \"touch /home/centos/.ssh/known_hosts\"",
+      "sudo su - centos -c \"chmod 0600 /home/centos/.ssh/known_hosts\"",
+      "sudo su - centos -c \"ssh-keygen -R 140.82.112.4\"",
+      "sudo su - centos -c \"ssh-keyscan -t rsa github.com >> /home/centos/.ssh/known_hosts\""
+    ]
+    only = [
+      "amazon-ebs.centos7-rendernode-ami"
+    ]
+  }
+
   provisioner "shell" { # Install amazon systems manager for centos intelx86/amd64
     inline = [
       "sudo yum install -y https://s3.${var.aws_region}.amazonaws.com/amazon-ssm-${var.aws_region}/latest/linux_amd64/amazon-ssm-agent.rpm",
@@ -578,18 +594,6 @@ build {
     ]
   }
 
-  # TODO remove tofu
-  # fix pub keys for github centos and deadlineuser ?
-  provisioner "shell" {
-    inline = [
-      "sudo su - centos -c \"mkdir -p /home/centos/.ssh\"",
-      "sudo su - centos -c \"ssh-keygen -R 140.82.112.4\"",
-      "sudo su - centos -c \"ssh-keyscan -t rsa github.com >> /home/centos/.ssh/known_hosts\""
-    ]
-    only = [
-      "amazon-ebs.centos7-rendernode-ami"
-    ]
-  }
 
   # Install terraform, terragrunt, packer for Amazon Linux
   provisioner "shell" {
