@@ -602,7 +602,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_host=default package_python_interpreter=/usr/bin/python3.8"
+      "variable_host=default package_python_interpreter=/usr/bin/python2.7"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
@@ -756,7 +756,7 @@ build {
     extra_arguments = [
       "-vvvv",
       "--extra-vars",
-      "variable_host=default set_selinux=disabled package_python_interpreter=/usr/bin/python3.8"
+      "variable_host=default set_selinux=disabled package_python_interpreter=/usr/bin/python2.7" # the python version on the target host
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
