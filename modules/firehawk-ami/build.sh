@@ -18,14 +18,14 @@ cd $SCRIPTDIR
 # You can build a single AMI to test by modifying this list.
 # Deployment will require all items in the list.
 
-# build_list="amazon-ebs.amazonlinux2-ami,\
-# amazon-ebs.centos7-ami,\
-# amazon-ebs.centos7-rendernode-ami,\
-# amazon-ebs.ubuntu18-ami,\
-# amazon-ebs.ubuntu18-vault-consul-server-ami,\
-# amazon-ebs.deadline-db-ubuntu18-ami"
+build_list="amazon-ebs.amazonlinux2-ami,\
+amazon-ebs.centos7-ami,\
+amazon-ebs.centos7-rendernode-ami,\
+amazon-ebs.ubuntu18-ami,\
+amazon-ebs.ubuntu18-vault-consul-server-ami,\
+amazon-ebs.deadline-db-ubuntu18-ami"
 
-build_list="amazon-ebs.amazonlinux2-ami"
+# build_list="amazon-ebs.amazonlinux2-ami"
 
 # build_list="amazon-ebs.amazonlinux2-ami,amazon-ebs.centos7-rendernode-ami"
 
