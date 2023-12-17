@@ -589,8 +589,18 @@ build {
       "sudo yum install -y rh-python38" # scl enable rh-python38 bash
     ]
     only = [
-      # "amazon-ebs.amazonlinux2-ami", # epel-release not used (epel)
-      "amazon-ebs.centos7-rendernode-ami"
+      "amazon-ebs.centos7-rendernode-ami" # the binary wont be located in normal location, for that you need to compile it.
+    ]
+  }
+
+  provisioner "shell" {
+    inline = [
+      "sudo amazon-linux-extras enable python3.8",
+      "sudo yum clean metadata",
+      "sudo yum install -y python3.8" # scl enable rh-python38 bash
+    ]
+    only = [
+      "amazon-ebs.amazonlinux2-ami"
     ]
   }
 
