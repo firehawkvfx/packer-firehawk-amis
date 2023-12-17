@@ -581,8 +581,9 @@ build {
   # fix pub keys for github
   provisioner "shell" {
     inline = [
-      "ssh-keygen -R 140.82.112.4",
-      "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
+      "mkdir -p ~/.ssh",
+      "sudo ssh-keygen -R 140.82.112.4",
+      "sudo ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami"
