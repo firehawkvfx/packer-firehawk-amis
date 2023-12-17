@@ -578,18 +578,6 @@ build {
     ]
   }
 
-  # fix pub keys for github
-  provisioner "shell" {
-    inline = [
-      "mkdir -p ~/.ssh",
-      "sudo ssh-keygen -R 140.82.112.4",
-      "sudo ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
-    ]
-    only = [
-      "amazon-ebs.centos7-rendernode-ami"
-    ]
-  }
-
   # Install terraform, terragrunt, packer for Amazon Linux
   provisioner "shell" {
     inline = [
@@ -816,6 +804,19 @@ build {
       "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
     ]
   }
+
+  # fix pub keys for github centos and deadlineuser ?
+  provisioner "shell" {
+    inline = [
+      "sudo su - centos -c \"mkdir -p /home/centos/.ssh\"",
+      "sudo su - centos -c \"ssh-keygen -R 140.82.112.4\"",
+      "sudo su - centos -c \"ssh-keyscan -t rsa github.com >> /home/centos/.ssh/known_hosts\""
+    ]
+    only = [
+      "amazon-ebs.centos7-rendernode-ami"
+    ]
+  }
+      # "sudo su - ${var.deadlineuser_name} -c \"mkdir -p /home/${var.deadlineuser_name}/Thinkbox/Deadline10\"",
 
   provisioner "ansible" {
     playbook_file = "./ansible/newuser.yaml"
