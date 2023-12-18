@@ -581,17 +581,17 @@ build {
     ]
   }
 
-  # install python 3.8
-  provisioner "shell" {
-    inline = [
-      "sudo yum install -y epel-release",
-      "sudo yum install -y centos-release-scl",
-      "sudo yum install -y rh-python38" # scl enable rh-python38 bash
-    ]
-    only = [
-      "amazon-ebs.centos7-rendernode-ami" # the binary wont be located in normal location, for that you need to compile it.
-    ]
-  }
+  # install python 3.8 # this might be affecting the sesi downloader
+  # provisioner "shell" {
+  #   inline = [
+  #     "sudo yum install -y epel-release",
+  #     "sudo yum install -y centos-release-scl",
+  #     "sudo yum install -y rh-python38" # scl enable rh-python38 bash
+  #   ]
+  #   only = [
+  #     "amazon-ebs.centos7-rendernode-ami" # the binary wont be located in normal location, for that you need to compile it.
+  #   ]
+  # }
 
   provisioner "shell" {
     inline = [
