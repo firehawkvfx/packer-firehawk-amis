@@ -191,8 +191,11 @@ function export_vars {
   )"
 
   if [[ "$skip_find_amis" == "false" ]]; then
+    echo "Query AMI's..."
     ami_filters="Name=tag:commit_hash,Values=$TF_VAR_ami_commit_hash"
-    query_result=$(aws ec2 describe-images --filters $ami_filters --owners self --region $AWS_DEFAULT_REGION --query 'Images[*].{image_id:ImageId, creation_date:CreationDate, ami_role:Tags[?Key==`ami_role`].Value | [0], commit_hash:Tags[?Key==`commit_hash`].Value | [0]}' --output json | jq 'group_by(.ami_role) | map(max_by(.creation_date))')
+    query_result=$(aws ec2 describe-images --filters $ami_filters --owners self --region "$AWS_DEFAULT_REGION" --query 'Images[*].{image_id:ImageId, creation_date:CreationDate, ami_role:Tags[?Key==`ami_role`].Value | [0], commit_hash:Tags[?Key==`commit_hash`].Value | [0]}' --output json | jq 'group_by(.ami_role) | map(max_by(.creation_date))')
+
+    echo "Query result: $query_result"
     # AMI query by commit - Vault and Consul Server
     ami_role="firehawk_ubuntu18_vault_consul_server_ami"
     export TF_VAR_vault_consul_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
