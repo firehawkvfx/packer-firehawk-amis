@@ -66,7 +66,6 @@ function retrieve_ami {
   fi
   # this query by aws will return null presently if invalid
   ami_result=$(aws ec2 describe-images --filters $ami_filters --owners self --region $AWS_DEFAULT_REGION --query 'sort_by(Images, &CreationDate)[].ImageId' --output json | jq '.[-1]' --raw-output)
-
   echo "$ami_result"
 }
 
@@ -107,11 +106,12 @@ function export_vars {
     set -x
   fi
   # Region is required for AWS CLI
-  echo "AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION"
+  # echo "AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION"
 
-  if [[ "$codebuild" == "false" ]]; then
-    export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
-  fi
+  # if [[ "$codebuild" == "false" ]]; then
+  #   export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
+  # fi
+  echo "AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION"
   # Get the resourcetier from the instance tag if not passed inline
   if [[ -z "$resourcetier" ]]; then
     export TF_VAR_instance_id_main_cloud9=$(curl http://169.254.169.254/latest/meta-data/instance-id)
@@ -191,37 +191,39 @@ function export_vars {
   )"
 
   if [[ "$skip_find_amis" == "false" ]]; then
+    ami_filters="Name=tag:commit_hash,Values=$TF_VAR_ami_commit_hash"
+    query_result=$(aws ec2 describe-images --filters $ami_filters --owners self --region $AWS_DEFAULT_REGION --query 'Images[*].{image_id:ImageId, creation_date:CreationDate, ami_role:Tags[?Key==`ami_role`].Value | [0], commit_hash:Tags[?Key==`commit_hash`].Value | [0]}' --output json | jq 'group_by(.ami_role) | map(max_by(.creation_date))')
     # AMI query by commit - Vault and Consul Server
     ami_role="firehawk_ubuntu18_vault_consul_server_ami"
-    export TF_VAR_vault_consul_ami_id=$(retrieve_ami $latest_ami $ami_role $TF_VAR_ami_commit_hash)
+    export TF_VAR_vault_consul_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     warn_if_invalid "$ami_role" "$TF_VAR_vault_consul_ami_id" "TF_VAR_vault_consul_ami_id"
     # AMI query by commit - Vault and Consul Client
     ami_role="firehawk_centos7_ami"
-    export TF_VAR_vault_client_ami_id=$(retrieve_ami $latest_ami $ami_role $TF_VAR_ami_commit_hash)
+    export TF_VAR_vault_client_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     warn_if_invalid "$ami_role" "$TF_VAR_vault_client_ami_id" "TF_VAR_vault_client_ami_id"
     # AMI query by commit - Bastion Host
     ami_role="firehawk_centos7_ami"
-    export TF_VAR_bastion_ami_id=$(retrieve_ami $latest_ami $ami_role $TF_VAR_ami_commit_hash)
+    export TF_VAR_bastion_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     warn_if_invalid "$ami_role" "$TF_VAR_bastion_ami_id" "TF_VAR_bastion_ami_id"
     # AMI query by commit - Open VPN Server
     # ami_role="firehawk_openvpn_server_ami"
-    # export TF_VAR_openvpn_server_ami=$(retrieve_ami $latest_ami $ami_role $TF_VAR_ami_commit_hash)
+    # export TF_VAR_openvpn_server_ami=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     # warn_if_invalid "$ami_role" "$TF_VAR_openvpn_server_ami" "TF_VAR_openvpn_server_ami"
     # AMI query by commit - Deadline DB
     ami_role="firehawk_deadlinedb_ami"
-    export TF_VAR_deadline_db_ami_id=$(retrieve_ami $latest_ami $ami_role $TF_VAR_ami_commit_hash)
+    export TF_VAR_deadline_db_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     warn_if_invalid "$ami_role" "$TF_VAR_deadline_db_ami_id" "TF_VAR_deadline_db_ami_id"
     # AMI query by commit - Render node
     ami_role="firehawk_centos7_rendernode_ami"
-    export TF_VAR_node_centos7_houdini_ami_id=$(retrieve_ami $latest_ami $ami_role $TF_VAR_ami_commit_hash)
+    export TF_VAR_node_centos7_houdini_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     warn_if_invalid "$ami_role" "$TF_VAR_node_centos7_houdini_ami_id" "TF_VAR_node_centos7_houdini_ami_id"
     # AMI query by commit - Workstation
     ami_role="firehawk_amazonlinux2_ami"
-    export TF_VAR_provisioner_ami_id=$(retrieve_ami $latest_ami $ami_role $TF_VAR_ami_commit_hash)
+    export TF_VAR_provisioner_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     warn_if_invalid "$ami_role" "$TF_VAR_provisioner_ami_id" "TF_VAR_provisioner_ami_id"
     # # AMI query by commit - Workstation
     # ami_role="firehawk_amazonlinux2_nicedcv_ami"
-    # export TF_VAR_workstation_amazonlinux2_nicedcv_ami_id=$(retrieve_ami $latest_ami $ami_role $TF_VAR_ami_commit_hash)
+    # export TF_VAR_workstation_amazonlinux2_nicedcv_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     # warn_if_invalid "$ami_role" "$TF_VAR_workstation_amazonlinux2_nicedcv_ami_id" "TF_VAR_workstation_amazonlinux2_nicedcv_ami_id"
   fi
 
