@@ -9,13 +9,13 @@ packer_version="1.7.2"
 set -e
 set -x
 
-SOURCE=${BASH_SOURCE[0]} # resolve the script dir even if a symlink is used to this script
+SOURCE=${BASH_SOURCE[0]}   # resolve the script dir even if a symlink is used to this script
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
-  SOURCE=$(readlink "$SOURCE")
-  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+    DIR=$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
+    SOURCE=$(readlink "$SOURCE")
+    [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
-SCRIPTDIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+SCRIPTDIR=$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
 cd $SCRIPTDIR
 
 SUDOCMD="" # replace with text sudo to use elevated permissions
@@ -38,15 +38,15 @@ mkdir -p $SCRIPTDIR/tmp
 # sudo ./aws/install
 # && python3.8 -m pip install --user typing_extensions --upgrade \
 
-python3.8 -m pip install --upgrade pip \
-    && python3.8 -m pip install --user "ansible==5.9.0" \
-    && python3.8 -m pip install --user boto3 botocore \
-    && export PATH=$PATH:/root/.local/bin \
-    && ansible --version
+python3.8 -m pip install --upgrade pip &&
+    python3.8 -m pip install --user "ansible==5.9.0" &&
+    python3.8 -m pip install --user boto3 botocore &&
+    export PATH=$PATH:/root/.local/bin &&
+    ansible --version
 
 # ansible [core 2.12.6]
 
-if terraform --version 2> /dev/null | grep -nq "Terraform v${terraform_version}"; then
+if terraform --version 2>/dev/null | grep -nq "Terraform v${terraform_version}"; then
     echo 'terraform already installed'
 else
     wget https://releases.hashicorp.com/terraform/${terraform_version}/terraform_${terraform_version}_linux_amd64.zip -P /tmp/ --quiet # Get terraform
@@ -58,7 +58,7 @@ wget https://releases.hashicorp.com/packer/${packer_version}/packer_${packer_ver
 $SUDOCMD unzip /tmp/packer_${packer_version}_linux_amd64.zip -d /tmp/
 $SUDOCMD mv /tmp/packer /usr/local/bin/.
 
-if terragrunt --version 2> /dev/null | grep -nq "terragrunt version v${terragrunt_version}"; then
+if terragrunt --version 2>/dev/null | grep -nq "terragrunt version v${terragrunt_version}"; then
     echo 'Terragrunt already installed'
 else
     wget https://github.com/gruntwork-io/terragrunt/releases/download/v${terragrunt_version}/terragrunt_linux_386 -P /tmp/ --quiet # Get Terragrunt
