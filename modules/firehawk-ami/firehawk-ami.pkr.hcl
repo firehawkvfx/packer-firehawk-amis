@@ -34,7 +34,7 @@ variable "resourcetier" {
 variable "terraform_version" {
   description = "The current environment ( dev / green / blue / main )"
   type        = string
-  default     = "1.1.7"
+  default     = "1.5.6"
 }
 variable "terragrunt_version" {
   description = "The current environment ( dev / green / blue / main )"
