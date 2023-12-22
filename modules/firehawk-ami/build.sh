@@ -165,6 +165,11 @@ if [[ $total_built_images -gt 0 ]]; then
   $SCRIPTDIR/delete-all-old-amis.sh --commit-hash-short-list $PKR_VAR_commit_hash_short --auto-approve
 fi
 
+echo "Ensure Anwible is installed"
+export PATH=$PATH:/root/.local/bin
+ansible --version
+ansible-playbook --version
+
 echo "Building AMI's for deployment: $ami_role"
 
 if [[ "$ami_role" == "firehawk-base-ami" ]]; then
