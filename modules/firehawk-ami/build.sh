@@ -44,9 +44,7 @@ function error_if_empty {
 
 # Store all arguments in a variable
 all_args="$@"
-
 ami_role="$1"
-
 # Store all arguments except the first one in a new variable
 shift
 args_without_first="$@"
@@ -58,13 +56,24 @@ args_without_first="$@"
 
 if [[ "$ami_role" == "firehawk-base-ami" ]]; then
   export PKR_VAR_ami_role="firehawk-base-ami"
+  BUILDIR="$TF_VAR_PATH_PACKER_FIREHAWK_AMIS/modules/firehawk-base-ami"
   # primary amis to build:
   build_list="amazon-ebs.ubuntu18-ami,\
 amazon-ebs.amazonlinux2-ami,\
 amazon-ebs.centos7-ami"
 
+  if ! cd "$BUILDIR"; then
+    log_error "Failed to change directory."
+    exit 1
+  fi
+
+  export PKR_VAR_commit_hash="$(git rev-parse HEAD)"
+  export PKR_VAR_commit_hash_short="$(git rev-parse --short HEAD)"
+  export PKR_VAR_manifest_path="$BUILDIR/manifest.json"
+
 elif [[ "$ami_role" == "firehawk-ami" ]]; then
   export PKR_VAR_ami_role="firehawk-ami"
+  BUILDIR="$TF_VAR_PATH_PACKER_FIREHAWK_AMIS/modules/firehawk-ami"
   # secondary amis to build
   build_list="amazon-ebs.amazonlinux2-ami,\
 amazon-ebs.centos7-ami,\
@@ -72,23 +81,34 @@ amazon-ebs.centos7-rendernode-ami,\
 amazon-ebs.ubuntu18-ami,\
 amazon-ebs.ubuntu18-vault-consul-server-ami,\
 amazon-ebs.deadline-db-ubuntu18-ami"
+
+  # Get the commit hash for the base ami
+  if ! cd "$TF_VAR_PATH_PACKER_FIREHAWK_AMIS/modules/firehawk-base-ami"; then
+    log_error "Failed to change directory."
+    exit 1
+  fi
+  export PKR_VAR_ingress_commit_hash="$(git rev-parse HEAD)" # the commit hash for incoming amis
+  export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
+
+  if ! cd "$BUILDIR"; then
+    log_error "Failed to change directory."
+    exit 1
+  fi
+
+  export PKR_VAR_commit_hash="$(git rev-parse HEAD)"
+  export PKR_VAR_commit_hash_short="$(git rev-parse --short HEAD)"
+  export PKR_VAR_manifest_path="$BUILDIR/manifest.json"
 else
   log_error "Invalid argument: $ami_role"
   exit 1
 fi
 
 export PKR_VAR_resourcetier="$TF_VAR_resourcetier"
-export PKR_VAR_commit_hash="$(git rev-parse HEAD)"
-export PKR_VAR_commit_hash_short="$(git rev-parse --short HEAD)"
 export PKR_VAR_aws_region="$AWS_DEFAULT_REGION"
 export PACKER_LOG=1
-export PACKER_LOG_PATH="$SCRIPTDIR/packerlog.log"
-export PKR_VAR_manifest_path="$SCRIPTDIR/manifest.json"
+export PACKER_LOG_PATH="$BUILDIR/packerlog.log"
 
-cd $SCRIPTDIR/../firehawk-base-ami
-export PKR_VAR_ingress_commit_hash="$(git rev-parse HEAD)" # the commit hash for incoming amis
-export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
-cd $SCRIPTDIR
+# cd $SCRIPTDIR
 
 echo "Will build AMI's for deployment: $PKR_VAR_ami_role"
 
@@ -132,7 +152,7 @@ if [[ "$ami_role" == "firehawk-ami" ]]; then
   # export PKR_VAR_installers_bucket="$(terragrunt output installers_bucket)"
   echo "Using installers bucket: $PKR_VAR_installers_bucket"
   error_if_empty "Missing: PKR_VAR_installers_bucket" "$PKR_VAR_installers_bucket"
-  cd $SCRIPTDIR
+  # cd $SCRIPTDIR
 
   # Retrieve secretsmanager secrets
   sesi_client_secret_key_path="/firehawk/resourcetier/${TF_VAR_resourcetier}/sesi_client_secret_key"
@@ -162,10 +182,10 @@ echo "$missing_images_for_hash"
 echo "total_built_images: $total_built_images"
 if [[ $total_built_images -gt 0 ]]; then
   echo "Packer will erase all images for this commit hash and rebuild all images"
-  $SCRIPTDIR/delete-all-old-amis.sh --commit-hash-short-list $PKR_VAR_commit_hash_short --auto-approve
+  $BUILDIR/delete-all-old-amis.sh --commit-hash-short-list $PKR_VAR_commit_hash_short --auto-approve
 fi
 
-echo "Ensure Anwible is installed"
+echo "Ensure Ansible is installed and in path"
 export PATH=$PATH:/root/.local/bin
 ansible --version
 ansible-playbook --version
@@ -176,28 +196,28 @@ if [[ "$ami_role" == "firehawk-base-ami" ]]; then
   # Validate
   packer validate \
     -only=$build_list \
-    $SCRIPTDIR/firehawk-base-ami.pkr.hcl
+    $BUILDIR/firehawk-base-ami.pkr.hcl
 
   # Prepare for build.
   # Ansible log path
-  mkdir -p "$SCRIPTDIR/tmp/log"
+  mkdir -p "$BUILDIR/tmp/log"
   # Clear previous manifest
   rm -f $PKR_VAR_manifest_path
 
   # Build
   packer build \
     -only=$build_list \
-    $SCRIPTDIR/firehawk-base-ami.pkr.hcl
+    $BUILDIR/firehawk-base-ami.pkr.hcl
 elif [[ "$ami_role" == "firehawk-ami" ]]; then
 
   # Prepare for build.
   # Ansible log path
-  mkdir -p "$SCRIPTDIR/tmp/log"
+  mkdir -p "$BUILDIR/tmp/log"
   # Clear previous manifest
   rm -f $PKR_VAR_manifest_path
 
   # Ensure certs exist for Consul and Vault
-  $SCRIPTDIR/../../init/init
+  $TF_VAR_PATH_PACKER_FIREHAWK_AMIS/init/init
   if [[ -f "$TF_VAR_ca_public_key_file_path" ]]; then
     export SSL_expiry=$(cat "$TF_VAR_ca_public_key_file_path" | openssl x509 -noout -enddate | awk -F "=" '{print $2}')
     # export PKR_VAR_SSL_expiry="$TF_VAR_SSL_expiry"
@@ -213,7 +233,7 @@ elif [[ "$ami_role" == "firehawk-ami" ]]; then
     -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
     -var "SSL_expiry=$SSL_expiry" \
     -only=$build_list \
-    $SCRIPTDIR/firehawk-ami.pkr.hcl
+    $BUILDIR/firehawk-ami.pkr.hcl
 
   # Build
   packer build \
@@ -222,7 +242,7 @@ elif [[ "$ami_role" == "firehawk-ami" ]]; then
     -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
     -var "SSL_expiry=$SSL_expiry" \
     -only=$build_list \
-    $SCRIPTDIR/firehawk-ami.pkr.hcl
+    $BUILDIR/firehawk-ami.pkr.hcl
 
   # Track the houdini build by adding an extra tag to the AMI.
   # ...Since the build version downloaded cannot always be known until after install.
