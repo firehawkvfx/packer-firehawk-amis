@@ -51,17 +51,18 @@ if [[ $1 == "firehawk-base-ami" ]]; then
   export PKR_VAR_ami_role="firehawk-base-ami"
   # primary amis to build:
   build_list="amazon-ebs.ubuntu18-ami,\
-  amazon-ebs.amazonlinux2-ami,\
-  amazon-ebs.centos7-ami"
+amazon-ebs.amazonlinux2-ami,\
+amazon-ebs.centos7-ami"
+
 elif [[ $1 == "firehawk-ami" ]]; then
   export PKR_VAR_ami_role="firehawk-ami"
   # secondary amis to build
   build_list="amazon-ebs.amazonlinux2-ami,\
-  amazon-ebs.centos7-ami,\
-  amazon-ebs.centos7-rendernode-ami,\
-  amazon-ebs.ubuntu18-ami,\
-  amazon-ebs.ubuntu18-vault-consul-server-ami,\
-  amazon-ebs.deadline-db-ubuntu18-ami"
+amazon-ebs.centos7-ami,\
+amazon-ebs.centos7-rendernode-ami,\
+amazon-ebs.ubuntu18-ami,\
+amazon-ebs.ubuntu18-vault-consul-server-ami,\
+amazon-ebs.deadline-db-ubuntu18-ami"
 else
   log_error "Invalid argument: $1"
   exit 1
