@@ -42,19 +42,28 @@ function error_if_empty {
   return
 }
 
+# Store all arguments in a variable
+all_args="$@"
+
+ami_role="$1"
+
+# Store all arguments except the first one in a new variable
+shift
+args_without_first="$@"
+
 ### Vars
 
 # You can build a single AMI to test by modifying this list.
 # Deployment will require all items in the list.
 
-if [[ $1 == "firehawk-base-ami" ]]; then
+if [[ $ami_role == "firehawk-base-ami" ]]; then
   export PKR_VAR_ami_role="firehawk-base-ami"
   # primary amis to build:
   build_list="amazon-ebs.ubuntu18-ami,\
 amazon-ebs.amazonlinux2-ami,\
 amazon-ebs.centos7-ami"
 
-elif [[ $1 == "firehawk-ami" ]]; then
+elif [[ $ami_role == "firehawk-ami" ]]; then
   export PKR_VAR_ami_role="firehawk-ami"
   # secondary amis to build
   build_list="amazon-ebs.amazonlinux2-ami,\
@@ -64,11 +73,9 @@ amazon-ebs.ubuntu18-ami,\
 amazon-ebs.ubuntu18-vault-consul-server-ami,\
 amazon-ebs.deadline-db-ubuntu18-ami"
 else
-  log_error "Invalid argument: $1"
+  log_error "Invalid argument: $ami_role"
   exit 1
 fi
-
-# build_list=$1
 
 export PKR_VAR_resourcetier="$TF_VAR_resourcetier"
 export PKR_VAR_commit_hash="$(git rev-parse HEAD)"
@@ -120,7 +127,7 @@ fi
 echo "Using profile: $PKR_VAR_provisioner_iam_profile_name"
 error_if_empty "Missing: PKR_VAR_provisioner_iam_profile_name" "$PKR_VAR_provisioner_iam_profile_name"
 
-if [[ $1 == "firehawk-ami" ]]; then
+if [[ $ami_role == "firehawk-ami" ]]; then
   ### Software Bucket
   # export PKR_VAR_installers_bucket="$(terragrunt output installers_bucket)"
   echo "Using installers bucket: $PKR_VAR_installers_bucket"
@@ -158,9 +165,9 @@ if [[ $total_built_images -gt 0 ]]; then
   $SCRIPTDIR/delete-all-old-amis.sh --commit-hash-short-list $PKR_VAR_commit_hash_short --auto-approve
 fi
 
-if [[ $1 == "firehawk-base-ami" ]]; then
+if [[ $ami_role == "firehawk-base-ami" ]]; then
   # Validate
-  packer validate "$@" \
+  packer validate "$args_without_first" \
     -only=$build_list \
     $SCRIPTDIR/firehawk-base-ami.pkr.hcl
 
@@ -171,7 +178,7 @@ if [[ $1 == "firehawk-base-ami" ]]; then
   rm -f $PKR_VAR_manifest_path
 
   # Build
-  packer build "$@" \
+  packer build "$args_without_first" \
     -only=$build_list \
     $SCRIPTDIR/firehawk-base-ami.pkr.hcl
 elif [[ $1 == "firehawk-ami" ]]; then
@@ -193,7 +200,7 @@ elif [[ $1 == "firehawk-ami" ]]; then
   fi
 
   # Validate
-  packer validate "$@" \
+  packer validate "$args_without_first" \
     -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
     -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
     -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
@@ -202,7 +209,7 @@ elif [[ $1 == "firehawk-ami" ]]; then
     $SCRIPTDIR/firehawk-ami.pkr.hcl
 
   # Build
-  packer build "$@" \
+  packer build "$args_without_first" \
     -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
     -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
     -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
