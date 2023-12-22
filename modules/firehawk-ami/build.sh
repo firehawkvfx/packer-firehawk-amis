@@ -13,6 +13,35 @@ done
 SCRIPTDIR=$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
 cd $SCRIPTDIR
 
+function log {
+  local -r level="$1"
+  local -r message="$2"
+  local -r timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+  echo >&2 -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
+}
+
+function log_info {
+  local -r message="$1"
+  log "INFO" "$message"
+}
+
+function log_warn {
+  local -r message="$1"
+  log "WARN" "$message"
+}
+
+function log_error {
+  local -r message="$1"
+  log "ERROR" "$message"
+}
+
+function error_if_empty {
+  if [[ -z "$2" ]]; then
+    log_error "$1"
+  fi
+  return
+}
+
 ### Vars
 
 # You can build a single AMI to test by modifying this list.
@@ -54,35 +83,6 @@ export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
 cd $SCRIPTDIR
 
 echo "Building AMI's for deployment: $PKR_VAR_ami_role"
-
-function log {
-  local -r level="$1"
-  local -r message="$2"
-  local -r timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-  echo >&2 -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
-}
-
-function log_info {
-  local -r message="$1"
-  log "INFO" "$message"
-}
-
-function log_warn {
-  local -r message="$1"
-  log "WARN" "$message"
-}
-
-function log_error {
-  local -r message="$1"
-  log "ERROR" "$message"
-}
-
-function error_if_empty {
-  if [[ -z "$2" ]]; then
-    log_error "$1"
-  fi
-  return
-}
 
 ### Idempotency logic: exit if all images exist
 error_if_empty "Missing: PKR_VAR_commit_hash_short:" "$PKR_VAR_commit_hash_short"
