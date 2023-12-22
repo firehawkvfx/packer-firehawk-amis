@@ -56,14 +56,14 @@ args_without_first="$@"
 # You can build a single AMI to test by modifying this list.
 # Deployment will require all items in the list.
 
-if [[ $ami_role == "firehawk-base-ami" ]]; then
+if [[ "$ami_role" == "firehawk-base-ami" ]]; then
   export PKR_VAR_ami_role="firehawk-base-ami"
   # primary amis to build:
   build_list="amazon-ebs.ubuntu18-ami,\
 amazon-ebs.amazonlinux2-ami,\
 amazon-ebs.centos7-ami"
 
-elif [[ $ami_role == "firehawk-ami" ]]; then
+elif [[ "$ami_role" == "firehawk-ami" ]]; then
   export PKR_VAR_ami_role="firehawk-ami"
   # secondary amis to build
   build_list="amazon-ebs.amazonlinux2-ami,\
@@ -90,7 +90,7 @@ export PKR_VAR_ingress_commit_hash="$(git rev-parse HEAD)" # the commit hash for
 export PKR_VAR_ingress_commit_hash_short="$(git rev-parse --short HEAD)"
 cd $SCRIPTDIR
 
-echo "Building AMI's for deployment: $PKR_VAR_ami_role"
+echo "Will build AMI's for deployment: $PKR_VAR_ami_role"
 
 ### Idempotency logic: exit if all images exist
 error_if_empty "Missing: PKR_VAR_commit_hash_short:" "$PKR_VAR_commit_hash_short"
@@ -127,7 +127,7 @@ fi
 echo "Using profile: $PKR_VAR_provisioner_iam_profile_name"
 error_if_empty "Missing: PKR_VAR_provisioner_iam_profile_name" "$PKR_VAR_provisioner_iam_profile_name"
 
-if [[ $ami_role == "firehawk-ami" ]]; then
+if [[ "$ami_role" == "firehawk-ami" ]]; then
   ### Software Bucket
   # export PKR_VAR_installers_bucket="$(terragrunt output installers_bucket)"
   echo "Using installers bucket: $PKR_VAR_installers_bucket"
@@ -167,7 +167,7 @@ fi
 
 echo "Building AMI's for deployment: $ami_role"
 
-if [[ $ami_role == "firehawk-base-ami" ]]; then
+if [[ "$ami_role" == "firehawk-base-ami" ]]; then
   # Validate
   packer validate \
     -only=$build_list \
@@ -183,7 +183,7 @@ if [[ $ami_role == "firehawk-base-ami" ]]; then
   packer build \
     -only=$build_list \
     $SCRIPTDIR/firehawk-base-ami.pkr.hcl
-elif [[ $1 == "firehawk-ami" ]]; then
+elif [[ "$ami_role" == "firehawk-ami" ]]; then
 
   # Prepare for build.
   # Ansible log path
