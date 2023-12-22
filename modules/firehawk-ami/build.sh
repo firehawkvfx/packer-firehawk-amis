@@ -167,7 +167,7 @@ fi
 
 if [[ $ami_role == "firehawk-base-ami" ]]; then
   # Validate
-  packer validate "$args_without_first" \
+  packer validate \
     -only=$build_list \
     $SCRIPTDIR/firehawk-base-ami.pkr.hcl
 
@@ -178,7 +178,7 @@ if [[ $ami_role == "firehawk-base-ami" ]]; then
   rm -f $PKR_VAR_manifest_path
 
   # Build
-  packer build "$args_without_first" \
+  packer build \
     -only=$build_list \
     $SCRIPTDIR/firehawk-base-ami.pkr.hcl
 elif [[ $1 == "firehawk-ami" ]]; then
@@ -200,7 +200,7 @@ elif [[ $1 == "firehawk-ami" ]]; then
   fi
 
   # Validate
-  packer validate "$args_without_first" \
+  packer validate \
     -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
     -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
     -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
@@ -209,7 +209,7 @@ elif [[ $1 == "firehawk-ami" ]]; then
     $SCRIPTDIR/firehawk-ami.pkr.hcl
 
   # Build
-  packer build "$args_without_first" \
+  packer build \
     -var "ca_public_key_path=$HOME/.ssh/tls/ca.crt.pem" \
     -var "tls_public_key_path=$HOME/.ssh/tls/vault.crt.pem" \
     -var "tls_private_key_path=$HOME/.ssh/tls/vault.key.pem" \
