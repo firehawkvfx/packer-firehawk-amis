@@ -4,17 +4,18 @@ set -e
 
 # Log the given message. All logs are written to stderr with a timestamp.
 function log {
- local -r message="$1"
- local -r timestamp=$(date +"%Y-%m-%d %H:%M:%S")
- >&2 echo -e "$timestamp $message"
+  local -r message="$1"
+  local -r timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+  echo >&2 -e "$timestamp $message"
 }
 
 # A retry function that attempts to run a command a number of times and returns the output
 function retry {
   local -r cmd="$1"
   local -r description="$2"
+  local -r attempts=30
 
-  for i in $(seq 1 30); do
+  for i in $(seq 1 $attempts); do
     log "$description"
 
     # The boolean operations with the exit status are there to temporarily circumvent the "set -e" at the
@@ -28,11 +29,11 @@ function retry {
       echo "$output"
       return
     fi
-    log "$description failed. Will sleep for 30 seconds and try again."
+    log "$description failed. Will sleep for 10 seconds and try again. Attempt $i of $attempts."
     sleep 30
-  done;
+  done
 
-  log "$description failed after 30 attempts (15 mins). Check that deadline DB suceeded, and verify the s3 bucket contents.  It is possible the number of attempts should be extended."
+  log "$description failed after $attempts attempts. Check that deadline DB suceeded, and verify the s3 bucket contents.  It is possible the number of attempts should be extended."
   exit $exit_status
 }
 retry "$1" "$2"
