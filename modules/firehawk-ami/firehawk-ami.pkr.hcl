@@ -554,8 +554,7 @@ build {
       "sudo yum install -y https://s3.${var.aws_region}.amazonaws.com/amazon-ssm-${var.aws_region}/latest/linux_amd64/amazon-ssm-agent.rpm",
       "sudo systemctl enable amazon-ssm-agent",
       "sudo systemctl start amazon-ssm-agent",
-      "sudo yum install -y ruby", # the following steps are to install codedeploy agent
-      "sudo yum install -y wget",
+      "sudo yum install -y ruby wget", # the following steps are to install codedeploy agent
       # "CODEDEPLOY_BIN=\"/opt/codedeploy-agent/bin/codedeploy-agent\"", # only required if there is an existing version
       # "$CODEDEPLOY_BIN stop",
       # "sudo yum erase codedeploy-agent -y",
