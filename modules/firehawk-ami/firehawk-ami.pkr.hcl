@@ -776,21 +776,14 @@ build {
 
   ### End public cert block to verify other consul agents ###
 
-  provisioner "ansible" { # Disable SELINUX for rendernodes until tested and working when enabled.
-    playbook_file = "./ansible/selinux.yaml"
-    user          = "centos"
-    extra_arguments = [
-      "-vvvv",
-      "--extra-vars",
-      "variable_host=default set_selinux=disabled package_python_interpreter=/usr/bin/python2.7" # the python version on the target host
+  provisioner "shell" {
+    inline = [
+      "sudo setenforce 0", # Temporarily disable SELinux
+      "sudo sed -i 's/^SELINUX=.*$/SELINUX=disabled/' /etc/selinux/config", # Permanently disable SELinux
+      # "sudo reboot" # Reboot the system
     ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only = [
-      "amazon-ebs.centos7-rendernode-ami"
-    ]
+    inline_shebang = "/bin/bash -e"
+    only           = ["amazon-ebs.centos7-rendernode-ami"]
   }
 
   provisioner "ansible" { # Add user deployuser
