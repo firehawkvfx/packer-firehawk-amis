@@ -128,7 +128,7 @@ variable "SSL_expiry" {
 locals {
   timestamp         = regex_replace(timestamp(), "[- TZ:]", "")
   template_dir      = path.root
-  deadline_version  = "10.1.23.6"
+  deadline_version  = "10.3.2.1"
   installers_bucket = var.installers_bucket
   common_ami_tags = {
     "packer_template" : "firehawk-ami",
@@ -161,15 +161,15 @@ locals {
     ]
   }
   # deprecated: this is only needed if installing a license server
-    #   "houdini_license_server_version_list" : [
-    #   {
-    #     "houdini_major_version"      = "19.0",
-    #     "houdini_auto_version"       = "true",
-    #     "houdini_minor_version"      = "auto",
-    #     "houdini_linux_tar_filename" = "auto",
-    #     "houdini_build"              = "production"
-    #   }
-    # ]
+  #   "houdini_license_server_version_list" : [
+  #   {
+  #     "houdini_major_version"      = "19.0",
+  #     "houdini_auto_version"       = "true",
+  #     "houdini_minor_version"      = "auto",
+  #     "houdini_linux_tar_filename" = "auto",
+  #     "houdini_build"              = "production"
+  #   }
+  # ]
 }
 
 source "amazon-ebs" "openvpn-server-ami" {
@@ -563,8 +563,8 @@ build {
       "sudo service codedeploy-agent status",
       "sudo service codedeploy-agent enable",
     ]
-    inline_shebang   = "/bin/bash -e"
-    only = ["amazon-ebs.centos7-rendernode-ami"]
+    inline_shebang = "/bin/bash -e"
+    only           = ["amazon-ebs.centos7-rendernode-ami"]
   }
 
   ### Install cloudwatch logs agent
@@ -607,7 +607,7 @@ build {
   # Install terraform, terragrunt, packer for Amazon Linux
   provisioner "shell" {
     inline = [
-      "sudo python3.8 -m pip install ansible boto3 botocore", #: Install ansible using the same method we use to install it to codebuild
+      "sudo python3.8 -m pip install ansible boto3 botocore",                                                                                       #: Install ansible using the same method we use to install it to codebuild
       "wget https://releases.hashicorp.com/terraform/${var.terraform_version}/terraform_${var.terraform_version}_linux_amd64.zip -P /tmp/ --quiet", # Get terraform
       "sudo unzip /tmp/terraform_${var.terraform_version}_linux_amd64.zip -d /tmp/",
       "sudo mv /tmp/terraform /usr/local/bin/.",
@@ -778,7 +778,7 @@ build {
 
   provisioner "shell" {
     inline = [
-      "sudo setenforce 0", # Temporarily disable SELinux
+      "sudo setenforce 0",                                                  # Temporarily disable SELinux
       "sudo sed -i 's/^SELINUX=.*$/SELINUX=disabled/' /etc/selinux/config", # Permanently disable SELinux
       # "sudo reboot" # Reboot the system
     ]
@@ -824,7 +824,7 @@ build {
     ]
   }
 
-      # "sudo su - ${var.deadlineuser_name} -c \"mkdir -p /home/${var.deadlineuser_name}/Thinkbox/Deadline10\"",
+  # "sudo su - ${var.deadlineuser_name} -c \"mkdir -p /home/${var.deadlineuser_name}/Thinkbox/Deadline10\"",
 
   provisioner "ansible" {
     playbook_file = "./ansible/newuser.yaml"
