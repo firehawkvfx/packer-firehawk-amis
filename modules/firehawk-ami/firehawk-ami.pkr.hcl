@@ -563,13 +563,13 @@ build {
 
   provisioner "shell" { # Install amazon systems manager for rocky intelx86/amd64
     inline = [
-      "sudo yum install -y https://s3.${var.aws_region}.amazonaws.com/amazon-ssm-${var.aws_region}/latest/linux_amd64/amazon-ssm-agent.rpm",
+      "sudo dnf install -y https://s3.${var.aws_region}.amazonaws.com/amazon-ssm-${var.aws_region}/latest/linux_amd64/amazon-ssm-agent.rpm",
       "sudo systemctl enable amazon-ssm-agent",
       "sudo systemctl start amazon-ssm-agent",
-      "sudo yum install -y ruby wget", # the following steps are to install codedeploy agent
+      "sudo dnf install -y ruby wget", # the following steps are to install codedeploy agent
       # "CODEDEPLOY_BIN=\"/opt/codedeploy-agent/bin/codedeploy-agent\"", # only required if there is an existing version
       # "$CODEDEPLOY_BIN stop",
-      # "sudo yum erase codedeploy-agent -y",
+      # "sudo dnf erase codedeploy-agent -y",
       "cd /home/rocky; sudo wget https://aws-codedeploy-${var.aws_region}.s3.${var.aws_region}.amazonaws.com/latest/install; sudo chmod +x ./install; sudo ./install auto",
       "sudo service codedeploy-agent start",
       "sudo service codedeploy-agent status",
@@ -584,7 +584,7 @@ build {
     inline = [
       "cd /tmp; sudo wget https://s3.${var.aws_region}.amazonaws.com/amazoncloudwatch-agent-${var.aws_region}/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm; sudo rpm -U ./amazon-cloudwatch-agent.rpm",
       "sudo rm -f /tmp/amazon-cloudwatch-agent.rpm",
-      "sudo yum install -y jq"
+      "sudo dnf install -y jq"
     ]
     only = [
       "amazon-ebs.amznlnx2023-ami",
@@ -595,9 +595,9 @@ build {
   # install python 3.8 # this might be affecting the sesi downloader
   # provisioner "shell" {
   #   inline = [
-  #     "sudo yum install -y epel-release",
-  #     "sudo yum install -y rocky-release-scl",
-  #     "sudo yum install -y rh-python38" # scl enable rh-python38 bash
+  #     "sudo dnf install -y epel-release",
+  #     "sudo dnf install -y rocky-release-scl",
+  #     "sudo dnf install -y rh-python38" # scl enable rh-python38 bash
   #   ]
   #   only = [
   #     "amazon-ebs.rocky8-rendernode-ami" # the binary wont be located in normal location, for that you need to compile it.
@@ -673,7 +673,7 @@ build {
   #     "else",
   #     " set -x; /tmp/terraform-aws-vault/modules/install-vault/install-vault --version 1.6.1 --skip-package-update",
   #     "fi"
-  #     # "if [[ -n \"$(command -v yum)\" ]]; then sudo yum remove awscli -y; fi", # uninstall AWS CLI v1
+  #     # "if [[ -n \"$(command -v dnf)\" ]]; then sudo dnf remove awscli -y; fi", # uninstall AWS CLI v1
   #     # "if [[ -n \"$(command -v apt-get)\" ]]; then sudo apt-get remove awscli -y; fi", # uninstall AWS CLI v1
   #     # "if sudo test -f /bin/aws; then sudo rm -f /bin/aws; fi" # Ensure AWS CLI v1 doesn't exist
   #   ]
@@ -844,6 +844,16 @@ build {
     ]
   }
 
+  provisioner "shell" { ### Install requests for houdini install script
+    inline = [
+      # "sudo python3.11 -m pip install requests"
+      "python3.11 -m pip install --user requests --upgrade"
+    ]
+    only = [
+      "amazon-ebs.rocky8-rendernode-ami"
+    ]
+  }
+
   ### Install Mongo / Deadline DB
 
   provisioner "shell" {
@@ -857,7 +867,7 @@ build {
   provisioner "shell" {
     ### Install Deadline Worker Centos Dependencies. nc is also used to ensure a connection can be established with a port.
     inline = [
-      "sudo yum install -y redhat-lsb samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap wget nc"
+      "sudo dnf install -y redhat-lsb samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap wget nc"
     ]
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
@@ -877,9 +887,9 @@ build {
   }
   provisioner "shell" {
     inline = [
-      "curl https://packages.microsoft.com/config/rhel/7/prod.repo | sudo tee /etc/yum.repos.d/microsoft.repo",
-      "sudo yum makecache",
-      "sudo yum install powershell -y"
+      "sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc",
+      "sudo rpm -Uvh https://packages.microsoft.com/config/centos/8/packages-microsoft-prod.rpm",
+      "sudo dnf install powershell -y",
     ]
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
@@ -889,7 +899,7 @@ build {
   provisioner "shell" {
     ### Install Deadline Worker Amazon Linux 2 Dependencies - https://docs.thinkboxsoftware.com/products/deadline/10.1/1_User%20Manual/manual/install-client.html
     inline = [
-      "sudo yum install -y lsb"
+      "sudo dnf install -y lsb"
     ]
     only = [
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
@@ -1051,8 +1061,8 @@ build {
   provisioner "shell" {
     ### Centos 7 - jq required and the dig command is also required
     inline = [
-      # "sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
-      "sudo yum -y install bind-utils jq"
+      # "sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
+      "sudo dnf -y install bind-utils jq"
     ]
     only = [
       "amazon-ebs.rocky8-ami",
