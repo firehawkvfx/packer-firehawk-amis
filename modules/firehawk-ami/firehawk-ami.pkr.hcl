@@ -136,7 +136,7 @@ variable "SSL_expiry" {
 locals {
   timestamp         = regex_replace(timestamp(), "[- TZ:]", "")
   template_dir      = path.root
-  deadline_version  = "10.3.2.1"
+  deadline_version  = "10.4.0.10"
   installers_bucket = var.installers_bucket
   common_ami_tags = {
     "packer_template" : "firehawk-ami",
@@ -841,15 +841,6 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.deadline-db-ubuntu18-ami"
-    ]
-  }
-
-  provisioner "shell" { ### Install requests for houdini install script
-    inline = [
-      "set -x; python3.11 -m pip install requests",  # the installs below may be able to be removed
-    ]
-    only = [
-      "amazon-ebs.rocky8-rendernode-ami"
     ]
   }
 
