@@ -1,6 +1,14 @@
 # Ensure you first build the ./firehawk-base-ami first to produce a manifest.
 # The firehawk-base-ami is used to build this ami.
 
+packer {
+  required_plugins {
+    amazon = {
+      version = ">= 1.0.8"
+      source  = "github.com/hashicorp/amazon"
+    }
+  }
+}
 variable "aws_region" {
   type = string
 }
@@ -181,7 +189,7 @@ source "amazon-ebs" "openvpn-server-ami" {
   )
   ami_description = "An Open VPN Access Server AMI configured for Firehawk"
   ami_name        = "firehawk-openvpn-server-${local.timestamp}-{{uuid}}"
-  instance_type   = "t2.micro"
+  instance_type   = "t2.small"
   region          = var.aws_region
   # source_ami      = "${var.openvpn_server_base_ami}"
   source_ami_filter {
@@ -214,7 +222,8 @@ source "amazon-ebs" "amznlnx2023-ami" {
   )
   ami_description = "An Amazon Linux 2 AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-bastion-amznlnx2023-${local.timestamp}-{{uuid}}"
-  instance_type   = "t2.micro"
+  temporary_key_pair_type = "ed25519"
+  instance_type   = "t2.small"
   region          = var.aws_region
   # source_ami      = "${var.amazon_linux_2_ami}"
   source_ami_filter {
@@ -240,7 +249,8 @@ source "amazon-ebs" "amznlnx2023-nicedcv-nvidia-ami" {
   )
   ami_description = "A Graphical Amazon Linux 2 NICE DCV AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-workstation-amznlnx2023-nicedcv-${local.timestamp}-{{uuid}}"
-  instance_type   = "t2.micro"
+  temporary_key_pair_type = "ed25519"
+  instance_type   = "t2.small"
   region          = var.aws_region
   # source_ami      = "${var.amazon_linux_2_ami}"
   source_ami_filter {
@@ -286,7 +296,8 @@ source "amazon-ebs" "rocky8-ami" {
   )
   ami_description = "A Cent OS 7 AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-bastion-rocky8-${local.timestamp}-{{uuid}}"
-  instance_type   = "t2.micro"
+  temporary_key_pair_type = "ed25519"
+  instance_type   = "t2.small"
   region          = var.aws_region
   # source_ami      = "${var.rocky8_ami}"
   source_ami_filter {
@@ -315,7 +326,8 @@ source "amazon-ebs" "rocky8-rendernode-ami" {
   )
   ami_description = "A Cent OS 7 AMI rendernode."
   ami_name        = "firehawk-rendernode-rocky8-${local.timestamp}-{{uuid}}"
-  instance_type   = "t2.micro"
+  temporary_key_pair_type = "ed25519"
+  instance_type   = "t2.small"
   region          = var.aws_region
   # source_ami      = "${var.rocky8_ami}"
   source_ami_filter {
