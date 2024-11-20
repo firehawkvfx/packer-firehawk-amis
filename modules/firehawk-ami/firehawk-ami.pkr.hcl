@@ -1061,33 +1061,40 @@ build {
     ]
   }
 
-  ### Install Consul
+  # ### Install Consul
 
-  provisioner "shell" {
-    inline = [
-      "git config --global advice.detachedHead false", # disable warning about detached head because we dont care, it is a software installation
-      "git clone --branch v0.8.0 https://github.com/hashicorp/terraform-aws-consul.git /tmp/terraform-aws-consul",
-      "if test -n \"${var.consul_download_url}\"; then",
-      " /tmp/terraform-aws-consul/modules/install-consul/install-consul --download-url ${var.consul_download_url}",
-      "else",
-      " /tmp/terraform-aws-consul/modules/install-consul/install-consul --version 1.9.2",
-    "fi"]
-  }
+# Disabled because:
+# ==> amazon-ebs.amznlnx2023-ami:  Problem 1: package dracut-102-3.amzn2023.0.1.x86_64 from amazonlinux conflicts with dracut-config-ec2 < 3.1 provided by dracut-config-ec2-3.0-4.amzn2023.0.2.noarch from @System
+# ==> amazon-ebs.amznlnx2023-ami:   - cannot install the best update candidate for package dracut-config-ec2-3.0-4.amzn2023.0.2.noarch
+# ==> amazon-ebs.amznlnx2023-ami:   - cannot install the best update candidate for package dracut-055-6.amzn2023.0.8.x86_64
+# ==> amazon-ebs.amznlnx2023-ami:  Problem 2: problem with installed package dracut-config-ec2-3.0-4.amzn2023.0.2.noarch
+# ==> amazon-ebs.amznlnx2023-ami:   - package dracut-102-3.amzn2023.0.1.x86_64 from amazonlinux conflicts with dracut-config-ec2 < 3.1 provided by dracut-config-ec2-3.0-4.amzn2023.0.2.noarch from @System
 
-  ### Consul DNS config.
+  # provisioner "shell" {
+  #   inline = [
+  #     "git config --global advice.detachedHead false", # disable warning about detached head because we dont care, it is a software installation
+  #     "git clone --branch v0.8.0 https://github.com/hashicorp/terraform-aws-consul.git /tmp/terraform-aws-consul",
+  #     "if test -n \"${var.consul_download_url}\"; then",
+  #     " /tmp/terraform-aws-consul/modules/install-consul/install-consul --download-url ${var.consul_download_url}",
+  #     "else",
+  #     " /tmp/terraform-aws-consul/modules/install-consul/install-consul --version 1.9.2",
+  #   "fi"]
+  # }
 
-  provisioner "shell" { # configure systemd-resolved per https://unix.stackexchange.com/questions/442598/how-to-configure-systemd-resolved-and-systemd-networkd-to-use-local-dns-server-f
-    inline = [
-      "set -x; sudo sed -i \"s/#Domains=/Domains=service.consul ~consul/g\" /etc/systemd/resolved.conf",
-      "set -x; /tmp/terraform-aws-consul/modules/setup-systemd-resolved/setup-systemd-resolved",
-      "set -x; sudo systemctl daemon-reload",
-      "set -x; sudo systemctl restart systemd-resolved",
-      "set -x; sudo cat /etc/systemd/resolved.conf",
-      "set -x; sudo cat /etc/resolv.conf",
-    ]
-    only = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
-  }
-  # The servers dont require the same config for DNS to function
+  # ### Consul DNS config.
+
+  # provisioner "shell" { # configure systemd-resolved per https://unix.stackexchange.com/questions/442598/how-to-configure-systemd-resolved-and-systemd-networkd-to-use-local-dns-server-f
+  #   inline = [
+  #     "set -x; sudo sed -i \"s/#Domains=/Domains=service.consul ~consul/g\" /etc/systemd/resolved.conf",
+  #     "set -x; /tmp/terraform-aws-consul/modules/setup-systemd-resolved/setup-systemd-resolved",
+  #     "set -x; sudo systemctl daemon-reload",
+  #     "set -x; sudo systemctl restart systemd-resolved",
+  #     "set -x; sudo cat /etc/systemd/resolved.conf",
+  #     "set -x; sudo cat /etc/resolv.conf",
+  #   ]
+  #   only = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+  # }
+  # # The servers dont require the same config for DNS to function
 
 
   provisioner "shell" {
