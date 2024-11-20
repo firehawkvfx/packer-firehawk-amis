@@ -23,11 +23,11 @@ function print_usage {
   echo -e "  --consul-module-version\ttThe github repo version for the consul module. Required."
   echo -e "  --consul-version\ttThe consul version to install. Required."
   echo -e "  --cert-file-path\tThe path to the CA certificate public key to add to the OS certificate store. Required."
-  echo -e "  --build\tThe linux build ( amazonlinux2, ubuntu16, ubuntu18 ). Required."
+  echo -e "  --build\tThe linux build ( amznlnx2023, ubuntu16, ubuntu18 ). Required."
   echo
   echo "Example:"
   echo
-  echo "  ./install-consul-vault-client --vault-module-version v0.17.0  --vault-version 1.6.1 --consul-module-version v0.8.0 --consul-version 1.9.2 --build amazonlinux2 --cert-file-path $HOME/.ssh/tls/ca.crt.pem"
+  echo "  ./install-consul-vault-client --vault-module-version v0.17.0  --vault-version 1.6.1 --consul-module-version v0.8.0 --consul-version 1.9.2 --build amznlnx2023 --cert-file-path $HOME/.ssh/tls/ca.crt.pem"
 }
 
 function log {
@@ -145,7 +145,7 @@ function run {
     #     /tmp/terraform-aws-consul/modules/install-consul/install-consul --version $consul_version
     # fi
 
-    # if [[ "$build" == "ubuntu16" ]] || [[ "$build" == "amazonlinux2" ]]; then
+    # if [[ "$build" == "ubuntu16" ]] || [[ "$build" == "amznlnx2023" ]]; then
     #     /tmp/terraform-aws-consul/modules/install-dnsmasq/install-dnsmasq
     #     sudo service dnsmasq restart # starting the service is required for it to function on first boot.
     #     log "WARNING:"

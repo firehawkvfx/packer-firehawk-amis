@@ -205,21 +205,21 @@ EOF
 
 }
 
-source "amazon-ebs" "amazonlinux2-ami" {
+source "amazon-ebs" "amznlnx2023-ami" {
   tags = merge(
-    { "packer_source" : "amazon-ebs.amazonlinux2-ami" },
-    { "ami_role" : "firehawk_amazonlinux2_ami" },
-    { "Name" : "firehawk_amazonlinux2_ami" },
+    { "packer_source" : "amazon-ebs.amznlnx2023-ami" },
+    { "ami_role" : "firehawk_amznlnx2023_ami" },
+    { "Name" : "firehawk_amznlnx2023_ami" },
     local.common_ami_tags
   )
   ami_description = "An Amazon Linux 2 AMI that will accept connections from hosts with TLS Certs."
-  ami_name        = "firehawk-bastion-amazonlinux2-${local.timestamp}-{{uuid}}"
+  ami_name        = "firehawk-bastion-amznlnx2023-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = var.aws_region
   # source_ami      = "${var.amazon_linux_2_ami}"
   source_ami_filter {
     filters = {
-      "tag:ami_role" : "amazonlinux2_base_ami",
+      "tag:ami_role" : "amznlnx2023_base_ami",
       "tag:packer_template" : "firehawk-base-ami",
       "tag:commit_hash" : var.ingress_commit_hash,
       "tag:commit_hash_short" : var.ingress_commit_hash_short,
@@ -231,21 +231,21 @@ source "amazon-ebs" "amazonlinux2-ami" {
   ssh_username = "ec2-user"
 }
 
-source "amazon-ebs" "amazonlinux2-nicedcv-nvidia-ami" {
+source "amazon-ebs" "amznlnx2023-nicedcv-nvidia-ami" {
   tags = merge(
-    { "packer_source" : "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami" },
-    { "ami_role" : "firehawk_amazonlinux2_nicedcv_ami" },
-    { "Name" : "firehawk_amazonlinux2_nicedcv_ami" },
+    { "packer_source" : "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami" },
+    { "ami_role" : "firehawk_amznlnx2023_nicedcv_ami" },
+    { "Name" : "firehawk_amznlnx2023_nicedcv_ami" },
     local.common_ami_tags
   )
   ami_description = "A Graphical Amazon Linux 2 NICE DCV AMI that will accept connections from hosts with TLS Certs."
-  ami_name        = "firehawk-workstation-amazonlinux2-nicedcv-${local.timestamp}-{{uuid}}"
+  ami_name        = "firehawk-workstation-amznlnx2023-nicedcv-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = var.aws_region
   # source_ami      = "${var.amazon_linux_2_ami}"
   source_ami_filter {
     filters = {
-      "tag:ami_role" : "amazonlinux2_nicedcv_base_ami",
+      "tag:ami_role" : "amznlnx2023_nicedcv_base_ami",
       "tag:packer_template" : "firehawk-base-ami",
       "tag:commit_hash" : var.ingress_commit_hash,
       "tag:commit_hash_short" : var.ingress_commit_hash_short,
@@ -464,8 +464,8 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
 
 build {
   sources = [
-    "source.amazon-ebs.amazonlinux2-ami",
-    "source.amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
+    "source.amazon-ebs.amznlnx2023-ami",
+    "source.amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
     "source.amazon-ebs.centos7-ami",
     "source.amazon-ebs.centos7-rendernode-ami",
     "source.amazon-ebs.ubuntu18-ami",
@@ -575,7 +575,7 @@ build {
       "sudo yum install -y jq"
     ]
     only = [
-      "amazon-ebs.amazonlinux2-ami",
+      "amazon-ebs.amznlnx2023-ami",
       "amazon-ebs.centos7-rendernode-ami"
     ]
   }
@@ -599,7 +599,7 @@ build {
       "sudo yum install -y python3.8" # scl enable rh-python38 bash
     ]
     only = [
-      "amazon-ebs.amazonlinux2-ami"
+      "amazon-ebs.amznlnx2023-ami"
     ]
   }
 
@@ -616,7 +616,7 @@ build {
       "sudo chmod +x /usr/local/bin/terragrunt"
     ]
     only = [
-      "amazon-ebs.amazonlinux2-ami",
+      "amazon-ebs.amznlnx2023-ami",
     ]
   }
 
@@ -654,8 +654,8 @@ build {
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
     galaxy_file      = "./requirements.yml"
     only = [
-      "amazon-ebs.amazonlinux2-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
+      "amazon-ebs.amznlnx2023-ami",
+      "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
       "amazon-ebs.ubuntu18-ami",
       "amazon-ebs.deadline-db-ubuntu18-ami",
       "amazon-ebs.openvpn-server-ami",
@@ -706,8 +706,8 @@ build {
     ]
     inline_shebang = "/bin/bash -e"
     only = [
-      "amazon-ebs.amazonlinux2-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
+      "amazon-ebs.amznlnx2023-ami",
+      "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
       "amazon-ebs.centos7-ami",
       "amazon-ebs.centos7-rendernode-ami",
       "amazon-ebs.ubuntu18-ami",
@@ -801,7 +801,7 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+      "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
@@ -820,7 +820,7 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+      "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
@@ -861,7 +861,7 @@ build {
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+      "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
   # Install Powershell
@@ -883,7 +883,7 @@ build {
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+      "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
   provisioner "shell" {
@@ -892,7 +892,7 @@ build {
       "sudo yum install -y lsb"
     ]
     only = [
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+      "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
@@ -977,7 +977,7 @@ build {
     ]
     only = [
       "amazon-ebs.centos7-rendernode-ami"
-      # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
@@ -1018,7 +1018,7 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
@@ -1042,7 +1042,7 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.centos7-rendernode-ami",
-      # "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
@@ -1057,7 +1057,7 @@ build {
     only = [
       "amazon-ebs.centos7-ami",
       "amazon-ebs.centos7-rendernode-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"
+      "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
@@ -1097,8 +1097,8 @@ build {
     ]
     only = [
       "amazon-ebs.ubuntu16-ami",
-      "amazon-ebs.amazonlinux2-ami",
-      "amazon-ebs.amazonlinux2-nicedcv-nvidia-ami",
+      "amazon-ebs.amznlnx2023-ami",
+      "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
       "amazon-ebs.centos7-ami",
       "amazon-ebs.centos7-rendernode-ami"
     ]
@@ -1198,13 +1198,13 @@ build {
       "sudo tar xvjf ~/FirefoxSetup.tar.bz2 -C /opt/",
       "sudo ln -s /opt/firefox/firefox /usr/bin/firefox"
     ]
-    only = ["amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"]
+    only = ["amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"]
   }
 
   provisioner "file" { # Start a virtual session on each boot.  Do not combine this with the console session above.  Pick one.
     destination = "/tmp/dcv_session.sh"
     source      = "${local.template_dir}/scripts/dcv_session.sh"
-    only        = ["amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"]
+    only        = ["amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"]
   }
 
   provisioner "shell" {
@@ -1213,7 +1213,7 @@ build {
       "sudo /var/lib/cloud/scripts/per-boot/dcv_session.sh", # This just tests the script.
       "dcv list-sessions"                                    # A session should be listed here.
     ]
-    only = ["amazon-ebs.amazonlinux2-nicedcv-nvidia-ami"]
+    only = ["amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"]
   }
 
   post-processor "manifest" {

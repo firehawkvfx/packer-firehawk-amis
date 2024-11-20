@@ -221,13 +221,13 @@ function export_vars {
     export TF_VAR_node_centos7_houdini_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     warn_if_invalid "$ami_role" "$TF_VAR_node_centos7_houdini_ami_id" "TF_VAR_node_centos7_houdini_ami_id"
     # AMI query by commit - Workstation
-    ami_role="firehawk_amazonlinux2_ami"
+    ami_role="firehawk_amznlnx2023_ami"
     export TF_VAR_provisioner_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     warn_if_invalid "$ami_role" "$TF_VAR_provisioner_ami_id" "TF_VAR_provisioner_ami_id"
     # # AMI query by commit - Workstation
-    # ami_role="firehawk_amazonlinux2_nicedcv_ami"
-    # export TF_VAR_workstation_amazonlinux2_nicedcv_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
-    # warn_if_invalid "$ami_role" "$TF_VAR_workstation_amazonlinux2_nicedcv_ami_id" "TF_VAR_workstation_amazonlinux2_nicedcv_ami_id"
+    # ami_role="firehawk_amznlnx2023_nicedcv_ami"
+    # export TF_VAR_workstation_amznlnx2023_nicedcv_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
+    # warn_if_invalid "$ami_role" "$TF_VAR_workstation_amznlnx2023_nicedcv_ami_id" "TF_VAR_workstation_amznlnx2023_nicedcv_ami_id"
   fi
 
   # Terraform Vars
