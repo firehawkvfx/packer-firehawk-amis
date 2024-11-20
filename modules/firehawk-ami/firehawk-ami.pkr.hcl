@@ -294,7 +294,7 @@ source "amazon-ebs" "rocky8-ami" {
     { "Name" : "firehawk_rocky8_ami" },
     local.common_ami_tags
   )
-  ami_description = "A Cent OS 7 AMI that will accept connections from hosts with TLS Certs."
+  ami_description = "A Rocky 8 AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-bastion-rocky8-${local.timestamp}-{{uuid}}"
   temporary_key_pair_type = "ed25519"
   instance_type   = "t2.small"
@@ -324,7 +324,7 @@ source "amazon-ebs" "rocky8-rendernode-ami" {
     { "houdini_major_version" : local.houdini_json_vars["houdini_version_list"][0]["houdini_major_version"] },
     local.common_ami_tags
   )
-  ami_description = "A Cent OS 7 AMI rendernode."
+  ami_description = "A Rocky 8 AMI rendernode."
   ami_name        = "firehawk-rendernode-rocky8-${local.timestamp}-{{uuid}}"
   temporary_key_pair_type = "ed25519"
   instance_type   = "t2.small"
