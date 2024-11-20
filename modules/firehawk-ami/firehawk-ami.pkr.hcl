@@ -604,22 +604,10 @@ build {
   #   ]
   # }
 
-  provisioner "shell" {
-    inline = [
-      "sudo amazon-linux-extras enable python3.8",
-      "sudo yum clean metadata",
-      "sudo yum install -y python3.8" # scl enable rh-python38 bash
-    ]
-    only = [
-      "amazon-ebs.amznlnx2023-ami"
-    ]
-  }
-
-
   # Install terraform, terragrunt, packer for Amazon Linux
   provisioner "shell" {
     inline = [
-      "sudo python3.8 -m pip install ansible boto3 botocore",                                                                                       #: Install ansible using the same method we use to install it to codebuild
+      "sudo python3.11 -m pip install ansible boto3 botocore",                                                                                       #: Install ansible using the same method we use to install it to codebuild
       "wget https://releases.hashicorp.com/terraform/${var.terraform_version}/terraform_${var.terraform_version}_linux_amd64.zip -P /tmp/ --quiet", # Get terraform
       "sudo unzip /tmp/terraform_${var.terraform_version}_linux_amd64.zip -d /tmp/",
       "sudo mv /tmp/terraform /usr/local/bin/.",
