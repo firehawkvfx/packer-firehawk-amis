@@ -277,21 +277,21 @@ source "amazon-ebs" "amznlnx2023-nicedcv-nvidia-ami" {
 
 #could not parse template for following block: "template: generated:4: function \"clean_resource_name\" not defined"
 
-source "amazon-ebs" "centos7-ami" {
+source "amazon-ebs" "rocky8-ami" {
   tags = merge(
-    { "packer_source" : "amazon-ebs.centos7-ami" },
-    { "ami_role" : "firehawk_centos7_ami" },
-    { "Name" : "firehawk_centos7_ami" },
+    { "packer_source" : "amazon-ebs.rocky8-ami" },
+    { "ami_role" : "firehawk_rocky8_ami" },
+    { "Name" : "firehawk_rocky8_ami" },
     local.common_ami_tags
   )
   ami_description = "A Cent OS 7 AMI that will accept connections from hosts with TLS Certs."
-  ami_name        = "firehawk-bastion-centos7-${local.timestamp}-{{uuid}}"
+  ami_name        = "firehawk-bastion-rocky8-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = var.aws_region
-  # source_ami      = "${var.centos7_ami}"
+  # source_ami      = "${var.rocky8_ami}"
   source_ami_filter {
     filters = {
-      "tag:ami_role" : "centos7_base_ami",
+      "tag:ami_role" : "rocky8_base_ami",
       "tag:packer_template" : "firehawk-base-ami",
       "tag:commit_hash" : var.ingress_commit_hash,
       "tag:commit_hash_short" : var.ingress_commit_hash_short,
@@ -300,27 +300,27 @@ source "amazon-ebs" "centos7-ami" {
     most_recent = true
     owners      = [var.account_id]
   }
-  ssh_username = "centos"
+  ssh_username = "rocky"
 
 }
 
-source "amazon-ebs" "centos7-rendernode-ami" {
+source "amazon-ebs" "rocky8-rendernode-ami" {
   tags = merge(
-    { "packer_source" : "amazon-ebs.centos7-rendernode-ami" },
-    { "ami_role" : "firehawk_centos7_rendernode_ami" },
-    { "Name" : "firehawk_centos7_rendernode_ami" },
+    { "packer_source" : "amazon-ebs.rocky8-rendernode-ami" },
+    { "ami_role" : "firehawk_rocky8_rendernode_ami" },
+    { "Name" : "firehawk_rocky8_rendernode_ami" },
     { "firehawk_deadline_installer_version" : "${var.firehawk_deadline_installer_version}" },
     { "houdini_major_version" : local.houdini_json_vars["houdini_version_list"][0]["houdini_major_version"] },
     local.common_ami_tags
   )
   ami_description = "A Cent OS 7 AMI rendernode."
-  ami_name        = "firehawk-rendernode-centos7-${local.timestamp}-{{uuid}}"
+  ami_name        = "firehawk-rendernode-rocky8-${local.timestamp}-{{uuid}}"
   instance_type   = "t2.micro"
   region          = var.aws_region
-  # source_ami      = "${var.centos7_ami}"
+  # source_ami      = "${var.rocky8_ami}"
   source_ami_filter {
     filters = {
-      "tag:ami_role" : "centos7_base_ami",
+      "tag:ami_role" : "rocky8_base_ami",
       "tag:packer_template" : "firehawk-base-ami",
       "tag:commit_hash" : var.ingress_commit_hash,
       "tag:commit_hash_short" : var.ingress_commit_hash_short,
@@ -329,7 +329,7 @@ source "amazon-ebs" "centos7-rendernode-ami" {
     most_recent = true
     owners      = [var.account_id]
   }
-  ssh_username = "centos"
+  ssh_username = "rocky"
 
   iam_instance_profile = var.packer_iam_profile_name # provide read and write s3 access for updating and retrieving installers
 
@@ -466,8 +466,8 @@ build {
   sources = [
     "source.amazon-ebs.amznlnx2023-ami",
     "source.amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
-    "source.amazon-ebs.centos7-ami",
-    "source.amazon-ebs.centos7-rendernode-ami",
+    "source.amazon-ebs.rocky8-ami",
+    "source.amazon-ebs.rocky8-rendernode-ami",
     "source.amazon-ebs.ubuntu18-ami",
     "source.amazon-ebs.ubuntu18-vault-consul-server-ami",
     "source.amazon-ebs.deadline-db-ubuntu18-ami",
@@ -534,22 +534,22 @@ build {
   }
 
   # TODO remove tofu
-  # fix pub keys for github centos and deadlineuser ?
+  # fix pub keys for github rocky and deadlineuser ?
   # provisioner "shell" {
   #   inline = [
   #     "echo 'Add github keys to known_hosts'",
-  #     "sudo su - centos -c \"mkdir -p /home/centos/.ssh\"",
-  #     "sudo su - centos -c \"touch /home/centos/.ssh/known_hosts\"",
-  #     "sudo su - centos -c \"chmod 0600 /home/centos/.ssh/known_hosts\"",
-  #     "sudo su - centos -c \"ssh-keygen -R 140.82.112.4\"",
-  #     "sudo su - centos -c \"ssh-keyscan -t rsa github.com >> /home/centos/.ssh/known_hosts\""
+  #     "sudo su - rocky -c \"mkdir -p /home/rocky/.ssh\"",
+  #     "sudo su - rocky -c \"touch /home/rocky/.ssh/known_hosts\"",
+  #     "sudo su - rocky -c \"chmod 0600 /home/rocky/.ssh/known_hosts\"",
+  #     "sudo su - rocky -c \"ssh-keygen -R 140.82.112.4\"",
+  #     "sudo su - rocky -c \"ssh-keyscan -t rsa github.com >> /home/rocky/.ssh/known_hosts\""
   #   ]
   #   only = [
-  #     "amazon-ebs.centos7-rendernode-ami"
+  #     "amazon-ebs.rocky8-rendernode-ami"
   #   ]
   # }
 
-  provisioner "shell" { # Install amazon systems manager for centos intelx86/amd64
+  provisioner "shell" { # Install amazon systems manager for rocky intelx86/amd64
     inline = [
       "sudo yum install -y https://s3.${var.aws_region}.amazonaws.com/amazon-ssm-${var.aws_region}/latest/linux_amd64/amazon-ssm-agent.rpm",
       "sudo systemctl enable amazon-ssm-agent",
@@ -558,13 +558,13 @@ build {
       # "CODEDEPLOY_BIN=\"/opt/codedeploy-agent/bin/codedeploy-agent\"", # only required if there is an existing version
       # "$CODEDEPLOY_BIN stop",
       # "sudo yum erase codedeploy-agent -y",
-      "cd /home/centos; sudo wget https://aws-codedeploy-${var.aws_region}.s3.${var.aws_region}.amazonaws.com/latest/install; sudo chmod +x ./install; sudo ./install auto",
+      "cd /home/rocky; sudo wget https://aws-codedeploy-${var.aws_region}.s3.${var.aws_region}.amazonaws.com/latest/install; sudo chmod +x ./install; sudo ./install auto",
       "sudo service codedeploy-agent start",
       "sudo service codedeploy-agent status",
       "sudo service codedeploy-agent enable",
     ]
     inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.centos7-rendernode-ami"]
+    only           = ["amazon-ebs.rocky8-rendernode-ami"]
   }
 
   ### Install cloudwatch logs agent
@@ -576,7 +576,7 @@ build {
     ]
     only = [
       "amazon-ebs.amznlnx2023-ami",
-      "amazon-ebs.centos7-rendernode-ami"
+      "amazon-ebs.rocky8-rendernode-ami"
     ]
   }
 
@@ -584,11 +584,11 @@ build {
   # provisioner "shell" {
   #   inline = [
   #     "sudo yum install -y epel-release",
-  #     "sudo yum install -y centos-release-scl",
+  #     "sudo yum install -y rocky-release-scl",
   #     "sudo yum install -y rh-python38" # scl enable rh-python38 bash
   #   ]
   #   only = [
-  #     "amazon-ebs.centos7-rendernode-ami" # the binary wont be located in normal location, for that you need to compile it.
+  #     "amazon-ebs.rocky8-rendernode-ami" # the binary wont be located in normal location, for that you need to compile it.
   #   ]
   # }
 
@@ -624,7 +624,7 @@ build {
 
   provisioner "ansible" { # See https://github.com/hashicorp/packer-plugin-ansible/issues/47#issuecomment-852443057
     playbook_file = "./ansible/ansible_init.yaml"
-    user          = "centos"
+    user          = "rocky"
     extra_arguments = [
       "-v",
       "--extra-vars",
@@ -635,8 +635,8 @@ build {
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
     galaxy_file      = "./requirements.yml"
     only = [
-      "amazon-ebs.centos7-ami",
-      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.rocky8-ami",
+      "amazon-ebs.rocky8-rendernode-ami",
     ]
   }
 
@@ -708,8 +708,8 @@ build {
     only = [
       "amazon-ebs.amznlnx2023-ami",
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
-      "amazon-ebs.centos7-ami",
-      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.rocky8-ami",
+      "amazon-ebs.rocky8-rendernode-ami",
       "amazon-ebs.ubuntu18-ami",
       "amazon-ebs.deadline-db-ubuntu18-ami",
       "amazon-ebs.openvpn-server-ami"
@@ -783,16 +783,16 @@ build {
       # "sudo reboot" # Reboot the system
     ]
     inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.centos7-rendernode-ami"]
+    only           = ["amazon-ebs.rocky8-rendernode-ami"]
   }
 
   provisioner "ansible" { # Add user deployuser
     playbook_file = "./ansible/newuser.yaml"
-    user          = "centos"
+    user          = "rocky"
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=centos variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=rocky variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
       #  package_python_interpreter=/usr/bin/python2.7"
     ]
     collections_path = "./ansible/collections"
@@ -800,18 +800,18 @@ build {
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
     galaxy_file      = "./requirements.yml"
     only = [
-      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.rocky8-rendernode-ami",
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
   provisioner "ansible" {
     playbook_file = "./ansible/newuser.yaml"
-    user          = "centos"
+    user          = "rocky"
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=centos variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=rocky variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
       #  package_python_interpreter=/usr/bin/python2.7"
     ]
     collections_path = "./ansible/collections"
@@ -819,7 +819,7 @@ build {
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
     galaxy_file      = "./requirements.yml"
     only = [
-      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.rocky8-rendernode-ami",
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
@@ -860,7 +860,7 @@ build {
       "sudo yum install -y redhat-lsb samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap wget nc"
     ]
     only = [
-      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.rocky8-rendernode-ami",
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
@@ -882,7 +882,7 @@ build {
       "sudo yum install powershell -y"
     ]
     only = [
-      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.rocky8-rendernode-ami",
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
@@ -925,7 +925,7 @@ build {
     ]
     only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
-      "amazon-ebs.centos7-rendernode-ami"
+      "amazon-ebs.rocky8-rendernode-ami"
     ]
   }
 
@@ -946,7 +946,7 @@ build {
     destination = "/tmp/retry"
     source      = "${local.template_dir}/scripts/retry"
     only = [
-      "amazon-ebs.centos7-rendernode-ami"
+      "amazon-ebs.rocky8-rendernode-ami"
     ]
   }
 
@@ -976,7 +976,7 @@ build {
       "sudo systemctl stop deadline10launcher"
     ]
     only = [
-      "amazon-ebs.centos7-rendernode-ami"
+      "amazon-ebs.rocky8-rendernode-ami"
       # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
@@ -1006,7 +1006,7 @@ build {
 
   provisioner "ansible" {
     playbook_file = "./ansible/fsx_packages.yaml"
-    user          = "centos"
+    user          = "rocky"
     extra_arguments = [
       "-vv",
       "--extra-vars",
@@ -1017,7 +1017,7 @@ build {
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
     galaxy_file      = "./requirements.yml"
     only = [
-      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.rocky8-rendernode-ami",
       # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
@@ -1026,7 +1026,7 @@ build {
 
   provisioner "ansible" {
     playbook_file = "./ansible/houdini_module.yaml"
-    user          = "centos"
+    user          = "rocky"
     extra_arguments = [
       "-vv",
       "--extra-vars",
@@ -1041,7 +1041,7 @@ build {
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key}"]
     galaxy_file      = "./requirements.yml"
     only = [
-      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.rocky8-rendernode-ami",
       # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
@@ -1055,8 +1055,8 @@ build {
       "sudo yum -y install bind-utils jq"
     ]
     only = [
-      "amazon-ebs.centos7-ami",
-      "amazon-ebs.centos7-rendernode-ami",
+      "amazon-ebs.rocky8-ami",
+      "amazon-ebs.rocky8-rendernode-ami",
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
@@ -1099,8 +1099,8 @@ build {
       "amazon-ebs.ubuntu16-ami",
       "amazon-ebs.amznlnx2023-ami",
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
-      "amazon-ebs.centos7-ami",
-      "amazon-ebs.centos7-rendernode-ami"
+      "amazon-ebs.rocky8-ami",
+      "amazon-ebs.rocky8-rendernode-ami"
     ]
   }
   provisioner "shell" {
@@ -1109,11 +1109,11 @@ build {
   }
   provisioner "shell" {
     inline = [
-      "echo 'Reconfigure network interfaces...'",              # the centos 7 base ami has issues with sudo.  These hacks here are unfortunate.
+      "echo 'Reconfigure network interfaces...'",              # the rocky 8 base ami has issues with sudo.  These hacks here are unfortunate.
       "sudo rm -fr /etc/sysconfig/network-scripts/ifcfg-eth0", # this may need to be removed from the image. having a leftover network interface file here if the interface is not present can cause dns issues and slowdowns with sudo.
-      "sudo sed -i 's/sudo //g' /opt/consul/bin/run-consul"    # strip sudo for when we run consul. sudo on centos takes 25 seconds due to a bad AMI build. https://bugs.centos.org/view.php?id=18066
+      "sudo sed -i 's/sudo //g' /opt/consul/bin/run-consul"    # strip sudo for when we run consul. sudo on rocky takes 25 seconds due to a bad AMI build. https://bugs.rocky.org/view.php?id=18066
     ]
-    only = ["amazon-ebs.centos7-ami", "amazon-ebs.centos7-rendernode-ami"]
+    only = ["amazon-ebs.rocky8-ami", "amazon-ebs.rocky8-rendernode-ami"]
   }
   provisioner "shell" { # Generate certificates with vault.
     inline = [
@@ -1167,13 +1167,13 @@ build {
   #   extra_arguments = [
   #     "-v",
   #     "--extra-vars",
-  #     "user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=centos variable_user=deployuser sudo=true add_to_group_syscontrol=true create_ssh_key=false variable_uid=${local.deployuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
+  #     "user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=rocky variable_user=deployuser sudo=true add_to_group_syscontrol=true create_ssh_key=false variable_uid=${local.deployuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
   #   ]
   #   collections_path = "./ansible/collections"
   #   roles_path = "./ansible/roles"
   #   ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
   #   galaxy_file = "./requirements.yml"
-  #   only = ["amazon-ebs.centos7-rendernode-ami"]
+  #   only = ["amazon-ebs.rocky8-rendernode-ami"]
   # }
 
   # provisioner "ansible" {
@@ -1181,13 +1181,13 @@ build {
   #   extra_arguments = [
   #     "-v",
   #     "--extra-vars",
-  #     "user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=centos variable_user=deadlineuser sudo=false add_to_group_syscontrol=false create_ssh_key=false variable_uid=${local.deadlineuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
+  #     "user_deadlineuser_name=ubuntu variable_host=default variable_connect_as_user=rocky variable_user=deadlineuser sudo=false add_to_group_syscontrol=false create_ssh_key=false variable_uid=${local.deadlineuser_uid} delegate_host=localhost syscontrol_gid=${local.syscontrol_gid}"
   #   ]
   #   collections_path = "./ansible/collections"
   #   roles_path = "./ansible/roles"
   #   ansible_env_vars = [ "ANSIBLE_CONFIG=ansible/ansible.cfg" ]
   #   galaxy_file = "./requirements.yml"
-  #   only = ["amazon-ebs.centos7-rendernode-ami"]
+  #   only = ["amazon-ebs.rocky8-rendernode-ami"]
   # }
 
 

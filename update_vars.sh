@@ -201,11 +201,11 @@ function export_vars {
     export TF_VAR_vault_consul_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     warn_if_invalid "$ami_role" "$TF_VAR_vault_consul_ami_id" "TF_VAR_vault_consul_ami_id"
     # AMI query by commit - Vault and Consul Client
-    ami_role="firehawk_centos7_ami"
+    ami_role="firehawk_rocky8_ami"
     export TF_VAR_vault_client_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     warn_if_invalid "$ami_role" "$TF_VAR_vault_client_ami_id" "TF_VAR_vault_client_ami_id"
     # AMI query by commit - Bastion Host
-    ami_role="firehawk_centos7_ami"
+    ami_role="firehawk_rocky8_ami"
     export TF_VAR_bastion_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     warn_if_invalid "$ami_role" "$TF_VAR_bastion_ami_id" "TF_VAR_bastion_ami_id"
     # AMI query by commit - Open VPN Server
@@ -217,9 +217,9 @@ function export_vars {
     export TF_VAR_deadline_db_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
     warn_if_invalid "$ami_role" "$TF_VAR_deadline_db_ami_id" "TF_VAR_deadline_db_ami_id"
     # AMI query by commit - Render node
-    ami_role="firehawk_centos7_rendernode_ami"
-    export TF_VAR_node_centos7_houdini_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
-    warn_if_invalid "$ami_role" "$TF_VAR_node_centos7_houdini_ami_id" "TF_VAR_node_centos7_houdini_ami_id"
+    ami_role="firehawk_rocky8_rendernode_ami"
+    export TF_VAR_node_rocky8_houdini_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
+    warn_if_invalid "$ami_role" "$TF_VAR_node_rocky8_houdini_ami_id" "TF_VAR_node_rocky8_houdini_ami_id"
     # AMI query by commit - Workstation
     ami_role="firehawk_amznlnx2023_ami"
     export TF_VAR_provisioner_ami_id=$(echo $query_result | jq -c "map(select(.ami_role == \"$ami_role\")) | max_by(.creation_date)" | jq '.image_id' -r)
