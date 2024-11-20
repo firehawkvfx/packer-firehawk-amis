@@ -664,86 +664,86 @@ build {
   }
 
 
-  provisioner "shell" { # Vault client probably wont be installed on bastions in future, but most hosts that will authenticate will require it.
-    inline = [
-      "git config --global advice.detachedHead false",                                                                    # disable warning about detached head because we dont care, it is a software installation
-      "set -x; git clone --branch v0.17.0 https://github.com/hashicorp/terraform-aws-vault.git /tmp/terraform-aws-vault", # This can be replaced with a local copy if required.
-      "if test -n '${var.vault_download_url}'; then",
-      " set -x; /tmp/terraform-aws-vault/modules/install-vault/install-vault --download-url ${var.vault_download_url} --skip-package-update",
-      "else",
-      " set -x; /tmp/terraform-aws-vault/modules/install-vault/install-vault --version 1.6.1 --skip-package-update",
-      "fi"
-      # "if [[ -n \"$(command -v yum)\" ]]; then sudo yum remove awscli -y; fi", # uninstall AWS CLI v1
-      # "if [[ -n \"$(command -v apt-get)\" ]]; then sudo apt-get remove awscli -y; fi", # uninstall AWS CLI v1
-      # "if sudo test -f /bin/aws; then sudo rm -f /bin/aws; fi" # Ensure AWS CLI v1 doesn't exist
-    ]
-  }
+  # provisioner "shell" { # Vault client probably wont be installed on bastions in future, but most hosts that will authenticate will require it.
+  #   inline = [
+  #     "git config --global advice.detachedHead false",                                                                    # disable warning about detached head because we dont care, it is a software installation
+  #     "set -x; git clone --branch v0.17.0 https://github.com/hashicorp/terraform-aws-vault.git /tmp/terraform-aws-vault", # This can be replaced with a local copy if required.
+  #     "if test -n '${var.vault_download_url}'; then",
+  #     " set -x; /tmp/terraform-aws-vault/modules/install-vault/install-vault --download-url ${var.vault_download_url} --skip-package-update",
+  #     "else",
+  #     " set -x; /tmp/terraform-aws-vault/modules/install-vault/install-vault --version 1.6.1 --skip-package-update",
+  #     "fi"
+  #     # "if [[ -n \"$(command -v yum)\" ]]; then sudo yum remove awscli -y; fi", # uninstall AWS CLI v1
+  #     # "if [[ -n \"$(command -v apt-get)\" ]]; then sudo apt-get remove awscli -y; fi", # uninstall AWS CLI v1
+  #     # "if sudo test -f /bin/aws; then sudo rm -f /bin/aws; fi" # Ensure AWS CLI v1 doesn't exist
+  #   ]
+  # }
 
-  ### Install certs for clients and servers
+  # ### Install certs for clients and servers
 
-  provisioner "file" {
-    destination = "/tmp/sign-request.py"
-    source      = "${local.template_dir}/auth/sign-request.py"
-  }
-  provisioner "file" {
-    destination = "/tmp/ca.crt.pem"
-    source      = var.ca_public_key_path
-  }
-  ### Clients only require the CA cert.
-  provisioner "shell" {
-    inline = [
-      "if [[ '${var.install_auth_signing_script}' == 'true' ]]; then",
-      "sudo mkdir -p /opt/vault/scripts/",
-      "sudo mv /tmp/sign-request.py /opt/vault/scripts/",
-      "else",
-      "sudo rm /tmp/sign-request.py",
-      "fi",
-      "sudo mkdir -p /opt/vault/tls/",
-      "sudo mv /tmp/ca.crt.pem /opt/vault/tls/",
-      "sudo chmod -R 600 /opt/vault/tls",
-      "sudo chmod 700 /opt/vault/tls",
-      "sudo /tmp/terraform-aws-vault/modules/update-certificate-store/update-certificate-store --cert-file-path /opt/vault/tls/ca.crt.pem"
-    ]
-    inline_shebang = "/bin/bash -e"
-    only = [
-      "amazon-ebs.amznlnx2023-ami",
-      "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
-      "amazon-ebs.rocky8-ami",
-      "amazon-ebs.rocky8-rendernode-ami",
-      "amazon-ebs.ubuntu18-ami",
-      "amazon-ebs.deadline-db-ubuntu18-ami",
-      "amazon-ebs.openvpn-server-ami"
-    ]
-  }
+  # provisioner "file" {
+  #   destination = "/tmp/sign-request.py"
+  #   source      = "${local.template_dir}/auth/sign-request.py"
+  # }
+  # provisioner "file" {
+  #   destination = "/tmp/ca.crt.pem"
+  #   source      = var.ca_public_key_path
+  # }
+  # ### Clients only require the CA cert.
+  # provisioner "shell" {
+  #   inline = [
+  #     "if [[ '${var.install_auth_signing_script}' == 'true' ]]; then",
+  #     "sudo mkdir -p /opt/vault/scripts/",
+  #     "sudo mv /tmp/sign-request.py /opt/vault/scripts/",
+  #     "else",
+  #     "sudo rm /tmp/sign-request.py",
+  #     "fi",
+  #     "sudo mkdir -p /opt/vault/tls/",
+  #     "sudo mv /tmp/ca.crt.pem /opt/vault/tls/",
+  #     "sudo chmod -R 600 /opt/vault/tls",
+  #     "sudo chmod 700 /opt/vault/tls",
+  #     "sudo /tmp/terraform-aws-vault/modules/update-certificate-store/update-certificate-store --cert-file-path /opt/vault/tls/ca.crt.pem"
+  #   ]
+  #   inline_shebang = "/bin/bash -e"
+  #   only = [
+  #     "amazon-ebs.amznlnx2023-ami",
+  #     "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
+  #     "amazon-ebs.rocky8-ami",
+  #     "amazon-ebs.rocky8-rendernode-ami",
+  #     "amazon-ebs.ubuntu18-ami",
+  #     "amazon-ebs.deadline-db-ubuntu18-ami",
+  #     "amazon-ebs.openvpn-server-ami"
+  #   ]
+  # }
   # ### Only Vault and Consul servers should have the private keys.
-  provisioner "file" {
-    destination = "/tmp/vault.crt.pem"
-    source      = var.tls_public_key_path
-    only        = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
-  }
-  provisioner "file" {
-    destination = "/tmp/vault.key.pem"
-    source      = var.tls_private_key_path
-    only        = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
-  }
+  # provisioner "file" {
+  #   destination = "/tmp/vault.crt.pem"
+  #   source      = var.tls_public_key_path
+  #   only        = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
+  # }
+  # provisioner "file" {
+  #   destination = "/tmp/vault.key.pem"
+  #   source      = var.tls_private_key_path
+  #   only        = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
+  # }
 
-  provisioner "shell" {
-    inline = [
-      "if [[ '${var.install_auth_signing_script}' == 'true' ]]; then",
-      "sudo mv /tmp/sign-request.py /opt/vault/scripts/",
-      "else",
-      "sudo rm /tmp/sign-request.py",
-      "fi",
-      "sudo mv /tmp/ca.crt.pem /opt/vault/tls/",
-      "sudo mv /tmp/vault.crt.pem /opt/vault/tls/",
-      "sudo mv /tmp/vault.key.pem /opt/vault/tls/",
-      "sudo chown -R vault:vault /opt/vault/tls/",
-      "sudo chmod -R 600 /opt/vault/tls",
-      "sudo chmod 700 /opt/vault/tls",
-    "sudo /tmp/terraform-aws-vault/modules/update-certificate-store/update-certificate-store --cert-file-path /opt/vault/tls/ca.crt.pem"]
-    inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
-  }
+  # provisioner "shell" {
+  #   inline = [
+  #     "if [[ '${var.install_auth_signing_script}' == 'true' ]]; then",
+  #     "sudo mv /tmp/sign-request.py /opt/vault/scripts/",
+  #     "else",
+  #     "sudo rm /tmp/sign-request.py",
+  #     "fi",
+  #     "sudo mv /tmp/ca.crt.pem /opt/vault/tls/",
+  #     "sudo mv /tmp/vault.crt.pem /opt/vault/tls/",
+  #     "sudo mv /tmp/vault.key.pem /opt/vault/tls/",
+  #     "sudo chown -R vault:vault /opt/vault/tls/",
+  #     "sudo chmod -R 600 /opt/vault/tls",
+  #     "sudo chmod 700 /opt/vault/tls",
+  #   "sudo /tmp/terraform-aws-vault/modules/update-certificate-store/update-certificate-store --cert-file-path /opt/vault/tls/ca.crt.pem"]
+  #   inline_shebang = "/bin/bash -e"
+  #   only           = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
+  # }
 
   provisioner "shell" {
     inline = [
@@ -1115,21 +1115,21 @@ build {
     ]
     only = ["amazon-ebs.rocky8-ami", "amazon-ebs.rocky8-rendernode-ami"]
   }
-  provisioner "shell" { # Generate certificates with vault.
-    inline = [
-      "if [[ \"${var.test_consul}\" == true ]]; then",                                                                                                                 # only test the connection if the var is set.
-      " set -x; sudo /opt/consul/bin/run-consul --client --cluster-tag-key \"${var.consul_cluster_tag_key}\" --cluster-tag-value \"${var.consul_cluster_tag_value}\"", # this is normally done with user data but dont for convenience here
-      " set -x; consul members list",
-      " set -x; dig $(hostname) | awk '/^;; ANSWER SECTION:$/ { getline ; print $5 ; exit }'",                      # check localhost resolve's
-      " set -x; dig @127.0.0.1 vault.service.consul | awk '/^;; ANSWER SECTION:$/ { getline ; print $5 ; exit }'",  # check consul will resolve vault
-      " set -x; dig @localhost vault.service.consul | awk '/^;; ANSWER SECTION:$/ { getline ; print $5 ; exit }'",  # check localhost will resolve vault
-      " set -x; vault_ip=$(dig vault.service.consul | awk '/^;; ANSWER SECTION:$/ { getline ; print $5 ; exit }')", # check default lookup will resolve vault
-      " echo \"vault_ip=$vault_ip\"",
-      " if [[ -n \"$vault_ip\" ]]; then echo 'Build Success'; else echo 'Build Failed' >&2; dig vault.service.consul; exit 1; fi",
-      "fi"
-    ]
-    inline_shebang = "/bin/bash -e"
-  }
+  # provisioner "shell" { # Generate certificates with vault.
+  #   inline = [
+  #     "if [[ \"${var.test_consul}\" == true ]]; then",                                                                                                                 # only test the connection if the var is set.
+  #     " set -x; sudo /opt/consul/bin/run-consul --client --cluster-tag-key \"${var.consul_cluster_tag_key}\" --cluster-tag-value \"${var.consul_cluster_tag_value}\"", # this is normally done with user data but dont for convenience here
+  #     " set -x; consul members list",
+  #     " set -x; dig $(hostname) | awk '/^;; ANSWER SECTION:$/ { getline ; print $5 ; exit }'",                      # check localhost resolve's
+  #     " set -x; dig @127.0.0.1 vault.service.consul | awk '/^;; ANSWER SECTION:$/ { getline ; print $5 ; exit }'",  # check consul will resolve vault
+  #     " set -x; dig @localhost vault.service.consul | awk '/^;; ANSWER SECTION:$/ { getline ; print $5 ; exit }'",  # check localhost will resolve vault
+  #     " set -x; vault_ip=$(dig vault.service.consul | awk '/^;; ANSWER SECTION:$/ { getline ; print $5 ; exit }')", # check default lookup will resolve vault
+  #     " echo \"vault_ip=$vault_ip\"",
+  #     " if [[ -n \"$vault_ip\" ]]; then echo 'Build Success'; else echo 'Build Failed' >&2; dig vault.service.consul; exit 1; fi",
+  #     "fi"
+  #   ]
+  #   inline_shebang = "/bin/bash -e"
+  # }
   provisioner "shell" {
     expect_disconnect = true
     inline            = ["set -x; sudo reboot; sleep 60"]
