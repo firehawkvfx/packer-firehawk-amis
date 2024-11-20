@@ -1097,31 +1097,31 @@ build {
   # # The servers dont require the same config for DNS to function
 
 
-  provisioner "shell" {
-    inline = [
-      "/tmp/terraform-aws-consul/modules/install-dnsmasq/install-dnsmasq"
-      # "sudo systemctl restart dnsmasq", # if this fixes vault server, but breaks other clients, inspect further.
-    ]
-    only = [
-      "amazon-ebs.ubuntu16-ami",
-      "amazon-ebs.amznlnx2023-ami",
-      "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
-      "amazon-ebs.rocky8-ami",
-      "amazon-ebs.rocky8-rendernode-ami"
-    ]
-  }
-  provisioner "shell" {
-    inline = ["/tmp/terraform-aws-consul/modules/setup-systemd-resolved/setup-systemd-resolved"]
-    only   = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
-  }
-  provisioner "shell" {
-    inline = [
-      "echo 'Reconfigure network interfaces...'",              # the rocky 8 base ami has issues with sudo.  These hacks here are unfortunate.
-      "sudo rm -fr /etc/sysconfig/network-scripts/ifcfg-eth0", # this may need to be removed from the image. having a leftover network interface file here if the interface is not present can cause dns issues and slowdowns with sudo.
-      "sudo sed -i 's/sudo //g' /opt/consul/bin/run-consul"    # strip sudo for when we run consul. sudo on rocky takes 25 seconds due to a bad AMI build. https://bugs.rocky.org/view.php?id=18066
-    ]
-    only = ["amazon-ebs.rocky8-ami", "amazon-ebs.rocky8-rendernode-ami"]
-  }
+  # provisioner "shell" {
+  #   inline = [
+  #     "/tmp/terraform-aws-consul/modules/install-dnsmasq/install-dnsmasq"
+  #     # "sudo systemctl restart dnsmasq", # if this fixes vault server, but breaks other clients, inspect further.
+  #   ]
+  #   only = [
+  #     "amazon-ebs.ubuntu16-ami",
+  #     "amazon-ebs.amznlnx2023-ami",
+  #     "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
+  #     "amazon-ebs.rocky8-ami",
+  #     "amazon-ebs.rocky8-rendernode-ami"
+  #   ]
+  # }
+  # provisioner "shell" {
+  #   inline = ["/tmp/terraform-aws-consul/modules/setup-systemd-resolved/setup-systemd-resolved"]
+  #   only   = ["amazon-ebs.ubuntu18-vault-consul-server-ami"]
+  # }
+  # provisioner "shell" {
+  #   inline = [
+  #     "echo 'Reconfigure network interfaces...'",              # the cent7 base ami has issues with sudo.  These hacks here are unfortunate.
+  #     "sudo rm -fr /etc/sysconfig/network-scripts/ifcfg-eth0", # this may need to be removed from the image. having a leftover network interface file here if the interface is not present can cause dns issues and slowdowns with sudo.
+  #     "sudo sed -i 's/sudo //g' /opt/consul/bin/run-consul"    # strip sudo for when we run consul. sudo on rocky takes 25 seconds due to a bad AMI build. https://bugs.rocky.org/view.php?id=18066
+  #   ]
+  #   only = ["amazon-ebs.rocky8-ami", "amazon-ebs.rocky8-rendernode-ami"]
+  # }
   # provisioner "shell" { # Generate certificates with vault.
   #   inline = [
   #     "if [[ \"${var.test_consul}\" == true ]]; then",                                                                                                                 # only test the connection if the var is set.
