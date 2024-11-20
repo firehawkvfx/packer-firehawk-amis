@@ -347,7 +347,7 @@ source "amazon-ebs" "rocky8-rendernode-ami" {
 
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
-    volume_size           = 17
+    volume_size           = 20
     volume_type           = "gp2"
     delete_on_termination = true
   }
