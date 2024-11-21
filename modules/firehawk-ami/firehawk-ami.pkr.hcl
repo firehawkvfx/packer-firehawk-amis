@@ -1038,17 +1038,17 @@ build {
     ]
   }
 
-  provisioner "shell" { ### Install requests for houdini install script
-    inline = [
-      "set -x; sudo python3.11 -m pip install requests", # the installs below may be able to be removed
-      "set -x; sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user requests --upgrade\"",
-      "set -x; python3.11 -m pip install --user requests --upgrade"
-    ]
-    only = [
-      "amazon-ebs.rocky8-rendernode-ami",
-      "amazon-ebs.amznlnx2023-rendernode-ami",
-    ]
-  }
+  # provisioner "shell" { ### Install requests for houdini install script
+  #   inline = [
+  #     "set -x; sudo python3.11 -m pip install requests", # the installs below may be able to be removed
+  #     "set -x; sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user requests --upgrade\"",
+  #     "set -x; python3.11 -m pip install --user requests --upgrade"
+  #   ]
+  #   only = [
+  #     "amazon-ebs.rocky8-rendernode-ami",
+  #     "amazon-ebs.amznlnx2023-rendernode-ami",
+  #   ]
+  # }
 
   # provisioner "shell" { ### Install Deadline for Client Worker
   #   inline = [
