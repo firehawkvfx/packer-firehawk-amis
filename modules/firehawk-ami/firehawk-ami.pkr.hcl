@@ -160,7 +160,7 @@ locals {
     "houdini_version_list" = [
       {
         "houdini_major_version"      = "20.5",
-        "python_libs_folder"         = "python3.10libs",
+        "python_libs_folder"         = "python3.11libs",
         "houdini_auto_version"       = "true",
         "houdini_minor_version"      = "auto",
         "houdini_linux_tar_filename" = "auto",
@@ -370,7 +370,7 @@ source "amazon-ebs" "ubuntu18-ami" {
   )
   ami_description = "An Ubuntu 18.04 AMI that will accept connections from hosts with TLS Certs."
   ami_name        = "firehawk-bastion-ubuntu18-${local.timestamp}-{{uuid}}"
-  instance_type   = "t2.micro"
+  instance_type   = "t2.small"
   region          = var.aws_region
   # source_ami      = "${var.ubuntu18_ami}"
   source_ami_filter {
@@ -396,7 +396,7 @@ source "amazon-ebs" "ubuntu18-vault-consul-server-ami" {
   )
   ami_description = "An Ubuntu 18.04 AMI Vault and Consul Server."
   ami_name        = "firehawk-vault-consul-server-ubuntu18-${local.timestamp}-{{uuid}}"
-  instance_type   = "t2.micro"
+  instance_type   = "t2.small"
   region          = var.aws_region
   # source_ami      = "${var.ubuntu18_ami}"
   source_ami_filter { # Uses firehawk base ami
@@ -435,7 +435,7 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
   )
   ami_description = "An Ubuntu 18.04 AMI with Deadline DB ${local.deadline_version} server."
   ami_name        = "firehawk-deadlinedb-ubuntu18-${local.timestamp}-{{uuid}}"
-  instance_type   = "t2.micro"
+  instance_type   = "t2.small"
   region          = var.aws_region
   # source_ami      = "${var.ubuntu18_ami}"
   source_ami_filter {
