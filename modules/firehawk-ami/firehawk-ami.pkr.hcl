@@ -596,7 +596,8 @@ build {
       # "CODEDEPLOY_BIN=\"/opt/codedeploy-agent/bin/codedeploy-agent\"", # only required if there is an existing version
       # "$CODEDEPLOY_BIN stop",
       # "sudo dnf erase codedeploy-agent -y",
-      "cd /home/rocky; sudo wget https://aws-codedeploy-${var.aws_region}.s3.${var.aws_region}.amazonaws.com/latest/install; sudo chmod +x ./install; sudo ./install auto",
+      "echo \"whoami: $(whoami)\"",
+      "set -x; cd $HOME; sudo wget https://aws-codedeploy-${var.aws_region}.s3.${var.aws_region}.amazonaws.com/latest/install; sudo chmod +x ./install; sudo ./install auto",
       "sudo service codedeploy-agent start",
       "sudo service codedeploy-agent status",
       "sudo service codedeploy-agent enable",
@@ -829,7 +830,6 @@ build {
       "-v",
       "--extra-vars",
       "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=rocky variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-      #  package_python_interpreter=/usr/bin/python3.11"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
@@ -837,7 +837,6 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
-      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
@@ -848,7 +847,6 @@ build {
       "-v",
       "--extra-vars",
       "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=ec2-user variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-      #  package_python_interpreter=/usr/bin/python3.11"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
@@ -856,7 +854,6 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.amznlnx2023-rendernode-ami",
-      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
