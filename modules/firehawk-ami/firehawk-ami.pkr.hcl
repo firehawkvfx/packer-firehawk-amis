@@ -923,7 +923,7 @@ build {
       "sudo chown -R :syscontrol /usr/lib/python3.11/site-packages",
       "sudo chmod -R g+rwX /usr/lib/python3.11/site-packages",
       "python3.11 -c \"import requests; print('requests module is available')\"",
-      "sudo su - ${var.deadlineuser_name} -c \"python3.11 -c \"import requests; print('requests module is available to deadlineuser')\"\"",
+      "sudo su - ${var.deadlineuser_name} -c \"python3.11 -c \\\"import requests; print('requests module is available to deadlineuser')\\\"\""
     ]
     inline_shebang = "/bin/bash -e"
     only = [
