@@ -220,11 +220,11 @@ source "amazon-ebs" "amznlnx2023-ami" {
     { "Name" : "firehawk_amznlnx2023_ami" },
     local.common_ami_tags
   )
-  ami_description = "An Amazon Linux 2 AMI that will accept connections from hosts with TLS Certs."
-  ami_name        = "firehawk-bastion-amznlnx2023-${local.timestamp}-{{uuid}}"
+  ami_description         = "An Amazon Linux 2 AMI that will accept connections from hosts with TLS Certs."
+  ami_name                = "firehawk-bastion-amznlnx2023-${local.timestamp}-{{uuid}}"
   temporary_key_pair_type = "ed25519"
-  instance_type   = "t2.small"
-  region          = var.aws_region
+  instance_type           = "t2.small"
+  region                  = var.aws_region
   # source_ami      = "${var.amazon_linux_2_ami}"
   source_ami_filter {
     filters = {
@@ -247,11 +247,11 @@ source "amazon-ebs" "amznlnx2023-nicedcv-nvidia-ami" {
     { "Name" : "firehawk_amznlnx2023_nicedcv_ami" },
     local.common_ami_tags
   )
-  ami_description = "A Graphical Amazon Linux 2 NICE DCV AMI that will accept connections from hosts with TLS Certs."
-  ami_name        = "firehawk-workstation-amznlnx2023-nicedcv-${local.timestamp}-{{uuid}}"
+  ami_description         = "A Graphical Amazon Linux 2 NICE DCV AMI that will accept connections from hosts with TLS Certs."
+  ami_name                = "firehawk-workstation-amznlnx2023-nicedcv-${local.timestamp}-{{uuid}}"
   temporary_key_pair_type = "ed25519"
-  instance_type   = "t2.small"
-  region          = var.aws_region
+  instance_type           = "t2.small"
+  region                  = var.aws_region
   # source_ami      = "${var.amazon_linux_2_ami}"
   source_ami_filter {
     filters = {
@@ -294,11 +294,11 @@ source "amazon-ebs" "rocky8-ami" {
     { "Name" : "firehawk_rocky8_ami" },
     local.common_ami_tags
   )
-  ami_description = "A Rocky 8 AMI that will accept connections from hosts with TLS Certs."
-  ami_name        = "firehawk-bastion-rocky8-${local.timestamp}-{{uuid}}"
+  ami_description         = "A Rocky 8 AMI that will accept connections from hosts with TLS Certs."
+  ami_name                = "firehawk-bastion-rocky8-${local.timestamp}-{{uuid}}"
   temporary_key_pair_type = "ed25519"
-  instance_type   = "t2.small"
-  region          = var.aws_region
+  instance_type           = "t2.small"
+  region                  = var.aws_region
   # source_ami      = "${var.rocky8_ami}"
   source_ami_filter {
     filters = {
@@ -312,7 +312,6 @@ source "amazon-ebs" "rocky8-ami" {
     owners      = [var.account_id]
   }
   ssh_username = "rocky"
-
 }
 
 source "amazon-ebs" "rocky8-rendernode-ami" {
@@ -324,11 +323,11 @@ source "amazon-ebs" "rocky8-rendernode-ami" {
     { "houdini_major_version" : local.houdini_json_vars["houdini_version_list"][0]["houdini_major_version"] },
     local.common_ami_tags
   )
-  ami_description = "A Rocky 8 AMI rendernode."
-  ami_name        = "firehawk-rendernode-rocky8-${local.timestamp}-{{uuid}}"
+  ami_description         = "A Rocky 8 AMI rendernode."
+  ami_name                = "firehawk-rendernode-rocky8-${local.timestamp}-{{uuid}}"
   temporary_key_pair_type = "ed25519"
-  instance_type   = "t2.small"
-  region          = var.aws_region
+  instance_type           = "t2.small"
+  region                  = var.aws_region
   # source_ami      = "${var.rocky8_ami}"
   source_ami_filter {
     filters = {
@@ -359,6 +358,32 @@ source "amazon-ebs" "rocky8-rendernode-ami" {
   #   device_name  = "/dev/sdc"
   #   virtual_name = "ephemeral1"
   # }
+}
+
+source "amazon-ebs" "amznlnx2023-rendernode-ami" {
+  tags = merge(
+    { "packer_source" : "amazon-ebs.amznlnx2023-rendernode-ami" },
+    { "ami_role" : "firehawk_amznlnx2023_rendernode_ami" },
+    { "Name" : "firehawk_amznlnx2023_rendernode_ami" },
+    local.common_ami_tags
+  )
+  ami_description         = "An Amazon Linux 2 AMI that will accept connections from hosts with TLS Certs."
+  ami_name                = "firehawk-rendernode-amznlnx2023-${local.timestamp}-{{uuid}}"
+  temporary_key_pair_type = "ed25519"
+  instance_type           = "t2.small"
+  region                  = var.aws_region
+  source_ami_filter {
+    filters = {
+      "tag:ami_role" : "amznlnx2023_base_ami",
+      "tag:packer_template" : "firehawk-base-ami",
+      "tag:commit_hash" : var.ingress_commit_hash,
+      "tag:commit_hash_short" : var.ingress_commit_hash_short,
+      "tag:resourcetier" : var.resourcetier,
+    }
+    most_recent = true
+    owners      = [var.account_id]
+  }
+  ssh_username = "ec2-user"
 }
 
 source "amazon-ebs" "ubuntu18-ami" {
@@ -480,6 +505,7 @@ build {
     "source.amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
     "source.amazon-ebs.rocky8-ami",
     "source.amazon-ebs.rocky8-rendernode-ami",
+    "source.amazon-ebs.amznlnx2023-rendernode-ami",
     "source.amazon-ebs.ubuntu18-ami",
     "source.amazon-ebs.ubuntu18-vault-consul-server-ami",
     "source.amazon-ebs.deadline-db-ubuntu18-ami",
@@ -576,7 +602,10 @@ build {
       "sudo service codedeploy-agent enable",
     ]
     inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.rocky8-rendernode-ami"]
+    only = [
+      "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
+    ]
   }
 
   ### Install cloudwatch logs agent
@@ -588,7 +617,8 @@ build {
     ]
     only = [
       "amazon-ebs.amznlnx2023-ami",
-      "amazon-ebs.rocky8-rendernode-ami"
+      "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
     ]
   }
 
@@ -600,14 +630,15 @@ build {
   #     "sudo dnf install -y rh-python38" # scl enable rh-python38 bash
   #   ]
   #   only = [
-  #     "amazon-ebs.rocky8-rendernode-ami" # the binary wont be located in normal location, for that you need to compile it.
+  #     "amazon-ebs.rocky8-rendernode-ami", # the binary wont be located in normal location, for that you need to compile it.
+  #     "amazon-ebs.amznlnx2023-rendernode-ami",
   #   ]
   # }
 
   # Install terraform, terragrunt, packer for Amazon Linux
   provisioner "shell" {
     inline = [
-      "sudo python3.11 -m pip install ansible boto3 botocore",                                                                                       #: Install ansible using the same method we use to install it to codebuild
+      "sudo python3.11 -m pip install ansible boto3 botocore",                                                                                      #: Install ansible using the same method we use to install it to codebuild
       "wget https://releases.hashicorp.com/terraform/${var.terraform_version}/terraform_${var.terraform_version}_linux_amd64.zip -P /tmp/ --quiet", # Get terraform
       "sudo unzip /tmp/terraform_${var.terraform_version}_linux_amd64.zip -d /tmp/",
       "sudo mv /tmp/terraform /usr/local/bin/.",
@@ -655,6 +686,7 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.amznlnx2023-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
       "amazon-ebs.ubuntu18-ami",
       "amazon-ebs.deadline-db-ubuntu18-ami",
@@ -710,6 +742,7 @@ build {
   #     "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
   #     "amazon-ebs.rocky8-ami",
   #     "amazon-ebs.rocky8-rendernode-ami",
+  #     "amazon-ebs.amznlnx2023-rendernode-ami",
   #     "amazon-ebs.ubuntu18-ami",
   #     "amazon-ebs.deadline-db-ubuntu18-ami",
   #     "amazon-ebs.openvpn-server-ami"
@@ -783,7 +816,10 @@ build {
       # "sudo reboot" # Reboot the system
     ]
     inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.rocky8-rendernode-ami"]
+    only = [
+      "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
+    ]
   }
 
   provisioner "ansible" { # Add user deployuser
@@ -801,7 +837,26 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
-      "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
+      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
+    ]
+  }
+
+  provisioner "ansible" { # Add user deployuser
+    playbook_file = "./ansible/newuser.yaml"
+    user          = "ec2-user"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=ec2-user variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+      #  package_python_interpreter=/usr/bin/python3.11"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only = [
+      "amazon-ebs.amznlnx2023-rendernode-ami",
+      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
@@ -820,7 +875,28 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
-      "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
+      # "amazon-ebs.amznlnx2023-rendernode-ami",
+      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
+    ]
+  }
+
+  provisioner "ansible" {
+    playbook_file = "./ansible/newuser.yaml"
+    user          = "ec2-user"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=ec2-user variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+      #  package_python_interpreter=/usr/bin/python3.11"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only = [
+      # "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
+      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
@@ -861,6 +937,7 @@ build {
     ]
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
@@ -883,6 +960,7 @@ build {
     ]
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
@@ -925,7 +1003,8 @@ build {
     ]
     only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
-      "amazon-ebs.rocky8-rendernode-ami"
+      "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
     ]
   }
 
@@ -946,18 +1025,20 @@ build {
     destination = "/tmp/retry"
     source      = "${local.template_dir}/scripts/retry"
     only = [
-      "amazon-ebs.rocky8-rendernode-ami"
+      "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
     ]
   }
 
   provisioner "shell" { ### Install requests for houdini install script
     inline = [
-      "set -x; sudo python3.11 -m pip install requests",  # the installs below may be able to be removed
+      "set -x; sudo python3.11 -m pip install requests", # the installs below may be able to be removed
       "set -x; sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user requests --upgrade\"",
       "set -x; python3.11 -m pip install --user requests --upgrade"
     ]
     only = [
-      "amazon-ebs.rocky8-rendernode-ami"
+      "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
     ]
   }
 
@@ -987,7 +1068,8 @@ build {
   #     "sudo systemctl stop deadline10launcher"
   #   ]
   #   only = [
-  #     "amazon-ebs.rocky8-rendernode-ami"
+  #     "amazon-ebs.rocky8-rendernode-ami",
+  #     "amazon-ebs.amznlnx2023-rendernode-ami",
   #     # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
   #   ]
   # }
@@ -1029,6 +1111,7 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
       # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
@@ -1053,6 +1136,30 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
+      # "amazon-ebs.amznlnx2023-rendernode-ami",
+      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
+    ]
+  }
+
+  provisioner "ansible" {
+    playbook_file = "./ansible/houdini_module.yaml"
+    user          = "ec2-user"
+    extra_arguments = [
+      "-vv",
+      "--extra-vars",
+      jsonencode(local.houdini_json_vars),
+      "--extra-vars",
+      "variable_user=deadlineuser resourcetier=${var.resourcetier} installers_bucket=${local.installers_bucket} variable_host=default houdini_build=${local.houdini_build} sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key} houdini_license_server_address=${var.houdini_license_server_address} user_deadlineuser_pw='' package_python_interpreter=/usr/bin/python3.11 firehawk_houdini_tools=/home/deadlineuser/openfirehawk-houdini-tools",
+      "--tags",
+      "install_houdini,set_hserver,install_deadline_db"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key}"]
+    galaxy_file      = "./requirements.yml"
+    only = [
+      # "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
       # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
@@ -1068,18 +1175,19 @@ build {
     only = [
       "amazon-ebs.rocky8-ami",
       "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
   # ### Install Consul
 
-# Disabled because:
-# ==> amazon-ebs.amznlnx2023-ami:  Problem 1: package dracut-102-3.amzn2023.0.1.x86_64 from amazonlinux conflicts with dracut-config-ec2 < 3.1 provided by dracut-config-ec2-3.0-4.amzn2023.0.2.noarch from @System
-# ==> amazon-ebs.amznlnx2023-ami:   - cannot install the best update candidate for package dracut-config-ec2-3.0-4.amzn2023.0.2.noarch
-# ==> amazon-ebs.amznlnx2023-ami:   - cannot install the best update candidate for package dracut-055-6.amzn2023.0.8.x86_64
-# ==> amazon-ebs.amznlnx2023-ami:  Problem 2: problem with installed package dracut-config-ec2-3.0-4.amzn2023.0.2.noarch
-# ==> amazon-ebs.amznlnx2023-ami:   - package dracut-102-3.amzn2023.0.1.x86_64 from amazonlinux conflicts with dracut-config-ec2 < 3.1 provided by dracut-config-ec2-3.0-4.amzn2023.0.2.noarch from @System
+  # Disabled because:
+  # ==> amazon-ebs.amznlnx2023-ami:  Problem 1: package dracut-102-3.amzn2023.0.1.x86_64 from amazonlinux conflicts with dracut-config-ec2 < 3.1 provided by dracut-config-ec2-3.0-4.amzn2023.0.2.noarch from @System
+  # ==> amazon-ebs.amznlnx2023-ami:   - cannot install the best update candidate for package dracut-config-ec2-3.0-4.amzn2023.0.2.noarch
+  # ==> amazon-ebs.amznlnx2023-ami:   - cannot install the best update candidate for package dracut-055-6.amzn2023.0.8.x86_64
+  # ==> amazon-ebs.amznlnx2023-ami:  Problem 2: problem with installed package dracut-config-ec2-3.0-4.amzn2023.0.2.noarch
+  # ==> amazon-ebs.amznlnx2023-ami:   - package dracut-102-3.amzn2023.0.1.x86_64 from amazonlinux conflicts with dracut-config-ec2 < 3.1 provided by dracut-config-ec2-3.0-4.amzn2023.0.2.noarch from @System
 
   # provisioner "shell" {
   #   inline = [
@@ -1118,7 +1226,8 @@ build {
   #     "amazon-ebs.amznlnx2023-ami",
   #     "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
   #     "amazon-ebs.rocky8-ami",
-  #     "amazon-ebs.rocky8-rendernode-ami"
+  #     "amazon-ebs.rocky8-rendernode-ami",
+  #     "amazon-ebs.amznlnx2023-rendernode-ami",
   #   ]
   # }
   # provisioner "shell" {
@@ -1131,7 +1240,7 @@ build {
   #     "sudo rm -fr /etc/sysconfig/network-scripts/ifcfg-eth0", # this may need to be removed from the image. having a leftover network interface file here if the interface is not present can cause dns issues and slowdowns with sudo.
   #     "sudo sed -i 's/sudo //g' /opt/consul/bin/run-consul"    # strip sudo for when we run consul. sudo on rocky takes 25 seconds due to a bad AMI build. https://bugs.rocky.org/view.php?id=18066
   #   ]
-  #   only = ["amazon-ebs.rocky8-ami", "amazon-ebs.rocky8-rendernode-ami"]
+  #   only = ["amazon-ebs.rocky8-ami", "amazon-ebs.rocky8-rendernode-ami", "amazon-ebs.amznlnx2023-rendernode-ami"]
   # }
   # provisioner "shell" { # Generate certificates with vault.
   #   inline = [
