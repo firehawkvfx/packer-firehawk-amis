@@ -917,6 +917,21 @@ build {
     ]
   }
 
+  provisioner "shell" {
+    ### Ensure all syscontrol users can read python site-packages
+    inline = [
+      "sudo chown -R :syscontrol /usr/local/lib/python3.11/site-packages",
+      "sudo chmod -R g+rwX /usr/local/lib/python3.11/site-packages",
+      "python3.8 -c \"import requests; print('requests module is available')\"",
+      "sudo su - ${var.deadlineuser_name} -c \"python3.8 -c \"import requests; print('requests module is available to deadlineuser')\"\"",
+    ]
+    inline_shebang = "/bin/bash -e"
+    only = [
+      "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
+    ]
+  }
+
   ### Install Mongo / Deadline DB
 
   provisioner "shell" {
