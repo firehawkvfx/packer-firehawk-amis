@@ -927,10 +927,21 @@ build {
     ]
     only = ["amazon-ebs.deadline-db-ubuntu18-ami"]
   }
+
   provisioner "shell" {
     ### Install Deadline Worker Centos Dependencies. nc is also used to ensure a connection can be established with a port.
     inline = [
-      "sudo dnf install -y redhat-lsb samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap wget nc"
+      "sudo dnf install -y redhat-lsb"
+    ]
+    only = [
+      "amazon-ebs.rocky8-rendernode-ami",
+    ]
+  }
+
+  provisioner "shell" {
+    ### Install Deadline Worker Centos Dependencies. nc is also used to ensure a connection can be established with a port.
+    inline = [
+      "sudo dnf install -y samba-client samba-common cifs-utils nfs-utils tree bzip2 nmap wget nc"
     ]
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
