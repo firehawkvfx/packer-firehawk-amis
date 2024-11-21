@@ -950,56 +950,56 @@ build {
     ]
   }
 
-  provisioner "shell" { ### Install Deadline for Client Worker
-    inline = [
-      "sudo su - ${var.deadlineuser_name} -c \"mkdir -p /home/${var.deadlineuser_name}/Thinkbox/Deadline10\"",
-      "sudo su - ${var.deadlineuser_name} -c \"touch /home/${var.deadlineuser_name}/Thinkbox/Deadline10/secure.ini\"", # to fix a bug introduced by Thinkbox in 10.1.17.x
-      "sudo su - ${var.deadlineuser_name} -c \"/var/tmp/aws-thinkbox-deadline/install-deadline --verbose --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages --installers-bucket ${local.installers_bucket}\"",
-      "sudo rm -fv /tmp/Deadline-${local.deadline_version}-linux-installers.tar",
-      "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
-      "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
-      "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
-      "echo '...Wait for Submission/Client plugin from bucket'",
-      # The need to wait for this dependency is unfortunate... the deadline repository /submission scripts for the render node are not available until the repostory is installed.  Rather than break the parallel build workflow, we test for existance of the required file in the s3 bucket for a duration limit (15 mins) before failing the render node build.  The deadline DB places those files in the bucket when installing, so if this fails, it should be because the Deadline repository build failed.
-      "sudo su - ${var.deadlineuser_name} -c \"/tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip' 'Wait for file to arrive in bucket...'\"",
-      "echo '...Retrieve file...'",
-      "sudo su - ${var.deadlineuser_name} -c \"aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip /tmp/Houdini.zip\"",
-      "sudo su - ${var.deadlineuser_name} -c \"/tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip' 'Wait for file to arrive in bucket...'\"",
-      "echo '...Retrieve file...'",
-      "sudo su - ${var.deadlineuser_name} -c \"aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip /tmp/HServer.zip\"",
-      "echo '...Create /var/tmp/submission'",
-      "sudo su - ${var.deadlineuser_name} -c \"mkdir -p /var/tmp/submission\"",
-      "sudo su - ${var.deadlineuser_name} -c \"unzip /tmp/Houdini.zip -d /var/tmp/submission\"",
-      "sudo su - ${var.deadlineuser_name} -c \"unzip /tmp/HServer.zip -d /var/tmp/submission\"",
-      "sudo ls -ltriah /var/tmp/submission/Houdini/Client",
-      "sudo systemctl disable deadline10launcher", # Ensure the launcher does not start automatically on first boot.  User data must aquire the certificates first, then the service will be started and enabled for subsequent reboots.
-      "sudo systemctl stop deadline10launcher"
-    ]
-    only = [
-      "amazon-ebs.rocky8-rendernode-ami"
-      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
-    ]
-  }
+  # provisioner "shell" { ### Install Deadline for Client Worker
+  #   inline = [
+  #     "sudo su - ${var.deadlineuser_name} -c \"mkdir -p /home/${var.deadlineuser_name}/Thinkbox/Deadline10\"",
+  #     "sudo su - ${var.deadlineuser_name} -c \"touch /home/${var.deadlineuser_name}/Thinkbox/Deadline10/secure.ini\"", # to fix a bug introduced by Thinkbox in 10.1.17.x
+  #     "sudo su - ${var.deadlineuser_name} -c \"/var/tmp/aws-thinkbox-deadline/install-deadline --verbose --deadline-version ${local.deadline_version} --db-host-name ${var.db_host_name} --install-worker --skip-install-validation --skip-download-mongo --skip-install-packages --installers-bucket ${local.installers_bucket}\"",
+  #     "sudo rm -fv /tmp/Deadline-${local.deadline_version}-linux-installers.tar",
+  #     "sudo rm -fv $deadline_installer_dir/AWSPortalLink*",
+  #     "sudo rm -fv $deadline_installer_dir/DeadlineRepository*",
+  #     "sudo rm -frv /var/log/Thinkbox/Deadline10/*", # cleanup logs
+  #     "echo '...Wait for Submission/Client plugin from bucket'",
+  #     # The need to wait for this dependency is unfortunate... the deadline repository /submission scripts for the render node are not available until the repostory is installed.  Rather than break the parallel build workflow, we test for existance of the required file in the s3 bucket for a duration limit (15 mins) before failing the render node build.  The deadline DB places those files in the bucket when installing, so if this fails, it should be because the Deadline repository build failed.
+  #     "sudo su - ${var.deadlineuser_name} -c \"/tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip' 'Wait for file to arrive in bucket...'\"",
+  #     "echo '...Retrieve file...'",
+  #     "sudo su - ${var.deadlineuser_name} -c \"aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/Houdini.zip /tmp/Houdini.zip\"",
+  #     "sudo su - ${var.deadlineuser_name} -c \"/tmp/retry 'aws s3api head-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip' 'Wait for file to arrive in bucket...'\"",
+  #     "echo '...Retrieve file...'",
+  #     "sudo su - ${var.deadlineuser_name} -c \"aws s3api get-object --bucket ${local.installers_bucket} --key Deadline-${local.deadline_version}/Thinkbox/DeadlineRepository10/submission/HServer.zip /tmp/HServer.zip\"",
+  #     "echo '...Create /var/tmp/submission'",
+  #     "sudo su - ${var.deadlineuser_name} -c \"mkdir -p /var/tmp/submission\"",
+  #     "sudo su - ${var.deadlineuser_name} -c \"unzip /tmp/Houdini.zip -d /var/tmp/submission\"",
+  #     "sudo su - ${var.deadlineuser_name} -c \"unzip /tmp/HServer.zip -d /var/tmp/submission\"",
+  #     "sudo ls -ltriah /var/tmp/submission/Houdini/Client",
+  #     "sudo systemctl disable deadline10launcher", # Ensure the launcher does not start automatically on first boot.  User data must aquire the certificates first, then the service will be started and enabled for subsequent reboots.
+  #     "sudo systemctl stop deadline10launcher"
+  #   ]
+  #   only = [
+  #     "amazon-ebs.rocky8-rendernode-ami"
+  #     # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
+  #   ]
+  # }
 
-  ### Install Houdini Plugin for Deadline DB ###
-  provisioner "ansible" {
-    playbook_file = "./ansible/deadline_db_houdini_plugin.yml"
-    user          = "ubuntu"
-    extra_arguments = [
-      "-vvv",
-      "--extra-vars",
-      jsonencode(local.houdini_json_vars),
-      "--extra-vars",
-      "resourcetier=${var.resourcetier} variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost",
-      "--tags",
-      "install_houdini,install_deadline_db"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
-  }
+  # ### Install Houdini Plugin for Deadline DB ###
+  # provisioner "ansible" {
+  #   playbook_file = "./ansible/deadline_db_houdini_plugin.yml"
+  #   user          = "ubuntu"
+  #   extra_arguments = [
+  #     "-vvv",
+  #     "--extra-vars",
+  #     jsonencode(local.houdini_json_vars),
+  #     "--extra-vars",
+  #     "resourcetier=${var.resourcetier} variable_host=default variable_connect_as_user=ubuntu delegate_host=localhost",
+  #     "--tags",
+  #     "install_houdini,install_deadline_db"
+  #   ]
+  #   collections_path = "./ansible/collections"
+  #   roles_path       = "./ansible/roles"
+  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+  #   galaxy_file      = "./requirements.yml"
+  #   only             = ["amazon-ebs.deadline-db-ubuntu18-ami"]
+  # }
 
 
   ### Install FSX fsx_packages.yaml
