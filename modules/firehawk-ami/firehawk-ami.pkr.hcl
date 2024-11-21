@@ -920,10 +920,12 @@ build {
   provisioner "shell" {
     ### Ensure all syscontrol users can read python site-packages
     inline = [
-      "sudo chown -R :syscontrol /usr/lib/python3.11/site-packages",
-      "sudo chmod -R g+rwX /usr/lib/python3.11/site-packages",
-      "python3.11 -c \"import requests; print('requests module is available')\"",
-      "sudo su - ${var.deadlineuser_name} -c \"python3.11 -c \\\"import requests; print('requests module is available to deadlineuser')\\\"\""
+      "sudo chown -R :syscontrol /usr/lib/python3.11",
+      "sudo chmod -R g+rwX /usr/lib/python3.11", # consider
+      "id -nG ${var.deadlineuser_name} | grep -qw syscontrol && echo \"User is in syscontrol group\" || echo \"User is not in syscontrol group\"",
+      "echo 'check site-packages permissions'; ls -ld /usr/lib/python3.11/site-packages",
+      "python3.11 -c \"import requests; print('requests module is available to current user'); print(requests.__file__)\"",
+      "sudo su - ${var.deadlineuser_name} -c \"python3.11 -c \\\"import os; print(os.getenv('PYTHONPATH'); import requests; print('requests module is available to deadlineuser')\\\"\""
     ]
     inline_shebang = "/bin/bash -e"
     only = [
