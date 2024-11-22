@@ -810,19 +810,6 @@ build {
 
   ### End public cert block to verify other consul agents ###
 
-  provisioner "shell" {
-    inline = [
-      "sudo setenforce 0",                                                  # Temporarily disable SELinux
-      "sudo sed -i 's/^SELINUX=.*$/SELINUX=disabled/' /etc/selinux/config", # Permanently disable SELinux
-      # "sudo reboot" # Reboot the system
-    ]
-    inline_shebang = "/bin/bash -e"
-    only = [
-      "amazon-ebs.rocky8-rendernode-ami",
-      "amazon-ebs.amznlnx2023-rendernode-ami",
-    ]
-  }
-
   provisioner "ansible" { # Add user deployuser
     playbook_file = "./ansible/newuser.yaml"
     user          = "rocky"
@@ -917,17 +904,13 @@ build {
     ]
   }
 
-  provisioner "shell" {
-    ### Ensure all syscontrol users can read python site-packages
+  provisioner "shell" { # When a new user is created it needs the pip modules installed because these packages are not installed globally.  That would require sudo and is a security risk.
     inline = [
-      "sudo chown -R :syscontrol /usr/lib/python3.11",
-      "sudo chmod -R g+rwX /usr/lib/python3.11", # consider /usr/lib/python3.11/site-packages
-      "id -nG ${var.deadlineuser_name} | grep -qw syscontrol && echo \"User is in syscontrol group\" || echo \"User is not in syscontrol group\"",
-      "echo 'check site-packages permissions'; ls -ld /usr/lib/python3.11/site-packages",
-      "python3.11 -c \"import requests; print('requests module is available to current user'); print(requests.__file__)\"",
-      "sudo su - ${var.deadlineuser_name} -c \"python3.11 -c \\\"import os; print(os.getenv('PYTHONPATH')); import requests; print('requests module is available to deadlineuser')\\\"\""
+      "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user --upgrade pip\"",
+      "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install requests --user --upgrade\"", # required for houdini install script
+      "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user boto3\"",
+      "sudo su - ${var.deadlineuser_name} -c \"python3.11 -c \\\"import os; print(os.getenv('PYTHONPATH')); import requests; print('requests module is available to ${var.deadlineuser_name}')\\\"\""
     ]
-    inline_shebang = "/bin/bash -e"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
       "amazon-ebs.amznlnx2023-rendernode-ami",
