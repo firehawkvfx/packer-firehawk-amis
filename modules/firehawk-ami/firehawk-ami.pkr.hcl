@@ -906,6 +906,10 @@ build {
 
   provisioner "shell" { # When a new user is created it needs the pip modules installed because these packages are not installed globally.  That would require sudo and is a security risk.
     inline = [
+      "sudo su - ${var.deadlineuser_name} -c \"cd ~; curl -O https://bootstrap.pypa.io/get-pip.py\"", # Install pip for py3.11
+      "sudo su - ${var.deadlineuser_name} -c \"python3.11 get-pip.py\"",
+      "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip --version\"",
+      "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user --upgrade pip\"",
       "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user --upgrade pip\"",
       "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install requests --user --upgrade\"", # required for houdini install script
       "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user boto3\"",
