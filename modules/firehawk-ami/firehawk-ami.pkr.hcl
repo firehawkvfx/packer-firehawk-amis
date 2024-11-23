@@ -346,7 +346,7 @@ source "amazon-ebs" "rocky8-rendernode-ami" {
 
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
-    volume_size           = 20
+    volume_size           = 25
     volume_type           = "gp2"
     delete_on_termination = true
   }
@@ -387,7 +387,7 @@ source "amazon-ebs" "amznlnx2023-rendernode-ami" {
 
   launch_block_device_mappings {
     device_name           = "/dev/xvda"
-    volume_size           = 20
+    volume_size           = 25
     volume_type           = "gp3"
     delete_on_termination = true
   }
