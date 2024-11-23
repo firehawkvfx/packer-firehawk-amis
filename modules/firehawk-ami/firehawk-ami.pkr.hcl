@@ -1046,7 +1046,6 @@ build {
     inline = [
       # "set -x; sudo python3.11 -m pip install requests", # the installs below may be able to be removed
       "set -x; sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user requests --upgrade\"",
-      # "set -x; python3.11 -m pip install --user requests --upgrade"
     ]
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
@@ -1107,26 +1106,26 @@ build {
   # }
 
 
-  ### Install FSX fsx_packages.yaml
+  # ### Install FSX fsx_packages.yaml
 
-  provisioner "ansible" {
-    playbook_file = "./ansible/fsx_packages.yaml"
-    user          = "rocky"
-    extra_arguments = [
-      "-vv",
-      "--extra-vars",
-      "variable_user=deadlineuser resourcetier=${var.resourcetier} variable_host=default user_deadlineuser_pw='' package_python_interpreter=/usr/bin/python3.11"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only = [
-      "amazon-ebs.rocky8-rendernode-ami",
-      "amazon-ebs.amznlnx2023-rendernode-ami",
-      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
-    ]
-  }
+  # provisioner "ansible" {
+  #   playbook_file = "./ansible/fsx_packages.yaml"
+  #   user          = "rocky"
+  #   extra_arguments = [
+  #     "-vv",
+  #     "--extra-vars",
+  #     "variable_user=deadlineuser resourcetier=${var.resourcetier} variable_host=default user_deadlineuser_pw='' package_python_interpreter=/usr/bin/python3.11"
+  #   ]
+  #   collections_path = "./ansible/collections"
+  #   roles_path       = "./ansible/roles"
+  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+  #   galaxy_file      = "./requirements.yml"
+  #   only = [
+  #     "amazon-ebs.rocky8-rendernode-ami",
+  #     "amazon-ebs.amznlnx2023-rendernode-ami",
+  #     # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
+  #   ]
+  # }
 
   ### Install Houdini ### Requires you create a SESI API Key on the Side FX website to auto download.
 
