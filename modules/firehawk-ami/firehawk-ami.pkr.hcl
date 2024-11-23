@@ -648,7 +648,7 @@ build {
   # Install terraform, terragrunt, packer for Amazon Linux
   provisioner "shell" {
     inline = [
-      "sudo python3.11 -m pip install ansible boto3 botocore",                                                                                      #: Install ansible using the same method we use to install it to codebuild
+      "python3.11 -m pip install ansible boto3 botocore", #: Install ansible using the same method we use to install it to codebuild. except this used to use sudo.
       "wget https://releases.hashicorp.com/terraform/${var.terraform_version}/terraform_${var.terraform_version}_linux_amd64.zip -P /tmp/ --quiet", # Get terraform
       "sudo unzip /tmp/terraform_${var.terraform_version}_linux_amd64.zip -d /tmp/",
       "sudo mv /tmp/terraform /usr/local/bin/.",
