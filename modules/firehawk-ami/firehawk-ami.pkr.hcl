@@ -384,6 +384,7 @@ source "amazon-ebs" "amznlnx2023-rendernode-ami" {
     owners      = [var.account_id]
   }
   ssh_username = "ec2-user"
+  iam_instance_profile = var.packer_iam_profile_name # provide read and write s3 access for updating and retrieving installers
 
   launch_block_device_mappings {
     device_name           = "/dev/xvda"
