@@ -5,6 +5,7 @@ echo "Installing packages for AWS codebuild environment"
 terraform_version="1.5.6"
 terragrunt_version="0.36.0"
 packer_version="1.7.2"
+python_exe_version="python3.8"
 
 set -e
 set -x
@@ -42,6 +43,10 @@ function log_error {
     log "ERROR" "$message"
 }
 
+function has_dnf {
+    [[ -n "$(command -v dnf)" ]]
+}
+
 function has_yum {
     [[ -n "$(command -v yum)" ]]
 }
@@ -61,15 +66,24 @@ function has_apt_get {
 log_info "Installing dependencies"
 
 if has_apt_get; then
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y git jq openssl python python3.8 python3-pip
-    LC_ALL=C && sudo pip install boto3
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y git jq openssl $python_exe_version
+    # LC_ALL=C && sudo pip install boto3
+elif has_dnf; then
+    dnf install -y git jq openssl $python_exe_version
+    # LC_ALL=C && pip install boto3
 elif has_yum; then
-    yum install -y git jq openssl python python3.8 python3-pip
-    LC_ALL=C && pip install boto3
+    yum install -y git jq openssl $python_exe_version
+    # LC_ALL=C && pip install boto3
 else
     log_error "Could not find apt-get or yum. Cannot install dependencies on this OS."
     exit 1
 fi
+
+curl -O https://bootstrap.pypa.io/get-pip.py # Install pip for py3.11
+$python_exe_version get-pip.py
+$python_exe_version -m pip --version
+$python_exe_version -m pip install --upgrade pip
+$python_exe_version -m pip install boto3 botocore # consider ansible? ansible
 
 mkdir -p $SCRIPTDIR/tmp
 
@@ -78,11 +92,11 @@ mkdir -p $SCRIPTDIR/tmp
 # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 # sudo unzip awscliv2.zip
 # sudo ./aws/install
-# && python3.8 -m pip install --user typing_extensions --upgrade \
+# && $python_exe_version -m pip install --user typing_extensions --upgrade \
 
-# python3.8 -m pip install --upgrade pip &&
-#     python3.8 -m pip install --user "ansible==5.9.0" &&
-#     python3.8 -m pip install --user boto3 botocore &&
+# $python_exe_version -m pip install --upgrade pip &&
+#     $python_exe_version -m pip install --user "ansible==5.9.0" &&
+#     $python_exe_version -m pip install --user boto3 botocore &&
 #     export PATH=$PATH:/root/.local/bin &&
 #     ansible --version
 
