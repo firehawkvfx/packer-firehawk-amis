@@ -386,7 +386,7 @@ source "amazon-ebs" "amznlnx2023-rendernode-ami" {
   ssh_username = "ec2-user"
 
   launch_block_device_mappings {
-    device_name           = "/dev/sda1"
+    device_name           = "/dev/xvda"
     volume_size           = 20
     volume_type           = "gp3"
     delete_on_termination = true
