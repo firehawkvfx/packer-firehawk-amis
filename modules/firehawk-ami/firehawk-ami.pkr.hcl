@@ -632,7 +632,7 @@ build {
     ]
   }
 
-  # install python 3.8 # this might be affecting the sesi downloader
+  # install python 3.11 # this might be affecting the sesi downloader
   # provisioner "shell" {
   #   inline = [
   #     "sudo dnf install -y epel-release",

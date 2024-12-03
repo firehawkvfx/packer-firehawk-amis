@@ -9,11 +9,11 @@ env:
 phases:
   install:
     runtime-versions:
-      python: 3.8
+      python: 3.11
     commands:
       - echo "Version of Node in Docker Image"
       - node --version
-      - python3.8 --version
+      - python3.11 --version
       - git rev-parse HEAD
       - ./gitpullrecursive --init-all
       - mkdir -p "$HOME/.ssh/tls"

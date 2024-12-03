@@ -4,8 +4,8 @@ echo "Installing packages for AWS codebuild environment"
 
 terraform_version="1.5.6"
 terragrunt_version="0.36.0"
-packer_version="1.7.2"
-python_exe_version="python3.8"
+packer_version="1.11.2"
+python_exe_version="python3.11"
 
 set -e
 set -x
@@ -87,7 +87,7 @@ $python_exe_version -m pip install boto3 botocore # consider ansible? ansible
 
 mkdir -p $SCRIPTDIR/tmp
 
-#: Codebuild requires python 3.8 instead of python 3.7 used in the amis for ansible to work.
+#: Codebuild requires python 3.11 instead of python 3.7 used in the amis for ansible to work.
 
 # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 # sudo unzip awscliv2.zip
