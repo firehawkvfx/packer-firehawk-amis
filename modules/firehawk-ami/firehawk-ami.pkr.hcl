@@ -2,6 +2,7 @@
 # The firehawk-base-ami is used to build this ami.
 
 packer {
+  required_version = ">= 1.11.2"
   required_plugins {
     amazon = {
       version = ">= 1.0.8"
