@@ -603,6 +603,7 @@ build {
 
   provisioner "shell" { # Install amazon systems manager for rocky intelx86/amd64
     inline = [
+      "sudo dnf install openssh-server openssh-clients -y", # not for ssm but ssh general use.
       "sudo dnf install -y https://s3.${var.aws_region}.amazonaws.com/amazon-ssm-${var.aws_region}/latest/linux_amd64/amazon-ssm-agent.rpm",
       "sudo systemctl enable amazon-ssm-agent",
       "sudo systemctl start amazon-ssm-agent",
