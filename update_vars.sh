@@ -240,6 +240,7 @@ function export_vars {
   export TF_VAR_vault_public_key=""
   if [[ ! -f $TF_VAR_public_key_path ]]; then
     log_error "Warning: File $TF_VAR_public_key_path is not there. Ensure you have initialised a keypair with ssh-keygen.  This should occur automatically when you deploy init/"
+    ls -ltriah $HOME/.ssh
   else
     export TF_VAR_vault_public_key=$(cat $TF_VAR_public_key_path)
   fi
