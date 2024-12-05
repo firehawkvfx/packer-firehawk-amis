@@ -9,7 +9,7 @@ packer {
       source  = "github.com/hashicorp/amazon"
     }
     ansible = {
-      version = "~> 1"
+      version = "~> 1.1.2" # consider 1.1.0 - ansible host key signature changed https://github.com/hashicorp/packer-plugin-ansible/issues/69
       source = "github.com/hashicorp/ansible"
     }
   }
