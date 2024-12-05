@@ -651,6 +651,7 @@ build {
   #   ]
   # }
 
+
   # Install terraform, terragrunt, packer for Amazon Linux
   provisioner "shell" {
     inline = [
