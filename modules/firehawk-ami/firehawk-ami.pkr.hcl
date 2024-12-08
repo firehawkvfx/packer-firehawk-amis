@@ -829,7 +829,7 @@ build {
 }
 
 source "users" "newuser" {
-
+  name = "create_users"
   syscontrol_gid = local.syscontrol_gid
 
   provisioner "ansible" { # Add user deployuser
@@ -849,10 +849,7 @@ source "users" "newuser" {
 }
 
 build {
-
-  source "users" "newuser" {
-    # Setting the name field allows to rename the source only for this build section.
-    name = "deployuser_rocky"
+  source "users.newuser" {
     variable_user = "deployuser"
     variable_uid = local.deployuser_uid
     add_to_group_syscontrol = true
@@ -862,9 +859,7 @@ build {
     ]
   }
 
-  source "users" "newuser" {
-    # Setting the name field allows to rename the source only for this build section.
-    name = "deployuser_ec2user"
+  source "users.newuser" {
     variable_user = "deployuser"
     variable_uid = local.deployuser_uid
     add_to_group_syscontrol = true
@@ -874,9 +869,7 @@ build {
     ]
   }
 
-  source "users" "newuser" {
-    # Setting the name field allows to rename the source only for this build section.
-    name = "deadlineuser_rocky"
+  source "users.newuser" {
     variable_user = "deadlineuser"
     variable_uid = local.deadlineuser_uid
     add_to_group_syscontrol = false
@@ -886,9 +879,7 @@ build {
     ]
   }
 
-  source "users" "newuser" {
-    # Setting the name field allows to rename the source only for this build section.
-    name = "deadlineuser_ec2user"
+  source "users.newuser" {
     variable_user = "deadlineuser"
     variable_uid = local.deadlineuser_uid
     add_to_group_syscontrol = false
@@ -898,9 +889,7 @@ build {
     ]
   }
 
-  source "users" "newuser" {
-    # Setting the name field allows to rename the source only for this build section.
-    name = "deadlineuser_ubuntu"
+  source "users.newuser" {
     variable_user = "deadlineuser"
     variable_uid = local.deadlineuser_uid
     add_to_group_syscontrol = false
