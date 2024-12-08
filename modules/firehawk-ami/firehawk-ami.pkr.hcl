@@ -826,6 +826,11 @@ build {
   }
 
   ### End public cert block to verify other consul agents ###
+}
+
+source "users" "newuser" {
+
+  syscontrol_gid = local.syscontrol_gid
 
   provisioner "ansible" { # Add user deployuser
     playbook_file = "./ansible/newuser.yaml"
@@ -833,94 +838,80 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=rocky variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+      "variable_user=${source.variable_user} sudo=true passwordless_sudo=true add_to_group_syscontrol=${source.add_to_group_syscontrol} variable_connect_as_user=${source.variable_connect_as_user} variable_uid=${source.variable_uid} syscontrol_gid=${source.syscontrol_gid} variable_host=default delegate_host=localhost"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
     galaxy_file      = "./requirements.yml"
+    only = source.only
+  }
+}
+
+build {
+
+  source "users" "newuser" {
+    # Setting the name field allows to rename the source only for this build section.
+    name = "deployuser_rocky"
+    variable_user = "deployuser"
+    variable_uid = local.deployuser_uid
+    add_to_group_syscontrol = true
+    variable_connect_as_user = "rocky"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
     ]
   }
 
-  provisioner "ansible" { # Add user deployuser
-    playbook_file = "./ansible/newuser.yaml"
-    user          = "ec2-user"
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=ec2-user variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
+  source "users" "newuser" {
+    # Setting the name field allows to rename the source only for this build section.
+    name = "deployuser_ec2user"
+    variable_user = "deployuser"
+    variable_uid = local.deployuser_uid
+    add_to_group_syscontrol = true
+    variable_connect_as_user = "ec2-user"
     only = [
       "amazon-ebs.amznlnx2023-rendernode-ami",
     ]
   }
 
-  provisioner "ansible" {
-    playbook_file = "./ansible/newuser.yaml"
-    user          = "rocky"
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=rocky variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-      #  package_python_interpreter=/usr/bin/python3.11"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
+  source "users" "newuser" {
+    # Setting the name field allows to rename the source only for this build section.
+    name = "deadlineuser_rocky"
+    variable_user = "deadlineuser"
+    variable_uid = local.deadlineuser_uid
+    add_to_group_syscontrol = false
+    variable_connect_as_user = "rocky"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
-      # "amazon-ebs.amznlnx2023-rendernode-ami",
-      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
-  provisioner "ansible" {
-    playbook_file = "./ansible/newuser.yaml"
-    user          = "ec2-user"
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=ec2-user variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-      #  package_python_interpreter=/usr/bin/python3.11"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
+  source "users" "newuser" {
+    # Setting the name field allows to rename the source only for this build section.
+    name = "deadlineuser_ec2user"
+    variable_user = "deadlineuser"
+    variable_uid = local.deadlineuser_uid
+    add_to_group_syscontrol = false
+    variable_connect_as_user = "ec2-user"
     only = [
-      # "amazon-ebs.rocky8-rendernode-ami",
       "amazon-ebs.amznlnx2023-rendernode-ami",
-      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
     ]
   }
 
-  # "sudo su - ${var.deadlineuser_name} -c \"mkdir -p /home/${var.deadlineuser_name}/Thinkbox/Deadline10\"",
-
-  provisioner "ansible" {
-    playbook_file = "./ansible/newuser.yaml"
-    user          = "ubuntu"
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=ubuntu variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-      #  package_python_interpreter=/usr/bin/python3.11"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
+  source "users" "newuser" {
+    # Setting the name field allows to rename the source only for this build section.
+    name = "deadlineuser_ubuntu"
+    variable_user = "deadlineuser"
+    variable_uid = local.deadlineuser_uid
+    add_to_group_syscontrol = false
+    variable_connect_as_user = "ubuntu"
     only = [
-      "amazon-ebs.deadline-db-ubuntu18-ami"
+      "amazon-ebs.deadline-db-ubuntu18-ami",
     ]
   }
+}
 
+build {
   provisioner "shell" { # When a new user is created it needs the pip modules installed because these packages are not installed globally.  That would require sudo and is a security risk.
     inline = [
       "sudo su - ${var.deadlineuser_name} -c \"cd ~; curl -O https://bootstrap.pypa.io/get-pip.py\"", # Install pip for py3.11
