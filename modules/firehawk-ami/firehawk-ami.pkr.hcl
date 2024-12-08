@@ -828,7 +828,7 @@ build {
   ### End public cert block to verify other consul agents ###
 }
 
-source "users" "newuser" {
+source "null" "newuser" {
   name = "create_users"
   syscontrol_gid = local.syscontrol_gid
 
@@ -849,7 +849,7 @@ source "users" "newuser" {
 }
 
 build {
-  source "users.newuser" {
+  source "source.null.newuser" {
     variable_user = "deployuser"
     variable_uid = local.deployuser_uid
     add_to_group_syscontrol = true
@@ -859,7 +859,7 @@ build {
     ]
   }
 
-  source "users.newuser" {
+  source "source.null.newuser" {
     variable_user = "deployuser"
     variable_uid = local.deployuser_uid
     add_to_group_syscontrol = true
@@ -869,7 +869,7 @@ build {
     ]
   }
 
-  source "users.newuser" {
+  source "source.null.newuser" {
     variable_user = "deadlineuser"
     variable_uid = local.deadlineuser_uid
     add_to_group_syscontrol = false
@@ -879,7 +879,7 @@ build {
     ]
   }
 
-  source "users.newuser" {
+  source "source.null.newuser" {
     variable_user = "deadlineuser"
     variable_uid = local.deadlineuser_uid
     add_to_group_syscontrol = false
@@ -889,7 +889,7 @@ build {
     ]
   }
 
-  source "users.newuser" {
+  source "source.null.newuser" {
     variable_user = "deadlineuser"
     variable_uid = local.deadlineuser_uid
     add_to_group_syscontrol = false
