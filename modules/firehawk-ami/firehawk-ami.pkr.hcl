@@ -518,13 +518,22 @@ build {
     "source.amazon-ebs.amznlnx2023-ami",
     "source.amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
     "source.amazon-ebs.rocky8-ami",
-    "source.amazon-ebs.rocky8-rendernode-ami",
-    "source.amazon-ebs.amznlnx2023-rendernode-ami",
+    # "source.amazon-ebs.rocky8-rendernode-ami",
+    # "source.amazon-ebs.amznlnx2023-rendernode-ami",
     "source.amazon-ebs.ubuntu18-ami",
     "source.amazon-ebs.ubuntu18-vault-consul-server-ami",
-    "source.amazon-ebs.deadline-db-ubuntu18-ami",
+    # "source.amazon-ebs.deadline-db-ubuntu18-ami",
     "source.amazon-ebs.openvpn-server-ami"
   ]
+  source "amazon-ebs.rocky8-rendernode-ami" {
+    connect_as_user = "rocky"
+  }
+  source "amazon-ebs.amznlnx2023-rendernode-ami" {
+    connect_as_user = "ec2-user"
+  }
+  source "amazon-ebs.deadline-db-ubuntu18-ami" {
+    connect_as_user = "ubuntu"
+  }
 
   ### Open VPN - Wait for updates to finish and change daily update timer ###
 
@@ -840,11 +849,11 @@ build {
 
   provisioner "ansible" { # Add user deployuser
     playbook_file = "./ansible/newuser.yaml"
-    user          = "${source.ssh_username}"
+    user          = "${source.connect_as_user}"
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=${source.ssh_username} variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=${source.connect_as_user} variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
@@ -870,11 +879,11 @@ build {
 
   provisioner "ansible" { # Add user deadlineuser
     playbook_file = "./ansible/newuser.yaml"
-    user          = "${source.ssh_username}"
+    user          = "${source.connect_as_user}"
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=${source.ssh_username} variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=${source.connect_as_user} variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
