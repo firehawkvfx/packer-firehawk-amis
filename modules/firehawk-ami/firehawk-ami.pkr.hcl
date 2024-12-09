@@ -514,17 +514,17 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
 }
 
 build {
-  sources = [
-    "source.amazon-ebs.amznlnx2023-ami",
-    "source.amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
-    "source.amazon-ebs.rocky8-ami",
-    # "source.amazon-ebs.rocky8-rendernode-ami",
-    # "source.amazon-ebs.amznlnx2023-rendernode-ami",
-    "source.amazon-ebs.ubuntu18-ami",
-    "source.amazon-ebs.ubuntu18-vault-consul-server-ami",
-    # "source.amazon-ebs.deadline-db-ubuntu18-ami",
-    "source.amazon-ebs.openvpn-server-ami"
-  ]
+  # sources = [
+  #   "source.amazon-ebs.amznlnx2023-ami",
+  #   "source.amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
+  #   "source.amazon-ebs.rocky8-ami",
+  #   # "source.amazon-ebs.rocky8-rendernode-ami",
+  #   # "source.amazon-ebs.amznlnx2023-rendernode-ami",
+  #   "source.amazon-ebs.ubuntu18-ami",
+  #   "source.amazon-ebs.ubuntu18-vault-consul-server-ami",
+  #   # "source.amazon-ebs.deadline-db-ubuntu18-ami",
+  #   "source.amazon-ebs.openvpn-server-ami"
+  # ]
   source "amazon-ebs.rocky8-ami" {
     ssh_username = "rocky"
   }
