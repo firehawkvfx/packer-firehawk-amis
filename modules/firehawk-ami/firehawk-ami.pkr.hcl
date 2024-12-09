@@ -530,7 +530,7 @@ source "null" "newuser" {
     roles_path       = "./ansible/roles"
     ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
     galaxy_file      = "./requirements.yml"
-    only = source.only
+    # only = source.only
   }
 }
 
@@ -852,7 +852,7 @@ build {
     variable_user = "deployuser"
     variable_uid = local.deployuser_uid
     add_to_group_syscontrol = true
-    # only = [
+    # only = [ # TODO dont do this, we need to enable it only for some images
     #   "amazon-ebs.rocky8-rendernode-ami",
     #   "amazon-ebs.amznlnx2023-rendernode-ami",
     #   "amazon-ebs.deadline-db-ubuntu18-ami",
