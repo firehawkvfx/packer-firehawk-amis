@@ -513,6 +513,27 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
   # }
 }
 
+source "null" "newuser" {
+  name = "create_users"
+  syscontrol_gid = local.syscontrol_gid
+  variable_connect_as_user = source.ssh_username
+
+  provisioner "ansible" { # Add user deployuser
+    playbook_file = "./ansible/newuser.yaml"
+    user          = "rocky"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "variable_user=${source.variable_user} sudo=true passwordless_sudo=true add_to_group_syscontrol=${source.add_to_group_syscontrol} variable_connect_as_user=${source.variable_connect_as_user} variable_uid=${source.variable_uid} syscontrol_gid=${source.syscontrol_gid} variable_host=default delegate_host=localhost"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only = source.only
+  }
+}
+
 build {
   sources = [
     "source.amazon-ebs.amznlnx2023-ami",
@@ -826,41 +847,6 @@ build {
   }
 
   ### End public cert block to verify other consul agents ###
-}
-
-source "null" "newuser" {
-  name = "create_users"
-  syscontrol_gid = local.syscontrol_gid
-  variable_connect_as_user = source.ssh_username
-
-  provisioner "ansible" { # Add user deployuser
-    playbook_file = "./ansible/newuser.yaml"
-    user          = "rocky"
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_user=${source.variable_user} sudo=true passwordless_sudo=true add_to_group_syscontrol=${source.add_to_group_syscontrol} variable_connect_as_user=${source.variable_connect_as_user} variable_uid=${source.variable_uid} syscontrol_gid=${source.syscontrol_gid} variable_host=default delegate_host=localhost"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only = source.only
-  }
-}
-
-build {
-  sources = [
-    "source.amazon-ebs.amznlnx2023-ami",
-    "source.amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
-    "source.amazon-ebs.rocky8-ami",
-    "source.amazon-ebs.rocky8-rendernode-ami",
-    "source.amazon-ebs.amznlnx2023-rendernode-ami",
-    "source.amazon-ebs.ubuntu18-ami",
-    "source.amazon-ebs.ubuntu18-vault-consul-server-ami",
-    "source.amazon-ebs.deadline-db-ubuntu18-ami",
-    "source.amazon-ebs.openvpn-server-ami"
-  ]
 
   source "source.null.newuser" {
     variable_user = "deployuser"
@@ -883,21 +869,7 @@ build {
       "amazon-ebs.deadline-db-ubuntu18-ami",
     ]
   }
-}
 
-build {
-  sources = [
-    "source.amazon-ebs.amznlnx2023-ami",
-    "source.amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
-    "source.amazon-ebs.rocky8-ami",
-    "source.amazon-ebs.rocky8-rendernode-ami",
-    "source.amazon-ebs.amznlnx2023-rendernode-ami",
-    "source.amazon-ebs.ubuntu18-ami",
-    "source.amazon-ebs.ubuntu18-vault-consul-server-ami",
-    "source.amazon-ebs.deadline-db-ubuntu18-ami",
-    "source.amazon-ebs.openvpn-server-ami"
-  ]
-  name = "general provisioning"
   provisioner "shell" { # When a new user is created it needs the pip modules installed because these packages are not installed globally.  That would require sudo and is a security risk.
     inline = [
       "sudo su - ${var.deadlineuser_name} -c \"cd ~; curl -O https://bootstrap.pypa.io/get-pip.py\"", # Install pip for py3.11
