@@ -831,6 +831,7 @@ build {
 source "null" "newuser" {
   name = "create_users"
   syscontrol_gid = local.syscontrol_gid
+  variable_connect_as_user = source.ssh_username
 
   provisioner "ansible" { # Add user deployuser
     playbook_file = "./ansible/newuser.yaml"
@@ -853,19 +854,10 @@ build {
     variable_user = "deployuser"
     variable_uid = local.deployuser_uid
     add_to_group_syscontrol = true
-    variable_connect_as_user = "rocky"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
-    ]
-  }
-
-  source "source.null.newuser" {
-    variable_user = "deployuser"
-    variable_uid = local.deployuser_uid
-    add_to_group_syscontrol = true
-    variable_connect_as_user = "ec2-user"
-    only = [
       "amazon-ebs.amznlnx2023-rendernode-ami",
+      "amazon-ebs.deadline-db-ubuntu18-ami",
     ]
   }
 
@@ -873,28 +865,9 @@ build {
     variable_user = "deadlineuser"
     variable_uid = local.deadlineuser_uid
     add_to_group_syscontrol = false
-    variable_connect_as_user = "rocky"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
-    ]
-  }
-
-  source "source.null.newuser" {
-    variable_user = "deadlineuser"
-    variable_uid = local.deadlineuser_uid
-    add_to_group_syscontrol = false
-    variable_connect_as_user = "ec2-user"
-    only = [
       "amazon-ebs.amznlnx2023-rendernode-ami",
-    ]
-  }
-
-  source "source.null.newuser" {
-    variable_user = "deadlineuser"
-    variable_uid = local.deadlineuser_uid
-    add_to_group_syscontrol = false
-    variable_connect_as_user = "ubuntu"
-    only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
     ]
   }
