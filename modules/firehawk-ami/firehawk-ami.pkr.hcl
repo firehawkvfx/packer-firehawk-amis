@@ -852,22 +852,22 @@ build {
     variable_user = "deployuser"
     variable_uid = local.deployuser_uid
     add_to_group_syscontrol = true
-    only = [
-      "amazon-ebs.rocky8-rendernode-ami",
-      "amazon-ebs.amznlnx2023-rendernode-ami",
-      "amazon-ebs.deadline-db-ubuntu18-ami",
-    ]
+    # only = [
+    #   "amazon-ebs.rocky8-rendernode-ami",
+    #   "amazon-ebs.amznlnx2023-rendernode-ami",
+    #   "amazon-ebs.deadline-db-ubuntu18-ami",
+    # ]
   }
 
   source "source.null.newuser" {
     variable_user = "deadlineuser"
     variable_uid = local.deadlineuser_uid
     add_to_group_syscontrol = false
-    only = [
-      "amazon-ebs.rocky8-rendernode-ami",
-      "amazon-ebs.amznlnx2023-rendernode-ami",
-      "amazon-ebs.deadline-db-ubuntu18-ami",
-    ]
+    # only = [
+    #   "amazon-ebs.rocky8-rendernode-ami",
+    #   "amazon-ebs.amznlnx2023-rendernode-ami",
+    #   "amazon-ebs.deadline-db-ubuntu18-ami",
+    # ]
   }
 
   provisioner "shell" { # When a new user is created it needs the pip modules installed because these packages are not installed globally.  That would require sudo and is a security risk.
