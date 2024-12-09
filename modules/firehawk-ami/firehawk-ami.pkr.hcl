@@ -901,6 +901,18 @@ build {
 }
 
 build {
+  sources = [
+    "source.amazon-ebs.amznlnx2023-ami",
+    "source.amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
+    "source.amazon-ebs.rocky8-ami",
+    "source.amazon-ebs.rocky8-rendernode-ami",
+    "source.amazon-ebs.amznlnx2023-rendernode-ami",
+    "source.amazon-ebs.ubuntu18-ami",
+    "source.amazon-ebs.ubuntu18-vault-consul-server-ami",
+    "source.amazon-ebs.deadline-db-ubuntu18-ami",
+    "source.amazon-ebs.openvpn-server-ami"
+  ]
+  name = "general provisioning"
   provisioner "shell" { # When a new user is created it needs the pip modules installed because these packages are not installed globally.  That would require sudo and is a security risk.
     inline = [
       "sudo su - ${var.deadlineuser_name} -c \"cd ~; curl -O https://bootstrap.pypa.io/get-pip.py\"", # Install pip for py3.11
