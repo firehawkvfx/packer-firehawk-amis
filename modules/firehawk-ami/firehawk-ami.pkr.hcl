@@ -513,36 +513,19 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
   # }
 }
 
+
 build {
-  # sources = [
-  #   "source.amazon-ebs.amznlnx2023-ami",
-  #   "source.amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
-  #   "source.amazon-ebs.rocky8-ami",
-  #   # "source.amazon-ebs.rocky8-rendernode-ami",
-  #   # "source.amazon-ebs.amznlnx2023-rendernode-ami",
-  #   "source.amazon-ebs.ubuntu18-ami",
-  #   "source.amazon-ebs.ubuntu18-vault-consul-server-ami",
-  #   # "source.amazon-ebs.deadline-db-ubuntu18-ami",
-  #   "source.amazon-ebs.openvpn-server-ami"
-  # ]
-  source "amazon-ebs.rocky8-ami" {
-    connection_user = "rocky"
-  }
-  source "amazon-ebs.rocky8-rendernode-ami" {
-    connection_user = "rocky"
-  }
-  source "amazon-ebs.amznlnx2023-ami" {
-    connection_user = "ec2-user"
-  }
-  source "amazon-ebs.amznlnx2023-rendernode-ami" {
-    connection_user = "ec2-user"
-  }
-  source "amazon-ebs.ubuntu18-ami" {
-    connection_user = "ubuntu"
-  }
-  source "amazon-ebs.deadline-db-ubuntu18-ami" {
-    connection_user = "ubuntu"
-  }
+  sources = [
+    "source.amazon-ebs.amznlnx2023-ami",
+    "source.amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
+    "source.amazon-ebs.rocky8-ami",
+    "source.amazon-ebs.rocky8-rendernode-ami",
+    "source.amazon-ebs.amznlnx2023-rendernode-ami",
+    "source.amazon-ebs.ubuntu18-ami",
+    "source.amazon-ebs.ubuntu18-vault-consul-server-ami",
+    "source.amazon-ebs.deadline-db-ubuntu18-ami",
+    "source.amazon-ebs.openvpn-server-ami"
+  ]
 
   ### Open VPN - Wait for updates to finish and change daily update timer ###
 
@@ -858,11 +841,11 @@ build {
 
   provisioner "ansible" { # Add user deployuser
     playbook_file = "./ansible/newuser.yaml"
-    user          = "${source.connection_user}"
+    # user          = "${source.connection_user}"
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=${source.connection_user} variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user={{ansible_user}} variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
