@@ -1,11 +1,12 @@
 ---
 
 - hosts: "{{ variable_host | default('ansible_control') }}"
-  remote_user: "{{ variable_connect_as_user | default('deployuser') }}"
+  # remote_user: "{{ variable_connect_as_user | default('deployuser') }}"
   gather_facts: "{{ variable_gather_facts | default('false') }}"
   become: true
 
   vars:
+    variable_connect_as_user: "{{ ansible_user }}"
     variable_user: # The username to ensure exist
     variable_uid: 9001
     variable_user_gid: "{{ variable_uid }}"
@@ -45,13 +46,14 @@
 # we need to ensure the new user can login
 
 - hosts: "{{ variable_host | default('ansible_control') }}" # check login is possible as user
-  remote_user: "{{ variable_connect_as_user | default('deployuser') }}"
+  # remote_user: "{{ variable_connect_as_user | default('deployuser') }}"
   gather_facts: false
   become: false
 
   vars:
     variable_user:
     sudo: true
+    variable_connect_as_user: "{{ ansible_user }}"
 
   pre_tasks:
   - fail:
@@ -66,11 +68,12 @@
     become_user: "{{ variable_user }}"
 
 - hosts: "{{ variable_host | default('ansible_control') }}" # check login is possible as user with sudo if enabled
-  remote_user: "{{ variable_connect_as_user | default('deployuser') }}"
+  # remote_user: "{{ variable_connect_as_user | default('deployuser') }}"
   gather_facts: true
   become: true
 
   vars:
+    variable_connect_as_user: "{{ ansible_user }}"
     my_password: # If no password is defined it will not be set.
     ansible_become_pass: "{{ my_password }}"
     ansible_password: "{{ my_password }}"

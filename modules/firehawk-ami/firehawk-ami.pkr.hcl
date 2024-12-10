@@ -845,7 +845,7 @@ build {
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user={{ansible_user}} variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
@@ -871,11 +871,11 @@ build {
 
   provisioner "ansible" { # Add user deadlineuser
     playbook_file = "./ansible/newuser.yaml"
-    user          = "${source.connection_user}"
+    # user          = "${source.connection_user}"
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=${source.connection_user} variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
