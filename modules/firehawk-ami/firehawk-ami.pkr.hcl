@@ -841,7 +841,7 @@ build {
 
   provisioner "ansible" { # Add user deployuser
     playbook_file = "./ansible/newuser.yaml"
-    # user          = "${source.connection_user}"
+    user          = "{{user `ssh_username`}}"
     extra_arguments = [
       "-v",
       "--extra-vars",
@@ -871,7 +871,7 @@ build {
 
   provisioner "ansible" { # Add user deadlineuser
     playbook_file = "./ansible/newuser.yaml"
-    # user          = "${source.connection_user}"
+    user          = "{{user `ssh_username`}}"
     extra_arguments = [
       "-v",
       "--extra-vars",
