@@ -23,7 +23,6 @@
     system: no # Defaults to no
     createhome: yes # Defaults to yes
   when: result.stat.exists == false
-  become: true
 
 - name: "Set login user password - {{ variable_user }}"
   user:

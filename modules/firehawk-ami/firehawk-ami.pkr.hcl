@@ -841,7 +841,7 @@ build {
 
   provisioner "ansible" { # Add user deployuser
     playbook_file = "./ansible/newuser.yaml"
-    # user          = "{{user `ssh_username`}}"
+    user          = "rocky"
     extra_arguments = [
       "-v",
       "--extra-vars",
@@ -853,25 +853,44 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
+    ]
+  }
+  provisioner "ansible" { # Add user deployuser
+    playbook_file = "./ansible/newuser.yaml"
+    user          = "ec2-user"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only = [
       "amazon-ebs.amznlnx2023-rendernode-ami",
+    ]
+  }
+  provisioner "ansible" { # Add user deployuser
+    playbook_file = "./ansible/newuser.yaml"
+    user          = "ubuntu"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
     ]
   }
 
-  # source "source.null.newuser" {
-  #   variable_user = "deadlineuser"
-  #   variable_uid = local.deadlineuser_uid
-  #   add_to_group_syscontrol = false
-  #   # only = [
-  #   #   "amazon-ebs.rocky8-rendernode-ami",
-  #   #   "amazon-ebs.amznlnx2023-rendernode-ami",
-  #   #   "amazon-ebs.deadline-db-ubuntu18-ami",
-  #   # ]
-  # }
-
   provisioner "ansible" { # Add user deadlineuser
     playbook_file = "./ansible/newuser.yaml"
-    # user          = "{{user `ssh_username`}}"
+    user          = "rocky"
     extra_arguments = [
       "-v",
       "--extra-vars",
@@ -883,7 +902,37 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
+    ]
+  }
+  provisioner "ansible" { # Add user deadlineuser
+    playbook_file = "./ansible/newuser.yaml"
+    user          = "ec2-user"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only = [
       "amazon-ebs.amznlnx2023-rendernode-ami",
+    ]
+  }
+  provisioner "ansible" { # Add user deadlineuser
+    playbook_file = "./ansible/newuser.yaml"
+    user          = "ubuntu"
+    extra_arguments = [
+      "-v",
+      "--extra-vars",
+      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+    ]
+    collections_path = "./ansible/collections"
+    roles_path       = "./ansible/roles"
+    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+    galaxy_file      = "./requirements.yml"
+    only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
     ]
   }
