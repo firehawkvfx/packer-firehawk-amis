@@ -242,7 +242,7 @@ source "amazon-ebs" "amznlnx2023-ami" {
     most_recent = true
     owners      = [var.account_id]
   }
-  # ssh_username = "ec2-user"
+  ssh_username = "ec2-user"
 }
 
 source "amazon-ebs" "amznlnx2023-nicedcv-nvidia-ami" {
@@ -316,7 +316,7 @@ source "amazon-ebs" "rocky8-ami" {
     most_recent = true
     owners      = [var.account_id]
   }
-  # ssh_username = "rocky"
+  ssh_username = "rocky"
 }
 
 source "amazon-ebs" "rocky8-rendernode-ami" {
@@ -345,7 +345,7 @@ source "amazon-ebs" "rocky8-rendernode-ami" {
     most_recent = true
     owners      = [var.account_id]
   }
-  # ssh_username = "rocky"
+  ssh_username = "rocky"
 
   iam_instance_profile = var.packer_iam_profile_name # provide read and write s3 access for updating and retrieving installers
 
@@ -388,7 +388,7 @@ source "amazon-ebs" "amznlnx2023-rendernode-ami" {
     most_recent = true
     owners      = [var.account_id]
   }
-  # ssh_username = "ec2-user"
+  ssh_username = "ec2-user"
   iam_instance_profile = var.packer_iam_profile_name # provide read and write s3 access for updating and retrieving installers
 
   launch_block_device_mappings {
@@ -423,7 +423,7 @@ source "amazon-ebs" "ubuntu18-ami" {
     most_recent = true
     owners      = [var.account_id]
   }
-  # ssh_username = "ubuntu"
+  ssh_username = "ubuntu"
 }
 
 source "amazon-ebs" "ubuntu18-vault-consul-server-ami" {
@@ -488,7 +488,7 @@ source "amazon-ebs" "deadline-db-ubuntu18-ami" {
     most_recent = true
     owners      = [var.account_id]
   }
-  # ssh_username = "ubuntu"
+  ssh_username = "ubuntu"
 
   iam_instance_profile = var.packer_iam_profile_name
 
@@ -526,22 +526,22 @@ build {
   #   "source.amazon-ebs.openvpn-server-ami"
   # ]
   source "amazon-ebs.rocky8-ami" {
-    ssh_username = "rocky"
+    connection_user = "rocky"
   }
   source "amazon-ebs.rocky8-rendernode-ami" {
-    ssh_username = "rocky"
+    connection_user = "rocky"
   }
   source "amazon-ebs.amznlnx2023-ami" {
-    ssh_username = "ec2-user"
+    connection_user = "ec2-user"
   }
   source "amazon-ebs.amznlnx2023-rendernode-ami" {
-    ssh_username = "ec2-user"
+    connection_user = "ec2-user"
   }
   source "amazon-ebs.ubuntu18-ami" {
-    ssh_username = "ubuntu"
+    connection_user = "ubuntu"
   }
   source "amazon-ebs.deadline-db-ubuntu18-ami" {
-    ssh_username = "ubuntu"
+    connection_user = "ubuntu"
   }
 
   ### Open VPN - Wait for updates to finish and change daily update timer ###
@@ -858,11 +858,11 @@ build {
 
   provisioner "ansible" { # Add user deployuser
     playbook_file = "./ansible/newuser.yaml"
-    user          = "${source.ssh_username}"
+    user          = "${source.connection_user}"
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=${source.ssh_username} variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_connect_as_user=${source.connection_user} variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
@@ -888,11 +888,11 @@ build {
 
   provisioner "ansible" { # Add user deadlineuser
     playbook_file = "./ansible/newuser.yaml"
-    user          = "${source.ssh_username}"
+    user          = "${source.connection_user}"
     extra_arguments = [
       "-v",
       "--extra-vars",
-      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=${source.ssh_username} variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_connect_as_user=${source.connection_user} variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
     ]
     collections_path = "./ansible/collections"
     roles_path       = "./ansible/roles"
