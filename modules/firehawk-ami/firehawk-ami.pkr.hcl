@@ -823,6 +823,21 @@ build {
     ]
   }
 
+  # Configure groups per docs.
+  provisioner "shell" {
+    inline = [
+      "sudo groupadd jobgroup",
+      "sudo usermod -a -G jobgroup deployuser", # add deadline user and deployuser to job group
+      "sudo usermod -a -G jobgroup deadlineuser",
+      "sudo usermod -a -G deadlineuser deployuser" # add deployuser to deadlineuser group.  Very important to not get this backwards.
+    ]
+    only = [
+      "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
+      "amazon-ebs.deadline-db-ubuntu18-ami",
+    ]
+  }
+
 
 
   provisioner "shell" { # When a new user is created it needs the pip modules installed because these packages are not installed globally.  That would require sudo and is a security risk.
