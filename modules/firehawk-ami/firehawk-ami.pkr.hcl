@@ -844,9 +844,68 @@ build {
   #   # ]
   # }
 
+  # provisioner "ansible" { # Add user deployuser
+  #   playbook_file = "./ansible/newuser.yaml"
+  #   user          = "rocky"
+  #   extra_arguments = [
+  #     "-v",
+  #     "--extra-vars",
+  #     "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+  #   ]
+  #   collections_path = "./ansible/collections"
+  #   roles_path       = "./ansible/roles"
+  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+  #   galaxy_file      = "./requirements.yml"
+  #   only = [
+  #     "amazon-ebs.rocky8-rendernode-ami",
+  #   ]
+  # }
+  # provisioner "ansible" { # Add user deployuser
+  #   playbook_file = "./ansible/newuser.yaml"
+  #   user          = "ec2-user"
+  #   extra_arguments = [
+  #     "-v",
+  #     "--extra-vars",
+  #     "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+  #   ]
+  #   collections_path = "./ansible/collections"
+  #   roles_path       = "./ansible/roles"
+  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+  #   galaxy_file      = "./requirements.yml"
+  #   only = [
+  #     "amazon-ebs.amznlnx2023-rendernode-ami",
+  #   ]
+  # }
+  # provisioner "ansible" { # Add user deployuser
+  #   playbook_file = "./ansible/newuser.yaml"
+  #   user          = "ubuntu"
+  #   extra_arguments = [
+  #     "-v",
+  #     "--extra-vars",
+  #     "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
+  #   ]
+  #   collections_path = "./ansible/collections"
+  #   roles_path       = "./ansible/roles"
+  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
+  #   galaxy_file      = "./requirements.yml"
+  #   only = [
+  #     "amazon-ebs.deadline-db-ubuntu18-ami",
+  #   ]
+  # }
+
+  provisioner "shell" {
+    inline = [
+      "echo 'Current source name: ${source.name}'"
+    ]
+    only = [
+      "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
+      "amazon-ebs.deadline-db-ubuntu18-ami",
+    ]
+  }
   provisioner "ansible" { # Add user deployuser
     playbook_file = "./ansible/newuser.yaml"
-    user          = "rocky"
+    user          = "${local.instance_users[source.name]}"
     extra_arguments = [
       "-v",
       "--extra-vars",
@@ -858,37 +917,7 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
-    ]
-  }
-  provisioner "ansible" { # Add user deployuser
-    playbook_file = "./ansible/newuser.yaml"
-    user          = "ec2-user"
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only = [
       "amazon-ebs.amznlnx2023-rendernode-ami",
-    ]
-  }
-  provisioner "ansible" { # Add user deployuser
-    playbook_file = "./ansible/newuser.yaml"
-    user          = "ubuntu"
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
     ]
   }
@@ -911,6 +940,8 @@ build {
       "amazon-ebs.deadline-db-ubuntu18-ami",
     ]
   }
+
+
 
   provisioner "shell" { # When a new user is created it needs the pip modules installed because these packages are not installed globally.  That would require sudo and is a security risk.
     inline = [
