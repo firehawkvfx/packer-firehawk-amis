@@ -185,7 +185,12 @@ locals {
   # ]
   instance_users = {
     "rocky8-rendernode-ami": "rocky",
+    "amznlnx2023-ami": "ec2-user",
+    "rocky8-ami": "rocky",
+    "ubuntu18-ami": "ubuntu",
     "amznlnx2023-rendernode-ami": "ec2-user",
+    "ubuntu18-vault-consul-server-ami": "ubuntu",
+    "amznlnx2023-nicedcv-nvidia-ami": "ec2-user",
     "deadline-db-ubuntu18-ami": "ubuntu"
   }
 }
