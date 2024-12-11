@@ -190,39 +190,6 @@ locals {
   }
 }
 
-source "amazon-ebs" "openvpn-server-ami" {
-  tags = merge(
-    { "packer_source" : "amazon-ebs.openvpn-server-ami" },
-    { "ami_role" : "firehawk_openvpn_server_ami" },
-    { "Name" : "firehawk_openvpn_server_ami" },
-    local.common_ami_tags
-  )
-  ami_description = "An Open VPN Access Server AMI configured for Firehawk"
-  ami_name        = "firehawk-openvpn-server-${local.timestamp}-{{uuid}}"
-  instance_type   = "t2.small"
-  region          = var.aws_region
-  # source_ami      = "${var.openvpn_server_base_ami}"
-  source_ami_filter {
-    filters = {
-      "tag:ami_role" : "openvpn_server_base_ami",
-      "tag:packer_template" : "firehawk-base-ami",
-      "tag:commit_hash" : var.ingress_commit_hash,
-      "tag:commit_hash_short" : var.ingress_commit_hash_short,
-      "tag:resourcetier" : var.resourcetier,
-    }
-    most_recent = true
-    owners      = [var.account_id]
-  }
-  # We generate a random pass for the image build.  It will never need to be reused.  When the ami is started, the password is reset to a vault provided value.
-  user_data    = <<EOF
-#! /bin/bash
-admin_user=openvpnas
-admin_pw="$(openssl rand -base64 12)"
-EOF
-  ssh_username = "openvpnas"
-
-}
-
 source "amazon-ebs" "amznlnx2023-ami" {
   tags = merge(
     { "packer_source" : "amazon-ebs.amznlnx2023-ami" },
@@ -529,7 +496,6 @@ build {
     "source.amazon-ebs.ubuntu18-ami",
     "source.amazon-ebs.ubuntu18-vault-consul-server-ami",
     "source.amazon-ebs.deadline-db-ubuntu18-ami",
-    "source.amazon-ebs.openvpn-server-ami"
   ]
 
   ### Open VPN - Wait for updates to finish and change daily update timer ###
@@ -547,7 +513,7 @@ build {
     ]
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline_shebang   = "/bin/bash -e"
-    only             = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami", "amazon-ebs.ubuntu18-vault-consul-server-ami"]
+    only             = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.ubuntu18-vault-consul-server-ami"]
   }
 
   provisioner "file" { # fix apt upgrades to not hold up boot
@@ -567,7 +533,7 @@ build {
       "sudo systemctl --all list-timers apt-daily{,-upgrade}.timer"
     ]
     inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
   ### Public cert block to verify other consul agents ###
@@ -588,7 +554,7 @@ build {
       "sudo systemd-run --property='After=apt-daily.service apt-daily-upgrade.service' --wait /bin/true; echo \"exit $?\""
     ]
     inline_shebang = "/bin/bash -e"
-    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+    only           = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
   }
 
   # TODO remove tofu
@@ -697,7 +663,6 @@ build {
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
       "amazon-ebs.ubuntu18-ami",
       "amazon-ebs.deadline-db-ubuntu18-ami",
-      "amazon-ebs.openvpn-server-ami",
       "ubuntu18-vault-consul-server-ami"
     ]
   }
@@ -752,7 +717,6 @@ build {
   #     "amazon-ebs.amznlnx2023-rendernode-ami",
   #     "amazon-ebs.ubuntu18-ami",
   #     "amazon-ebs.deadline-db-ubuntu18-ami",
-  #     "amazon-ebs.openvpn-server-ami"
   #   ]
   # }
   # ### Only Vault and Consul servers should have the private keys.
@@ -1173,7 +1137,7 @@ build {
   #     "set -x; sudo cat /etc/systemd/resolved.conf",
   #     "set -x; sudo cat /etc/resolv.conf",
   #   ]
-  #   only = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami", "amazon-ebs.openvpn-server-ami"]
+  #   only = ["amazon-ebs.ubuntu18-ami", "amazon-ebs.deadline-db-ubuntu18-ami"]
   # }
   # # The servers dont require the same config for DNS to function
 
@@ -1219,35 +1183,6 @@ build {
   #   ]
   #   inline_shebang = "/bin/bash -e"
   # }
-  provisioner "shell" {
-    expect_disconnect = true
-    inline            = ["set -x; sudo reboot; sleep 60"]
-    environment_vars  = ["DEBIAN_FRONTEND=noninteractive"]
-    inline_shebang    = "/bin/bash -e"
-    only              = ["amazon-ebs.openvpn-server-ami"]
-  }
-  provisioner "shell" {
-    expect_disconnect = true
-    inline            = ["set -x; sleep 120"]
-    only              = ["amazon-ebs.openvpn-server-ami"]
-  }
-
-  provisioner "ansible" {
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "ansible_distribution=Ubuntu ansible_python_interpreter=/usr/bin/python package_python_interpreter=/usr/bin/python variable_host=default variable_connect_as_user=openvpnas variable_user=openvpnas variable_become_user=openvpnas delegate_host=localhost",
-      "--skip-tags",
-      "user_access"
-    ]
-    playbook_file    = "./ansible/init-packages.yaml"
-    user             = "openvpnas"
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only             = ["amazon-ebs.openvpn-server-ami"]
-  }
 
   ### Configure Centos user and render user
 
