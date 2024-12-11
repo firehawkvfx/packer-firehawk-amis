@@ -183,6 +183,11 @@ locals {
   #     "houdini_build"              = "production"
   #   }
   # ]
+  instance_users = {
+    "amazon-ebs.rocky8-rendernode-ami": "rocky",
+    "amazon-ebs.amznlnx2023-rendernode-ami": "ec2-user",
+    "amazon-ebs.deadline-db-ubuntu18-ami": "ubuntu"
+  }
 }
 
 source "amazon-ebs" "openvpn-server-ami" {
@@ -890,7 +895,7 @@ build {
 
   provisioner "ansible" { # Add user deadlineuser
     playbook_file = "./ansible/newuser.yaml"
-    user          = "rocky"
+    user          = "${local.instance_users[build.name]}"
     extra_arguments = [
       "-v",
       "--extra-vars",
@@ -902,37 +907,7 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
-    ]
-  }
-  provisioner "ansible" { # Add user deadlineuser
-    playbook_file = "./ansible/newuser.yaml"
-    user          = "ec2-user"
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only = [
       "amazon-ebs.amznlnx2023-rendernode-ami",
-    ]
-  }
-  provisioner "ansible" { # Add user deadlineuser
-    playbook_file = "./ansible/newuser.yaml"
-    user          = "ubuntu"
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only = [
       "amazon-ebs.deadline-db-ubuntu18-ami",
     ]
   }
