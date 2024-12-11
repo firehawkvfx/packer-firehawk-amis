@@ -893,9 +893,9 @@ build {
     ]
   }
 
-  provisioner "ansible" { # Add user deadlineuser
+  provisioner "ansible" {
     playbook_file = "./ansible/newuser.yaml"
-    user          = "${local.instance_users[build.name]}"
+    user          = "${local.instance_users[source.name]}"
     extra_arguments = [
       "-v",
       "--extra-vars",
