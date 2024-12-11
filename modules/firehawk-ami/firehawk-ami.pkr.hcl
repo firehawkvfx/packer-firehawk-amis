@@ -679,7 +679,7 @@ build {
 
   provisioner "ansible" { # See https://github.com/hashicorp/packer-plugin-ansible/issues/47#issuecomment-852443057
     playbook_file = "./ansible/ansible_init.yaml"
-    user          = "rocky"
+    user          = "${local.instance_users[source.name]}"
     extra_arguments = [
       "-v",
       "--extra-vars",
@@ -692,23 +692,6 @@ build {
     only = [
       "amazon-ebs.rocky8-ami",
       "amazon-ebs.rocky8-rendernode-ami",
-    ]
-  }
-
-
-  provisioner "ansible" { # See https://github.com/hashicorp/packer-plugin-ansible/issues/47#issuecomment-852443057
-    playbook_file = "./ansible/ansible_init.yaml"
-    user          = "ec2-user"
-    extra_arguments = [
-      "-v",
-      "--extra-vars",
-      "variable_host=default package_python_interpreter=/usr/bin/python3.11"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-    galaxy_file      = "./requirements.yml"
-    only = [
       "amazon-ebs.amznlnx2023-ami",
       "amazon-ebs.amznlnx2023-rendernode-ami",
       "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami",
@@ -833,96 +816,6 @@ build {
 
   ### End public cert block to verify other consul agents ###
 
-  provisioner "shell" {
-    inline = [
-      "echo 'Current source name: ${source.name} user ${local.instance_users[source.name]}'"
-    ]
-    only = [
-      "amazon-ebs.rocky8-rendernode-ami",
-      "amazon-ebs.amznlnx2023-rendernode-ami",
-      "amazon-ebs.deadline-db-ubuntu18-ami",
-    ]
-  }
-  # source "source.null.newuser" {
-  #   variable_user = "deployuser"
-  #   variable_uid = local.deployuser_uid
-  #   add_to_group_syscontrol = true
-  #   # only = [ # TODO dont do this, we need to enable it only for some images
-  #   #   "amazon-ebs.rocky8-rendernode-ami",
-  #   #   "amazon-ebs.amznlnx2023-rendernode-ami",
-  #   #   "amazon-ebs.deadline-db-ubuntu18-ami",
-  #   # ]
-  # }
-
-  # provisioner "ansible" { # Add user deployuser
-  #   playbook_file = "./ansible/newuser.yaml"
-  #   user          = "rocky"
-  #   extra_arguments = [
-  #     "-v",
-  #     "--extra-vars",
-  #     "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-  #   ]
-  #   collections_path = "./ansible/collections"
-  #   roles_path       = "./ansible/roles"
-  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-  #   galaxy_file      = "./requirements.yml"
-  #   only = [
-  #     "amazon-ebs.rocky8-rendernode-ami",
-  #   ]
-  # }
-  # provisioner "ansible" { # Add user deployuser
-  #   playbook_file = "./ansible/newuser.yaml"
-  #   user          = "ec2-user"
-  #   extra_arguments = [
-  #     "-v",
-  #     "--extra-vars",
-  #     "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-  #   ]
-  #   collections_path = "./ansible/collections"
-  #   roles_path       = "./ansible/roles"
-  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-  #   galaxy_file      = "./requirements.yml"
-  #   only = [
-  #     "amazon-ebs.amznlnx2023-rendernode-ami",
-  #   ]
-  # }
-  # provisioner "ansible" { # Add user deployuser
-  #   playbook_file = "./ansible/newuser.yaml"
-  #   user          = "ubuntu"
-  #   extra_arguments = [
-  #     "-v",
-  #     "--extra-vars",
-  #     "variable_user=deployuser sudo=true passwordless_sudo=true add_to_group_syscontrol=true variable_uid=${local.deployuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-  #   ]
-  #   collections_path = "./ansible/collections"
-  #   roles_path       = "./ansible/roles"
-  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-  #   galaxy_file      = "./requirements.yml"
-  #   only = [
-  #     "amazon-ebs.deadline-db-ubuntu18-ami",
-  #   ]
-  # }
-
-  # provisioner "ansible" {
-  #   playbook_file = "./ansible/newuser.yaml"
-  #   user          = "${local.instance_users[source.name]}"
-  #   extra_arguments = [
-  #     "-v",
-  #     "--extra-vars",
-  #     "variable_user=deadlineuser sudo=true passwordless_sudo=true add_to_group_syscontrol=false variable_uid=${local.deadlineuser_uid} syscontrol_gid=${local.syscontrol_gid} variable_host=default delegate_host=localhost"
-  #   ]
-  #   collections_path = "./ansible/collections"
-  #   roles_path       = "./ansible/roles"
-  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg"]
-  #   galaxy_file      = "./requirements.yml"
-  #   only = [
-  #     "amazon-ebs.rocky8-rendernode-ami",
-  #     # "amazon-ebs.amznlnx2023-rendernode-ami",
-  #     # "amazon-ebs.deadline-db-ubuntu18-ami",
-  #   ]
-  # }
-
-
   provisioner "ansible" { # Add user deployuser
     playbook_file = "./ansible/newuser.yaml"
     user          = "${local.instance_users[source.name]}"
@@ -942,7 +835,7 @@ build {
     ]
   }
 
-  provisioner "ansible" {
+  provisioner "ansible" {  # Add user deadlineuser
     playbook_file = "./ansible/newuser.yaml"
     user          = "${local.instance_users[source.name]}"
     extra_arguments = [
@@ -1101,16 +994,16 @@ build {
     ]
   }
 
-  provisioner "shell" { ### Install requests for houdini install script
-    inline = [
-      # "set -x; sudo python3.11 -m pip install requests", # the installs below may be able to be removed
-      "set -x; sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user requests --upgrade\"",
-    ]
-    only = [
-      "amazon-ebs.rocky8-rendernode-ami",
-      "amazon-ebs.amznlnx2023-rendernode-ami",
-    ]
-  }
+  # provisioner "shell" { ### Install requests for houdini install script
+  #   inline = [
+  #     # "set -x; sudo python3.11 -m pip install requests", # the installs below may be able to be removed
+  #     "set -x; sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user requests --upgrade\"",
+  #   ]
+  #   only = [
+  #     "amazon-ebs.rocky8-rendernode-ami",
+  #     "amazon-ebs.amznlnx2023-rendernode-ami",
+  #   ]
+  # }
 
   # provisioner "shell" { ### Install Deadline for Client Worker
   #   inline = [
@@ -1190,7 +1083,7 @@ build {
 
   provisioner "ansible" {
     playbook_file = "./ansible/houdini_module.yaml"
-    user          = "rocky"
+    user          = "${local.instance_users[source.name]}"
     extra_arguments = [
       "-vv",
       "--extra-vars",
@@ -1206,33 +1099,32 @@ build {
     galaxy_file      = "./requirements.yml"
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
-      # "amazon-ebs.amznlnx2023-rendernode-ami",
-      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
+      "amazon-ebs.amznlnx2023-rendernode-ami",
     ]
   }
 
-  provisioner "ansible" {
-    playbook_file = "./ansible/houdini_module.yaml"
-    user          = "ec2-user"
-    extra_arguments = [
-      "-vv",
-      "--extra-vars",
-      jsonencode(local.houdini_json_vars),
-      "--extra-vars",
-      "variable_user=deadlineuser resourcetier=${var.resourcetier} installers_bucket=${local.installers_bucket} variable_host=default houdini_build=${local.houdini_build} sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key} houdini_license_server_address=${var.houdini_license_server_address} user_deadlineuser_pw='' package_python_interpreter=/usr/bin/python3.11 firehawk_houdini_tools=/home/deadlineuser/openfirehawk-houdini-tools",
-      "--tags",
-      "install_houdini,set_hserver,install_deadline_db"
-    ]
-    collections_path = "./ansible/collections"
-    roles_path       = "./ansible/roles"
-    ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key}"]
-    galaxy_file      = "./requirements.yml"
-    only = [
-      # "amazon-ebs.rocky8-rendernode-ami",
-      "amazon-ebs.amznlnx2023-rendernode-ami",
-      # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
-    ]
-  }
+  # provisioner "ansible" {
+  #   playbook_file = "./ansible/houdini_module.yaml"
+  #   user          = "ec2-user"
+  #   extra_arguments = [
+  #     "-vv",
+  #     "--extra-vars",
+  #     jsonencode(local.houdini_json_vars),
+  #     "--extra-vars",
+  #     "variable_user=deadlineuser resourcetier=${var.resourcetier} installers_bucket=${local.installers_bucket} variable_host=default houdini_build=${local.houdini_build} sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key} houdini_license_server_address=${var.houdini_license_server_address} user_deadlineuser_pw='' package_python_interpreter=/usr/bin/python3.11 firehawk_houdini_tools=/home/deadlineuser/openfirehawk-houdini-tools",
+  #     "--tags",
+  #     "install_houdini,set_hserver,install_deadline_db"
+  #   ]
+  #   collections_path = "./ansible/collections"
+  #   roles_path       = "./ansible/roles"
+  #   ansible_env_vars = ["ANSIBLE_CONFIG=ansible/ansible.cfg sesi_client_id=${local.sesi_client_id} sesi_client_secret_key=${local.sesi_client_secret_key}"]
+  #   galaxy_file      = "./requirements.yml"
+  #   only = [
+  #     # "amazon-ebs.rocky8-rendernode-ami",
+  #     "amazon-ebs.amznlnx2023-rendernode-ami",
+  #     # "amazon-ebs.amznlnx2023-nicedcv-nvidia-ami"
+  #   ]
+  # }
 
   ### This block will install Consul Agent for DNS
 
