@@ -830,6 +830,7 @@ build {
       "sudo usermod -a -G jobgroup deployuser", # add deadline user and deployuser to job group
       "sudo usermod -a -G jobgroup deadlineuser",
       "sudo usermod -a -G deadlineuser deployuser" # add deployuser to deadlineuser group.  Very important to not get this backwards.
+      # "sudo gpasswd -d deadlineuser syscontrol" # TODO we need to remove deadlineuser from syscontrol group once everything is working.
     ]
     only = [
       "amazon-ebs.rocky8-rendernode-ami",
