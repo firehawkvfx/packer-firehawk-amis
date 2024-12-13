@@ -859,14 +859,14 @@ build {
   }
 
   provisioner "shell" {
-    inline = [ # TODO get thinkbox to not be using sudo with pip.
-      "su -c \"python3.11 -m venv /opt/deadline/worker\"",
-      "su -c \"source /opt/deadline/worker/bin/activate && cd ~; curl -O https://bootstrap.pypa.io/get-pip.py\"", # Install pip for py3.11
-      "su -c \"source /opt/deadline/worker/bin/activate && python3.11 get-pip.py\"",
-      "su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip --version\"",
-      "su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip install --upgrade pip\"",
-      "su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip install deadline-cloud-worker-agent\"",
-      "su -c \"source /opt/deadline/worker/bin/activate && /opt/deadline/worker/bin/install-deadline-worker --farm-id farm-b628c618484545bb82fda6b09ec99395 --fleet-id fleet-1aaf65dd902e47a6b17aef4351d0ca79 --region ap-southeast-2 --allow-shutdown --user deployuser --group jobgroup\"",  # TODO generate these id's during terraform init.
+    inline = [ # TODO get thinkbox to not be using root with pip.
+      "sudo su -c \"python3.11 -m venv /opt/deadline/worker\"",
+      "sudo su -c \"source /opt/deadline/worker/bin/activate && cd ~; curl -O https://bootstrap.pypa.io/get-pip.py\"", # Install pip for py3.11
+      "sudo su -c \"source /opt/deadline/worker/bin/activate && python3.11 get-pip.py\"",
+      "sudo su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip --version\"",
+      "sudo su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip install --upgrade pip\"",
+      "sudo su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip install deadline-cloud-worker-agent\"",
+      "sudo su -c \"source /opt/deadline/worker/bin/activate && /opt/deadline/worker/bin/install-deadline-worker --farm-id farm-b628c618484545bb82fda6b09ec99395 --fleet-id fleet-1aaf65dd902e47a6b17aef4351d0ca79 --region ap-southeast-2 --allow-shutdown --user deployuser --group jobgroup\"",  # TODO generate these id's during terraform init.
       "sudo systemctl enable deadline-worker"
     ]
     only = [
