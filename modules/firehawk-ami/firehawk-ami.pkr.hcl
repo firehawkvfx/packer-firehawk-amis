@@ -847,7 +847,7 @@ build {
       "sudo su - ${var.deadlineuser_name} -c \"python3.11 get-pip.py\"",
       "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip --version\"",
       "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user --upgrade pip\"",
-      "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user --upgrade pip\"",
+      # "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user --upgrade pip\"",
       "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install requests --user --upgrade\"", # required for houdini install script
       "sudo su - ${var.deadlineuser_name} -c \"python3.11 -m pip install --user boto3\"",
       "sudo su - ${var.deadlineuser_name} -c \"python3.11 -c \\\"import os; print(os.getenv('PYTHONPATH')); import requests; print('requests module is available to ${var.deadlineuser_name}')\\\"\""
@@ -857,6 +857,31 @@ build {
       "amazon-ebs.amznlnx2023-rendernode-ami",
     ]
   }
+
+  provisioner "shell" {
+    inline = [ # TODO get thinkbox to not be using sudo with pip.
+      "su -c \"python3.11 -m venv /opt/deadline/worker\"",
+      "su -c \"source /opt/deadline/worker/bin/activate && cd ~; curl -O https://bootstrap.pypa.io/get-pip.py\"", # Install pip for py3.11
+      "su -c \"source /opt/deadline/worker/bin/activate && python3.11 get-pip.py\"",
+      "su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip --version\"",
+      "su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip install --upgrade pip\"",
+      "su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip install deadline-cloud-worker-agent\"",
+      "su -c \"source /opt/deadline/worker/bin/activate && /opt/deadline/worker/bin/install-deadline-worker \\
+        --farm-id farm-b628c618484545bb82fda6b09ec99395 \\
+        --fleet-id fleet-1aaf65dd902e47a6b17aef4351d0ca79 \\
+        --region ap-southeast-2 \\
+        --allow-shutdown \\
+        --user deployuser \\
+        --group jobgroup\"",
+      "sudo systemctl enable deadline-worker"
+    ]
+    only = [
+      "amazon-ebs.rocky8-rendernode-ami",
+      "amazon-ebs.amznlnx2023-rendernode-ami",
+    ]
+  }
+
+
 
   ### Install Mongo / Deadline DB
 
