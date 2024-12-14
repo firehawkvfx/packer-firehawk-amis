@@ -518,14 +518,17 @@ build {
       # sudo reboot
       # exit 0
       # EOF
+      "sudo cat /etc/pam.d/sudo",
+      "sudo cat /etc/pam.d/common-session-noninteractive",
+      "sudo cat /etc/pam.d/common-session"
       "echo 'update stack size limits'",
-      "sudo bash -c 'echo \"* soft nofile unlimited\" >> /etc/security/limits.conf'",
-      "sudo bash -c 'echo \"* hard nofile unlimited\" >> /etc/security/limits.conf'",
-      "sudo bash -c 'echo \"* soft nproc unlimited\" >> /etc/security/limits.conf'",
-      "sudo bash -c 'echo \"* hard nproc unlimited\" >> /etc/security/limits.conf'",
+      "echo '* soft nofile unlimited' | sudo tee -a /etc/security/limits.conf",
+      "echo '* hard nofile unlimited' | sudo tee -a /etc/security/limits.conf",
+      "echo '* soft nproc unlimited' | sudo tee -a /etc/security/limits.conf",
+      "echo '* hard nproc unlimited' | sudo tee -a /etc/security/limits.conf",
       "sudo cat /etc/security/limits.conf",
       "sudo reboot",
-      "exit 0",
+      "exit 0"
       # "echo 'update stack size limits'",
       # "sudo tee -a /etc/security/limits.conf << EOF",
       # "* soft nofile unlimited",
