@@ -522,7 +522,7 @@ build {
       "sudo cat /etc/pam.d/system-auth",
       "sudo cat /etc/pam.d/password-auth",
       # "sudo cat /etc/pam.d/common-session-noninteractive",
-      "sudo cat /etc/pam.d/common-session",
+      # "sudo cat /etc/pam.d/common-session",
       "echo 'update stack size limits'",
       "sudo sed -i '/# End of file/i * soft nofile unlimited' /etc/security/limits.conf",
       "sudo sed -i '/# End of file/i * hard nofile unlimited' /etc/security/limits.conf",
