@@ -858,6 +858,33 @@ build {
     ]
   }
 
+  provisioner "shell" {
+    inline = [
+      "sudo echo \"*               soft    stack           unlimited\" >> /etc/security/limits.conf",
+      "sudo echo \"*               hard    stack           unlimited\" >> /etc/security/limits.conf",
+      "sudo echo \"session required pam_limits.so\" >> /etc/pam.d/common-session",
+      "sudo echo -e \"[Manager]\\nDefaultLimitSTACK=infinity\" >> /etc/systemd/system.conf",
+      "echo 'Stack size limits have been updated.'"
+      "# Verify the stack size limit",
+      "sudo bash -c 'su - root -c \"ulimit -s\"' > /tmp/stack_size",
+      "stack_size=$(cat /tmp/stack_size)",
+      "if [ \"$stack_size\" = \"unlimited\" ]; then",
+      "  echo \"Stack size verification successful. Current size: $stack_size\"",
+      "else",
+      "  echo \"Error: Stack size is not set to unlimited. Current size: $stack_size\"",
+      "  exit 1",
+      "fi",
+      "# Verify systemd DefaultLimitSTACK",
+      "if systemctl show | grep -q 'DefaultLimitSTACK=infinity'; then",
+      "  echo \"systemd DefaultLimitSTACK verification successful.\"",
+      "else",
+      "  echo \"Error: systemd DefaultLimitSTACK is not set to infinity.\"",
+      "  exit 1",
+      "fi"
+    ]
+    only = ["amazon-ebs.amznlnx2023-rendernode-ami"]
+  }
+
   # Install deadline cloud worker agent
   provisioner "shell" {
     inline = [ # TODO get thinkbox to not be using root with pip.
