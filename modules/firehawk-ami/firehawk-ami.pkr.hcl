@@ -506,9 +506,9 @@ build {
   # Houdini says stack size limit is not correct on amazon linux
   provisioner "shell" {
     inline = [
-      <<-EOF
+<<-EOF
       echo 'update stack size limits'
-      sudo bash -c 'cat << EOT >> /etc/security/limits.conf
+      sudo -i bash -c 'cat << EOT >> /etc/security/limits.conf
       * soft nofile unlimited
       * hard nofile unlimited
       * soft nproc unlimited
@@ -528,6 +528,7 @@ build {
       # "sudo reboot",
       # "exit 0",
     ]
+    inline_shebang = "/bin/bash -e"
     only = ["amazon-ebs.amznlnx2023-rendernode-ami"]
   }
 
