@@ -523,6 +523,8 @@ build {
       "sudo cat /etc/pam.d/password-auth",
       # "sudo cat /etc/pam.d/common-session-noninteractive",
       # "sudo cat /etc/pam.d/common-session",
+      # "echo 'ec2-user ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/ec2-user",
+      "sudo sed -i '/## Same thing without a password/a ec2-user ALL=(ALL) NOPASSWD:ALL' /etc/sudoers",
       "echo 'update stack size limits'",
       "sudo sed -i '/# End of file/i * soft nofile unlimited' /etc/security/limits.conf",
       "sudo sed -i '/# End of file/i * hard nofile unlimited' /etc/security/limits.conf",
