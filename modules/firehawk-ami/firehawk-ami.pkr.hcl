@@ -858,13 +858,14 @@ build {
     ]
   }
 
+  # Houdini says stack size limit is not correct on amazon linux
   provisioner "shell" {
     inline = [
       "sudo echo \"*               soft    stack           unlimited\" >> /etc/security/limits.conf",
       "sudo echo \"*               hard    stack           unlimited\" >> /etc/security/limits.conf",
       "sudo echo \"session required pam_limits.so\" >> /etc/pam.d/common-session",
       "sudo echo -e \"[Manager]\\nDefaultLimitSTACK=infinity\" >> /etc/systemd/system.conf",
-      "echo 'Stack size limits have been updated.'"
+      "echo 'Stack size limits have been updated.'",
       "# Verify the stack size limit",
       "sudo bash -c 'su - root -c \"ulimit -s\"' > /tmp/stack_size",
       "stack_size=$(cat /tmp/stack_size)",
