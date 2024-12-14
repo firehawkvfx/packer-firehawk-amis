@@ -508,12 +508,12 @@ build {
     inline = [
       <<-EOF
       echo 'update stack size limits'
-      sudo tee -a /etc/security/limits.conf << EOT
+      sudo bash -c 'cat << EOT >> /etc/security/limits.conf
       * soft nofile unlimited
       * hard nofile unlimited
       * soft nproc unlimited
       * hard nproc unlimited
-      EOT
+      EOT'
       sudo cat /etc/security/limits.conf
       sudo reboot
       exit 0
