@@ -503,6 +503,34 @@ build {
     "source.amazon-ebs.deadline-db-ubuntu18-ami",
   ]
 
+  # Houdini says stack size limit is not correct on amazon linux
+  provisioner "shell" {
+    inline = [
+      <<-EOF
+      echo 'update stack size limits'
+      sudo tee -a /etc/security/limits.conf << EOT
+      * soft nofile unlimited
+      * hard nofile unlimited
+      * soft nproc unlimited
+      * hard nproc unlimited
+      EOT
+      sudo cat /etc/security/limits.conf
+      sudo reboot
+      exit 0
+      EOF
+      # "echo 'update stack size limits'",
+      # "sudo tee -a /etc/security/limits.conf << EOF",
+      # "* soft nofile unlimited",
+      # "* hard nofile unlimited",
+      # "* soft nproc unlimited",
+      # "* hard nproc unlimited",
+      # "EOF",
+      # "sudo reboot",
+      # "exit 0",
+    ]
+    only = ["amazon-ebs.amznlnx2023-rendernode-ami"]
+  }
+
   ### Open VPN - Wait for updates to finish and change daily update timer ###
 
   provisioner "shell" {
@@ -856,22 +884,6 @@ build {
       "amazon-ebs.rocky8-rendernode-ami",
       "amazon-ebs.amznlnx2023-rendernode-ami",
     ]
-  }
-
-  # Houdini says stack size limit is not correct on amazon linux
-  provisioner "shell" {
-    inline = [
-      "echo 'update stack size limits'",
-      "sudo tee -a /etc/security/limits.conf << EOF",
-      "* soft nofile unlimited",
-      "* hard nofile unlimited",
-      "* soft nproc unlimited",
-      "* hard nproc unlimited",
-      "EOF",
-      "sudo reboot",
-      "exit 0",
-    ]
-    only = ["amazon-ebs.amznlnx2023-rendernode-ami"]
   }
       # "sudo tee -a /etc/pam.d/common-session << EOF",
       # "session required pam_limits.so",
