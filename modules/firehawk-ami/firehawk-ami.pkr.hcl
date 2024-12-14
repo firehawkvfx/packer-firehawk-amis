@@ -506,18 +506,26 @@ build {
   # Houdini says stack size limit is not correct on amazon linux
   provisioner "shell" {
     inline = [
-<<-EOF
-      echo 'update stack size limits'
-      sudo -i bash -c 'cat << EOT >> /etc/security/limits.conf
-      * soft nofile unlimited
-      * hard nofile unlimited
-      * soft nproc unlimited
-      * hard nproc unlimited
-      EOT'
-      sudo cat /etc/security/limits.conf
-      sudo reboot
-      exit 0
-      EOF
+      # <<-EOF
+      # echo 'update stack size limits'
+      # sudo -i bash -c 'cat << EOT >> /etc/security/limits.conf
+      # * soft nofile unlimited
+      # * hard nofile unlimited
+      # * soft nproc unlimited
+      # * hard nproc unlimited
+      # EOT'
+      # sudo cat /etc/security/limits.conf
+      # sudo reboot
+      # exit 0
+      # EOF
+      "echo 'update stack size limits'",
+      "sudo bash -c 'echo \"* soft nofile unlimited\" >> /etc/security/limits.conf'",
+      "sudo bash -c 'echo \"* hard nofile unlimited\" >> /etc/security/limits.conf'",
+      "sudo bash -c 'echo \"* soft nproc unlimited\" >> /etc/security/limits.conf'",
+      "sudo bash -c 'echo \"* hard nproc unlimited\" >> /etc/security/limits.conf'",
+      "sudo cat /etc/security/limits.conf",
+      "sudo reboot",
+      "exit 0",
       # "echo 'update stack size limits'",
       # "sudo tee -a /etc/security/limits.conf << EOF",
       # "* soft nofile unlimited",
