@@ -868,6 +868,11 @@ build {
       "* soft nproc unlimited",
       "* hard nproc unlimited",
       "EOF",
+      "sudo reboot",
+      "exit 0",
+    ]
+    only = ["amazon-ebs.amznlnx2023-rendernode-ami"]
+  }
       # "sudo tee -a /etc/pam.d/common-session << EOF",
       # "session required pam_limits.so",
       # "EOF",
@@ -875,8 +880,10 @@ build {
       # "[Manager]",
       # "DefaultLimitSTACK=infinity",
       # "EOF",
+  provisioner "shell" {
+    inline = [
       "echo 'Stack size limits have been updated.'",
-      "# Verify the stack size limit",
+      # "# Verify the stack size limit",
       "sudo bash -c 'su - root -c \"ulimit -s\"' > /tmp/stack_size",
       "stack_size=$(cat /tmp/stack_size)",
       "if [ \"$stack_size\" = \"unlimited\" ]; then",
