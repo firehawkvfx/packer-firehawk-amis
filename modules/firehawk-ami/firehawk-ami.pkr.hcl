@@ -910,28 +910,28 @@ build {
       # "[Manager]",
       # "DefaultLimitSTACK=infinity",
       # "EOF",
-  provisioner "shell" {
-    inline = [
-      "echo 'Stack size limits have been updated.'",
-      # "# Verify the stack size limit",
-      "sudo bash -c 'su - root -c \"ulimit -s\"' > /tmp/stack_size",
-      "stack_size=$(cat /tmp/stack_size)",
-      "if [ \"$stack_size\" = \"unlimited\" ]; then",
-      "  echo \"Stack size verification successful. Current size: $stack_size\"",
-      "else",
-      "  echo \"Error: Stack size is not set to unlimited. Current size: $stack_size\"",
-      "  exit 1",
-      "fi",
-      "# Verify systemd DefaultLimitSTACK",
-      "if systemctl show | grep -q 'DefaultLimitSTACK=infinity'; then",
-      "  echo \"systemd DefaultLimitSTACK verification successful.\"",
-      "else",
-      "  echo \"Error: systemd DefaultLimitSTACK is not set to infinity.\"",
-      "  exit 1",
-      "fi"
-    ]
-    only = ["amazon-ebs.amznlnx2023-rendernode-ami"]
-  }
+  # provisioner "shell" {
+  #   inline = [
+  #     "echo 'Stack size limits have been updated.'",
+  #     # "# Verify the stack size limit",
+  #     "sudo bash -c 'su - root -c \"ulimit -s\"' > /tmp/stack_size",
+  #     "stack_size=$(cat /tmp/stack_size)",
+  #     "if [ \"$stack_size\" = \"unlimited\" ]; then",
+  #     "  echo \"Stack size verification successful. Current size: $stack_size\"",
+  #     "else",
+  #     "  echo \"Error: Stack size is not set to unlimited. Current size: $stack_size\"",
+  #     "  exit 1",
+  #     "fi",
+  #     "# Verify systemd DefaultLimitSTACK",
+  #     "if systemctl show | grep -q 'DefaultLimitSTACK=infinity'; then",
+  #     "  echo \"systemd DefaultLimitSTACK verification successful.\"",
+  #     "else",
+  #     "  echo \"Error: systemd DefaultLimitSTACK is not set to infinity.\"",
+  #     "  exit 1",
+  #     "fi"
+  #   ]
+  #   only = ["amazon-ebs.amznlnx2023-rendernode-ami"]
+  # }
 
   # Install deadline cloud worker agent
   provisioner "shell" {
