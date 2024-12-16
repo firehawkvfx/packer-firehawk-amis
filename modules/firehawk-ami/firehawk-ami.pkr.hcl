@@ -1212,7 +1212,8 @@ build {
     ### Centos 7 - jq required and the dig command is also required
     inline = [
       # "sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
-      "sudo dnf -y install bind-utils jq"
+      "sudo dnf -y install bind-utils jq",
+      "sudo cat /etc/security/limits.conf" # check stack size
     ]
     only = [
       "amazon-ebs.rocky8-ami",
