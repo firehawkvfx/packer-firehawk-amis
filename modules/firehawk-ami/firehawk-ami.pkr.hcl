@@ -1214,6 +1214,7 @@ build {
       # "sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
       "sudo dnf -y install bind-utils jq",
       "sudo cat /etc/security/limits.conf" # check stack size
+      "sudo cat /var/log/user-data.log" # check user data log.
     ]
     only = [
       "amazon-ebs.rocky8-ami",
