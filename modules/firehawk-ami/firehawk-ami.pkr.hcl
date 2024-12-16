@@ -375,7 +375,7 @@ source "amazon-ebs" "amznlnx2023-rendernode-ami" {
     delete_on_termination = true
   }
 
-  user_data = file("${path.root}/scripts/amazon_linux_user_data.sh")
+  user_data_file = "${path.root}/scripts/amazon_linux_user_data.sh"
 
 }
 
