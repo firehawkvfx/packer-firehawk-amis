@@ -10,7 +10,7 @@ function print_usage {
   echo
   echo "Usage: source ./update_vars.sh [OPTIONS]"
   echo
-  echo "This script can be used to source environment variables on a cloud 9 to deploy Firehawk. This script has been tested with Amazon Linux 2."
+  echo "This script can be used to source environment variables on a cloud 9 to deploy Firehawk. This script has been tested with Amazon Linux 2023."
   echo
   echo "Options:"
   echo

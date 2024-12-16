@@ -202,7 +202,7 @@ source "amazon-ebs" "amznlnx2023-ami" {
     { "Name" : "firehawk_amznlnx2023_ami" },
     local.common_ami_tags
   )
-  ami_description         = "An Amazon Linux 2 AMI that will accept connections from hosts with TLS Certs."
+  ami_description         = "An Amazon Linux 2023 AMI that will accept connections from hosts with TLS Certs."
   ami_name                = "firehawk-bastion-amznlnx2023-${local.timestamp}-{{uuid}}"
   temporary_key_pair_type = "ed25519"
   instance_type           = "t2.small"
@@ -349,7 +349,7 @@ source "amazon-ebs" "amznlnx2023-rendernode-ami" {
     { "Name" : "firehawk_amznlnx2023_rendernode_ami" },
     local.common_ami_tags
   )
-  ami_description         = "An Amazon Linux 2 AMI that will accept connections from hosts with TLS Certs."
+  ami_description         = "An Amazon Linux 2023 AMI that will accept connections from hosts with TLS Certs."
   ami_name                = "firehawk-rendernode-amznlnx2023-${local.timestamp}-{{uuid}}"
   temporary_key_pair_type = "ed25519"
   instance_type           = "t2.small"
@@ -374,6 +374,8 @@ source "amazon-ebs" "amznlnx2023-rendernode-ami" {
     volume_type           = "gp3"
     delete_on_termination = true
   }
+
+  user_data = file("${path.module}/scripts/amazon_linux_user_data.sh")
 
 }
 
@@ -503,49 +505,49 @@ build {
     "source.amazon-ebs.deadline-db-ubuntu18-ami",
   ]
 
-  # Houdini says stack size limit is not correct on amazon linux
-  provisioner "shell" {
-    inline = [
-      # <<-EOF
-      # echo 'update stack size limits'
-      # sudo -i bash -c 'cat << EOT >> /etc/security/limits.conf
-      # * soft nofile unlimited
-      # * hard nofile unlimited
-      # * soft nproc unlimited
-      # * hard nproc unlimited
-      # EOT'
-      # sudo cat /etc/security/limits.conf
-      # sudo reboot
-      # exit 0
-      # EOF
-      "sudo cat /etc/pam.d/sudo",
-      "sudo cat /etc/pam.d/system-auth",
-      "sudo cat /etc/pam.d/password-auth",
-      # "sudo cat /etc/pam.d/common-session-noninteractive",
-      # "sudo cat /etc/pam.d/common-session",
-      # "echo 'ec2-user ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/ec2-user",
-      "sudo sed -i '/## Same thing without a password/a ec2-user ALL=(ALL) NOPASSWD:ALL' /etc/sudoers",
-      "echo 'update stack size limits'",
-      "sudo sed -i '/# End of file/i * soft nofile unlimited' /etc/security/limits.conf",
-      "sudo sed -i '/# End of file/i * hard nofile unlimited' /etc/security/limits.conf",
-      "sudo sed -i '/# End of file/i * soft nproc unlimited' /etc/security/limits.conf",
-      "sudo sed -i '/# End of file/i * hard nproc unlimited' /etc/security/limits.conf",
-      "sudo cat /etc/security/limits.conf",
-      "sudo reboot",
-      "exit 0",
-      # "echo 'update stack size limits'",
-      # "sudo tee -a /etc/security/limits.conf << EOF",
-      # "* soft nofile unlimited",
-      # "* hard nofile unlimited",
-      # "* soft nproc unlimited",
-      # "* hard nproc unlimited",
-      # "EOF",
-      # "sudo reboot",
-      # "exit 0",
-    ]
-    inline_shebang = "/bin/bash -e"
-    only = ["amazon-ebs.amznlnx2023-rendernode-ami"]
-  }
+  # # Houdini says stack size limit is not correct on amazon linux
+  # provisioner "shell" {
+  #   inline = [
+  #     # <<-EOF
+  #     # echo 'update stack size limits'
+  #     # sudo -i bash -c 'cat << EOT >> /etc/security/limits.conf
+  #     # * soft nofile unlimited
+  #     # * hard nofile unlimited
+  #     # * soft nproc unlimited
+  #     # * hard nproc unlimited
+  #     # EOT'
+  #     # sudo cat /etc/security/limits.conf
+  #     # sudo reboot
+  #     # exit 0
+  #     # EOF
+  #     "sudo cat /etc/pam.d/sudo",
+  #     "sudo cat /etc/pam.d/system-auth",
+  #     "sudo cat /etc/pam.d/password-auth",
+  #     # "sudo cat /etc/pam.d/common-session-noninteractive",
+  #     # "sudo cat /etc/pam.d/common-session",
+  #     # "echo 'ec2-user ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/ec2-user",
+  #     "sudo sed -i '/## Same thing without a password/a ec2-user ALL=(ALL) NOPASSWD:ALL' /etc/sudoers",
+  #     "echo 'update stack size limits'",
+  #     "sudo sed -i '/# End of file/i * soft nofile unlimited' /etc/security/limits.conf",
+  #     "sudo sed -i '/# End of file/i * hard nofile unlimited' /etc/security/limits.conf",
+  #     "sudo sed -i '/# End of file/i * soft nproc unlimited' /etc/security/limits.conf",
+  #     "sudo sed -i '/# End of file/i * hard nproc unlimited' /etc/security/limits.conf",
+  #     "sudo cat /etc/security/limits.conf",
+  #     "sudo reboot",
+  #     "exit 0",
+  #     # "echo 'update stack size limits'",
+  #     # "sudo tee -a /etc/security/limits.conf << EOF",
+  #     # "* soft nofile unlimited",
+  #     # "* hard nofile unlimited",
+  #     # "* soft nproc unlimited",
+  #     # "* hard nproc unlimited",
+  #     # "EOF",
+  #     # "sudo reboot",
+  #     # "exit 0",
+  #   ]
+  #   inline_shebang = "/bin/bash -e"
+  #   only = ["amazon-ebs.amznlnx2023-rendernode-ami"]
+  # }
 
   ### Open VPN - Wait for updates to finish and change daily update timer ###
 
@@ -1007,7 +1009,7 @@ build {
     ]
   }
   provisioner "shell" {
-    ### Install Deadline Worker Amazon Linux 2 Dependencies - https://docs.thinkboxsoftware.com/products/deadline/10.1/1_User%20Manual/manual/install-client.html
+    ### Install Deadline Worker Amazon Linux 2023 Dependencies - https://docs.thinkboxsoftware.com/products/deadline/10.1/1_User%20Manual/manual/install-client.html
     inline = [
       "sudo dnf install -y lsb"
     ]

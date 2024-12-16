@@ -14,7 +14,7 @@ function print_usage {
   echo
   echo "Usage: consul-vault-client [OPTIONS]"
   echo
-  echo "Install vault and consul for a client. This script has been tested with Ubuntu 16.04 and Amazon Linux 2."
+  echo "Install vault and consul for a client. This script has been tested with Ubuntu 16.04 and Amazon Linux 2023."
   echo
   echo "Options:"
   echo
