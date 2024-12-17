@@ -505,6 +505,19 @@ build {
     "source.amazon-ebs.deadline-db-ubuntu18-ami",
   ]
 
+  provisioner "shell" {
+    ### Houdini says stack size limit is not correct on amazon linux
+    inline = [
+      "echo 'Wait for cloud-init to complete'",
+      "sudo cloud-init status --wait",
+      "echo 'Cloud-init has completed.'"
+      "sudo cat /etc/security/limits.conf", # check stack size
+      "sudo cat /var/log/cloud-init-output.log" # check cloud init log.
+    ]
+    only = [
+      "amazon-ebs.amznlnx2023-rendernode-ami",
+    ]
+  }
   # # Houdini says stack size limit is not correct on amazon linux
   # provisioner "shell" {
   #   inline = [
@@ -1213,9 +1226,6 @@ build {
     inline = [
       # "sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
       "sudo dnf -y install bind-utils jq",
-      "sudo cat /etc/security/limits.conf", # check stack size
-      # "sudo cat /var/log/user-data.log", # check user data log.
-      "sudo cat /var/log/cloud-init-output.log" # check cloud init log.
     ]
     only = [
       "amazon-ebs.rocky8-ami",
