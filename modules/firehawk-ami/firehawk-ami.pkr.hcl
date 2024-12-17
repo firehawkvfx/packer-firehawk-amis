@@ -503,6 +503,24 @@ build {
     "source.amazon-ebs.deadline-db-ubuntu18-ami",
   ]
 
+  ### Wait for cloud init ###
+  provisioner "shell" {
+    inline = [
+      "echo 'Wait for cloud-init to complete'",
+      "sudo cloud-init status --wait",
+      "echo 'Cloud-init has completed.'",
+    ]
+  }
+  provisioner "shell" {
+    ### Houdini says stack size limit is not correct on amazon linux so we fix it here.
+    inline = [
+      "sudo cat /etc/security/limits.conf", # check stack size
+      "sudo cat /var/log/cloud-init-output.log" # check cloud init log.
+    ]
+    only = [
+      "amazon-ebs.amznlnx2023-rendernode-ami",
+    ]
+  }
   # # Houdini says stack size limit is not correct on amazon linux
   # provisioner "shell" {
   #   inline = [
