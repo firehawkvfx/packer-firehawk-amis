@@ -375,7 +375,7 @@ source "amazon-ebs" "amznlnx2023-rendernode-ami" {
     delete_on_termination = true
   }
 
-  user_data_file = "${path.root}/scripts/amazon_linux_user_data.sh"
+  user_data_file = "${path.root}/scripts/cloud-init-config.yaml"
 
 }
 
@@ -1214,7 +1214,8 @@ build {
       # "sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
       "sudo dnf -y install bind-utils jq",
       "sudo cat /etc/security/limits.conf", # check stack size
-      "sudo cat /var/log/user-data.log" # check user data log.
+      # "sudo cat /var/log/user-data.log", # check user data log.
+      "sudo cat /var/log/cloud-init-output.log" # check cloud init log.
     ]
     only = [
       "amazon-ebs.rocky8-ami",
