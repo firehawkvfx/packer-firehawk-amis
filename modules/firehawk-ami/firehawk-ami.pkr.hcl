@@ -375,8 +375,6 @@ source "amazon-ebs" "amznlnx2023-rendernode-ami" {
     delete_on_termination = true
   }
 
-  user_data_file = "${path.root}/scripts/cloud-init-config.yaml"
-
 }
 
 source "amazon-ebs" "ubuntu18-ami" {
@@ -505,19 +503,6 @@ build {
     "source.amazon-ebs.deadline-db-ubuntu18-ami",
   ]
 
-  provisioner "shell" {
-    ### Houdini says stack size limit is not correct on amazon linux
-    inline = [
-      "echo 'Wait for cloud-init to complete'",
-      "sudo cloud-init status --wait",
-      "echo 'Cloud-init has completed.'",
-      "sudo cat /etc/security/limits.conf", # check stack size
-      "sudo cat /var/log/cloud-init-output.log" # check cloud init log.
-    ]
-    only = [
-      "amazon-ebs.amznlnx2023-rendernode-ami",
-    ]
-  }
   # # Houdini says stack size limit is not correct on amazon linux
   # provisioner "shell" {
   #   inline = [
