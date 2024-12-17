@@ -510,7 +510,7 @@ build {
     inline = [
       "echo 'Wait for cloud-init to complete'",
       "sudo cloud-init status --wait",
-      "echo 'Cloud-init has completed.'"
+      "echo 'Cloud-init has completed.'",
       "sudo cat /etc/security/limits.conf", # check stack size
       "sudo cat /var/log/cloud-init-output.log" # check cloud init log.
     ]
