@@ -963,7 +963,7 @@ build {
       "sudo systemctl start deadline-worker",
       "sleep 10",
       "sudo systemctl status deadline-worker",
-      "for file in /var/log/amazon/deadline/*; do echo \"Processing \$file\"; sudo cat \$file; done"
+      "for file in /var/log/amazon/deadline/*; do echo \"Processing \$$file\"; sudo cat \$$file; done"
     ]
     valid_exit_codes = [0, 1] # TODO remove this.
     only = [
