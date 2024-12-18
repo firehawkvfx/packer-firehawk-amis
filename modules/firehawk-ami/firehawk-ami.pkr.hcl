@@ -958,25 +958,7 @@ build {
       "sudo su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip --version\"",
       "sudo su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip install --upgrade pip\"",
       "sudo su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip install deadline-cloud-worker-agent\"",
-      "sudo su -c \"source /opt/deadline/worker/bin/activate && /opt/deadline/worker/bin/install-deadline-worker --farm-id farm-b628c618484545bb82fda6b09ec99395 --fleet-id fleet-1aaf65dd902e47a6b17aef4351d0ca79 --region ap-southeast-2 --allow-shutdown --user deployuser --group jobgroup\"",  # TODO generate these id's during terraform init.
-    ]
-    valid_exit_codes = [0, 1] # TODO remove this.
-    only = [
-      "amazon-ebs.rocky8-rendernode-ami",
-      "amazon-ebs.amznlnx2023-rendernode-ami",
-    ]
-  }
-
-  provisioner "shell" {
-    inline = [
-      "echo 'Deadline Worker installed.'",
-      # "sudo systemctl start deadline-worker",
-      "sleep 10",
-      # "sudo systemctl status deadline-worker",
-      "ls -l /var/log/amazon/deadline",
-      # "for file in /var/log/amazon/deadline/*; do echo \"Processing \\$file\"; sudo cat \\$file; done",
-      "echo 'Deadline Worker enabling service.'",
-      "sudo systemctl enable deadline-worker",
+      # "sudo su -c \"source /opt/deadline/worker/bin/activate && /opt/deadline/worker/bin/install-deadline-worker --farm-id farm-b628c618484545bb82fda6b09ec99395 --fleet-id fleet-1aaf65dd902e47a6b17aef4351d0ca79 --region ap-southeast-2 --allow-shutdown --user deployuser --group jobgroup\"",  # TODO generate these id's during terraform init.
     ]
     # valid_exit_codes = [0, 1] # TODO remove this.
     only = [
@@ -984,6 +966,24 @@ build {
       "amazon-ebs.amznlnx2023-rendernode-ami",
     ]
   }
+
+  # provisioner "shell" {
+  #   inline = [
+  #     "echo 'Deadline Worker installed.'",
+  #     # "sudo systemctl start deadline-worker",
+  #     "sleep 10",
+  #     # "sudo systemctl status deadline-worker",
+  #     "ls -l /var/log/amazon/deadline",
+  #     # "for file in /var/log/amazon/deadline/*; do echo \"Processing \\$file\"; sudo cat \\$file; done",
+  #     "echo 'Deadline Worker enabling service.'",
+  #     "sudo systemctl enable deadline-worker",
+  #   ]
+  #   # valid_exit_codes = [0, 1] # TODO remove this.
+  #   only = [
+  #     "amazon-ebs.rocky8-rendernode-ami",
+  #     "amazon-ebs.amznlnx2023-rendernode-ami",
+  #   ]
+  # }
 
 
   ### Install Mongo / Deadline DB
