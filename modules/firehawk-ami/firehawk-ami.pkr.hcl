@@ -969,13 +969,13 @@ build {
 
   provisioner "shell" {
     inline = [
+      "echo 'Deadline Worker installed.'",
+      # "sudo systemctl start deadline-worker",
+      "sleep 10",
+      # "sudo systemctl status deadline-worker",
+      "for file in /var/log/amazon/deadline/*; do echo \"Processing \\$file\"; sudo cat \\$file; done",
       "echo 'Deadline Worker enabling service.'",
       "sudo systemctl enable deadline-worker",
-      "sudo systemctl start deadline-worker",
-      "sleep 10",
-      "sudo systemctl status deadline-worker",
-      "for file in /var/log/amazon/deadline/*; do echo \"Processing \\$file\"; sudo cat \\$file; done",
-      "echo 'Deadline Worker installed.'"
     ]
     # valid_exit_codes = [0, 1] # TODO remove this.
     only = [
