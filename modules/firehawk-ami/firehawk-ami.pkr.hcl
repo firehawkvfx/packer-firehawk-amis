@@ -973,7 +973,8 @@ build {
       # "sudo systemctl start deadline-worker",
       "sleep 10",
       # "sudo systemctl status deadline-worker",
-      "for file in /var/log/amazon/deadline/*; do echo \"Processing \\$file\"; sudo cat \\$file; done",
+      "ls -l /var/log/amazon/deadline",
+      "for file in /var/log/amazon/deadline/*; do echo \"Processing \\$file\"; sudo cat \$file; done",
       "echo 'Deadline Worker enabling service.'",
       "sudo systemctl enable deadline-worker",
     ]
