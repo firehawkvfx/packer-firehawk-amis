@@ -959,11 +959,13 @@ build {
       "sudo su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip install --upgrade pip\"",
       "sudo su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip install deadline-cloud-worker-agent\"",
       "sudo su -c \"source /opt/deadline/worker/bin/activate && /opt/deadline/worker/bin/install-deadline-worker --farm-id farm-b628c618484545bb82fda6b09ec99395 --fleet-id fleet-1aaf65dd902e47a6b17aef4351d0ca79 --region ap-southeast-2 --allow-shutdown --user deployuser --group jobgroup\"",  # TODO generate these id's during terraform init.
+      "echo 'Deadline Worker enabling service.'",
       "sudo systemctl enable deadline-worker",
       "sudo systemctl start deadline-worker",
-      "sleep 10",
+      # "sleep 10",
       "sudo systemctl status deadline-worker",
-      "for file in /var/log/amazon/deadline/*; do echo \"Processing \\$file\"; sudo cat \\$file; done"
+      "for file in /var/log/amazon/deadline/*; do echo \"Processing \\$file\"; sudo cat \\$file; done",
+      "echo 'Deadline Worker installed.'"
     ]
     valid_exit_codes = [0, 1] # TODO remove this.
     only = [
