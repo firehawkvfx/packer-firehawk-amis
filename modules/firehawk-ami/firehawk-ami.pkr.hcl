@@ -969,8 +969,8 @@ build {
 
   provisioner "shell" {
     inline = [
-      "echo 'Deadline Worker installed.'",
-      # "sudo systemctl start deadline-worker",
+      "echo 'Deadline Worker installed. start service.'",
+      "sudo systemctl start deadline-worker",
       "sleep 10",
       # "for file in /var/log/amazon/deadline/*; do echo \"Processing \\$file\"; sudo cat \\$file; done",
       "echo 'Deadline Worker enabling service.'",
