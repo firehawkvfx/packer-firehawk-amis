@@ -975,10 +975,14 @@ build {
       # "for file in /var/log/amazon/deadline/*; do echo \"Processing \\$file\"; sudo cat \\$file; done",
       "echo 'Deadline Worker enabling service.'",
       "sudo systemctl enable deadline-worker",
-      # "echo 'Deadline Worker get status.'",
-      # "sudo systemctl status deadline-worker",
       "echo 'Deadline Worker get logs.'",
       "sudo ls -l /var/log/amazon/deadline",
+      "echo 'Contents of worker-agent-bootstrap.log'",
+      "sudo cat /var/log/amazon/deadline/worker-agent-bootstrap.log",
+      "echo 'Contents of worker-agent.log'",
+      "sudo cat /var/log/amazon/deadline/worker-agent.log",
+      "echo 'Deadline Worker get status.'",
+      "sudo systemctl status deadline-worker",
     ]
     # valid_exit_codes = [0, 1] # TODO remove this.
     only = [
