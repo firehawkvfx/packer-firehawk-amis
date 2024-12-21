@@ -972,11 +972,11 @@ build {
       "echo 'Deadline Worker installed.'",
       # "sudo systemctl start deadline-worker",
       "sleep 10",
-      # "sudo systemctl status deadline-worker",
-      "ls -l /var/log/amazon/deadline",
       # "for file in /var/log/amazon/deadline/*; do echo \"Processing \\$file\"; sudo cat \\$file; done",
       "echo 'Deadline Worker enabling service.'",
       "sudo systemctl enable deadline-worker",
+      "sudo systemctl status deadline-worker",
+      "sudo ls -l /var/log/amazon/deadline",
     ]
     # valid_exit_codes = [0, 1] # TODO remove this.
     only = [
