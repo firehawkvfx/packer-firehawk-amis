@@ -975,7 +975,9 @@ build {
       # "for file in /var/log/amazon/deadline/*; do echo \"Processing \\$file\"; sudo cat \\$file; done",
       "echo 'Deadline Worker enabling service.'",
       "sudo systemctl enable deadline-worker",
-      "sudo systemctl status deadline-worker",
+      # "echo 'Deadline Worker get status.'",
+      # "sudo systemctl status deadline-worker",
+      "echo 'Deadline Worker get logs.'",
       "sudo ls -l /var/log/amazon/deadline",
     ]
     # valid_exit_codes = [0, 1] # TODO remove this.
