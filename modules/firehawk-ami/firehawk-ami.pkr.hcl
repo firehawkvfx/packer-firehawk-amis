@@ -960,7 +960,7 @@ build {
       "sudo su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip install deadline-cloud-worker-agent\"",
       "sudo su -c \"source /opt/deadline/worker/bin/activate && /opt/deadline/worker/bin/install-deadline-worker --farm-id farm-b628c618484545bb82fda6b09ec99395 --fleet-id fleet-1aaf65dd902e47a6b17aef4351d0ca79 --region ap-southeast-2 --allow-shutdown --user deployuser --group jobgroup -y\"",  # TODO generate these id's during terraform init.
       "sudo su -c \"source /opt/deadline/worker/bin/activate && python3.11 -m pip install deadline-cloud-for-houdini\"", # Add support for houdini
-      "sudo su - deployuser -c \"houdini-openjd --help\"", # verify houdini adaptor is installed.
+      "sudo su - deployuser -c \"source /opt/deadline/worker/bin/activate && houdini-openjd --help\"", # verify houdini adaptor is installed.
     ]
     # valid_exit_codes = [0, 1] # TODO remove this.
     only = [
